@@ -16,7 +16,7 @@ public class Serial implements SerialPortEventListener{
 	SerialPort serialPort;
 	OutputStream outputStream;
 	InputStream inputStream;
-	FrameParser frameParser;
+	//FrameParser frameParser;
 
 	public void startConnection() {
 		serialPort = null;
@@ -69,9 +69,8 @@ public class Serial implements SerialPortEventListener{
 				zbk = f;
 			}
 			String binario = rellenarDatoRecibir(Integer.toBinaryString(zbk));
-			//guardarDato(binario);
-			frameParser.parse(binario);
-
+			//frameParser.parse(binario)
+			System.out.println(binario);
 
 		} catch (SerialPortException e) {
 			// TODO Auto-generated catch block
@@ -87,6 +86,5 @@ public class Serial implements SerialPortEventListener{
 		}
 		return dato;
 	}
-
 
 }
