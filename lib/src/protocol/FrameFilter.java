@@ -1,6 +1,6 @@
 package protocol;
 
-import models.Frame;
+import  models.Frame;
 
 public interface FrameFilter {
 	

@@ -1,7 +1,5 @@
 package models;
 
-import java.util.BitSet;
-
 public class Header {
 
 	String startFrame;
