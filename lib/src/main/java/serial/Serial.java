@@ -3,12 +3,12 @@ package serial;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import dialogs.COMPortChooser;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
-import dialogs.COMPortChooser;
 
 public class Serial implements SerialPortEventListener {
 
