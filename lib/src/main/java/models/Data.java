@@ -11,13 +11,13 @@ public class Data {
 	public String getType() {
 		return type;
 	}
-	public void setType(String startFrame) {
+	public void setType(String type) {
 		this.type = type;
 	}
 	public Status getStatus() {
 		return status;
 	}
-	public void setStatus(String packetType) {
+	public void setStatus(Status status) {
 		this.status = status;
 	}
 

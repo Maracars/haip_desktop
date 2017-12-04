@@ -9,6 +9,18 @@ public class Frame {
 	Data data;
 	String checksum;
 
+	public Frame(Header header, String originId, String destinationId, String length, Data data, String checksum) {
+		this.header = header;
+		this.originId = originId;
+		this.destinationId = destinationId;
+		this.length = length;
+		this.data = data;
+		this.checksum = checksum;
+	}
+
+	public Frame() {
+	}
+
 	public Header getHeader() {
 		return header;
 	}

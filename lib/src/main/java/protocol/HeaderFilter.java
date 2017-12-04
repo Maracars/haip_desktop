@@ -10,7 +10,7 @@ import static protocol.ProtocolProperties.COUNTER;
 import static protocol.ProtocolProperties.PACKET_TYPE;
 import static protocol.ProtocolProperties.START_FRAME;
 
-public class HeaderFilter implements FrameFilter{
+public class HeaderFilter implements FrameFilter {
 
 	List<String> packetTypeValues;
 
@@ -28,16 +28,17 @@ public class HeaderFilter implements FrameFilter{
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
 		Header header = new Header();
+		// TODO Here instead of substrings we should create our own funct. e.g. getFramePart(byteString, START_FRAME)
 		header.setStartFrame(byteString.substring(0, START_FRAME));
-		header.setPacketType(byteString.substring(START_FRAME, START_FRAME+PACKET_TYPE));
-		header.setCounter(byteString.substring(START_FRAME+PACKET_TYPE, START_FRAME+PACKET_TYPE+COUNTER));
+		header.setPacketType(byteString.substring(START_FRAME, START_FRAME + PACKET_TYPE));
+		header.setCounter(byteString.substring(START_FRAME + PACKET_TYPE, START_FRAME + PACKET_TYPE + COUNTER));
 		frame.setHeader(header);
 		return frame;
 	}
 
 	@Override
 	public boolean filter(Frame frame) {
-		if(!packetTypeValues.contains(frame.getHeader().getPacketType()))
+		if (!packetTypeValues.contains(frame.getHeader().getPacketType()))
 			return false;
 		return true;
 	}
