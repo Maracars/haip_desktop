@@ -15,25 +15,15 @@ public class HeaderFilter implements FrameFilter{
 	List<String> packetTypeValues;
 
 	public HeaderFilter() {
-		packetTypeValues = new ArrayList<String>();
+		packetTypeValues = new ArrayList<>();
 		initializePacketTypes();
 	}
-
 
 	private void initializePacketTypes() {
 		packetTypeValues.add("00");
 		packetTypeValues.add("01");
 		packetTypeValues.add("10");
 	}
-
-
-	@Override
-	public boolean filter(Frame frame) {
-		if(!packetTypeValues.contains(frame.getHeader().getPacketType()))
-			return false;
-		return true;
-	}
-
 
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
@@ -43,6 +33,13 @@ public class HeaderFilter implements FrameFilter{
 		header.setCounter(byteString.substring(START_FRAME+PACKET_TYPE, START_FRAME+PACKET_TYPE+COUNTER));
 		frame.setHeader(header);
 		return frame;
+	}
+
+	@Override
+	public boolean filter(Frame frame) {
+		if(!packetTypeValues.contains(frame.getHeader().getPacketType()))
+			return false;
+		return true;
 	}
 
 }

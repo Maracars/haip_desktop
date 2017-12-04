@@ -14,7 +14,7 @@ public class IdentificationFilter implements FrameFilter{
 	
 	public IdentificationFilter() {
 		bytesCounter = 0;
-		filters = new ArrayList<FrameFilter>();
+		filters = new ArrayList<>();
 		initializeFilters();
 	}
 
@@ -30,7 +30,7 @@ public class IdentificationFilter implements FrameFilter{
 		bytesCounter++;
 		return filter;
 	}
-	
+
 	public void initializeFilters() {
 		filters.add(new OriginFilter());
 		filters.add(new DestinationFilter());
@@ -72,6 +72,6 @@ public class IdentificationFilter implements FrameFilter{
 		}
 		
 	}
-	
+
 
 }

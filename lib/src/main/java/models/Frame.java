@@ -45,14 +45,10 @@ public class Frame {
 	public void setChecksum(String checksum) {
 		this.checksum = checksum;
 	}
+
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return header.getStartFrame() + header.getPacketType() + 
-				header.getCounter() + originId + destinationId + length + checksum;
+		return header.toString() + originId + destinationId + length + data.toString() + checksum;
 	}
-	
-	
-	
-	
+
 }
