@@ -15,18 +15,20 @@ public class IdentificationFilter implements FrameFilter{
 	public IdentificationFilter() {
 		bytesCounter = 0;
 		filters = new ArrayList<FrameFilter>();
+		initializeFilters();
 	}
 
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
 		frame = filters.get(bytesCounter).parseRx(frame, byteString);
-		bytesCounter++;
 		return frame;
 	}
 
 	@Override
 	public boolean filter(Frame frame) {
-		return filters.get(bytesCounter).filter(frame);
+		boolean filter = filters.get(bytesCounter).filter(frame);
+		bytesCounter++;
+		return filter;
 	}
 	
 	public void initializeFilters() {

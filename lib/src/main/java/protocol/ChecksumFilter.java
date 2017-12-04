@@ -12,8 +12,7 @@ public class ChecksumFilter implements FrameFilter{
 
 	@Override
 	public boolean filter(Frame frame) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

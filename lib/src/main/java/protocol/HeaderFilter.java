@@ -11,20 +11,19 @@ import static protocol.ProtocolProperties.PACKET_TYPE;
 import static protocol.ProtocolProperties.START_FRAME;
 
 public class HeaderFilter implements FrameFilter{
-	
+
 	List<String> packetTypeValues;
-	
+
 	public HeaderFilter() {
 		packetTypeValues = new ArrayList<String>();
 		initializePacketTypes();
 	}
-	
+
 
 	private void initializePacketTypes() {
-		for (int i = 0; i < PACKET_TYPE; i++) {
-			String packetType = Integer.toBinaryString(i);
-			packetTypeValues.add(packetType);
-		}
+		packetTypeValues.add("00");
+		packetTypeValues.add("01");
+		packetTypeValues.add("10");
 	}
 
 
@@ -39,9 +38,9 @@ public class HeaderFilter implements FrameFilter{
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
 		Header header = new Header();
-		header.setStartFrame(byteString.substring(0, START_FRAME - 1));
-		header.setPacketType(byteString.substring(START_FRAME, PACKET_TYPE - 1));
-		header.setCounter(byteString.substring(PACKET_TYPE, COUNTER - 1));
+		header.setStartFrame(byteString.substring(0, START_FRAME));
+		header.setPacketType(byteString.substring(START_FRAME, START_FRAME+PACKET_TYPE));
+		header.setCounter(byteString.substring(START_FRAME+PACKET_TYPE, START_FRAME+PACKET_TYPE+COUNTER));
 		frame.setHeader(header);
 		return frame;
 	}
