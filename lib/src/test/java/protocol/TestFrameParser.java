@@ -35,10 +35,27 @@ public class TestFrameParser {
 		FrameParser frameParser = new FrameParser(serialTx);
 		frameParser.parseRx(HEADER);
 		frameParser.parseRx("00000001");
-		frameParser.parseRx(DESTINATION_ID);
-		frameParser.parseRx(LENGTH);
-		frameParser.parseRx(CHECKSUM);
 		Frame frame = frameParser.getFrame();
-		assertEquals("Parser error", null, frame);
+		assertEquals("Parser error", null, frame.getDestinationId());
+	}
+	
+	@Test
+	public void checkParseRxOringAndDestinationEqual() {
+		Serial serialTx = new Serial();
+		FrameParser frameParser = new FrameParser(serialTx);
+		frameParser.parseRx(HEADER);
+		frameParser.parseRx("00000000");
+		frameParser.parseRx("00000000");
+		Frame frame = frameParser.getFrame();
+		assertEquals("Parser error", null, frame.getLength());
+	}
+	
+	@Test
+	public void checkParseRxPacketFilterNotExist() {
+		Serial serialTx = new Serial();
+		FrameParser frameParser = new FrameParser(serialTx);
+		frameParser.parseRx("01011000");
+		Frame frame = frameParser.getFrame();
+		assertEquals("Parser error", null, frame.getOriginId());
 	}
 }
