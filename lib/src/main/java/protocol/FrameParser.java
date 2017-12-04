@@ -16,6 +16,7 @@ public class FrameParser{
 	public FrameParser(Serial serialTx) {
 		this.serialTx = serialTx;
 		bytesCounter = 0;
+		frame = new Frame();
 		filters = new ArrayList<FrameFilter>();
 		initializeFilters();
 	}
@@ -27,15 +28,17 @@ public class FrameParser{
 			bytesCounter = 0;
 			frame = new Frame();
 		}
+		
 		//Falta por ver como parseamos el DATA
-		if(frame.getChecksum() != null || !frame.getChecksum().equals("")) {
+		
+		if(frame.getChecksum() != null) {
 			//Terminamos de recibir el paquete.
 			bytesCounter = 0;
-			frame = new Frame();
+			//Llamar al node logic
+			//frame = new Frame();
 		}else{
 			bytesCounter++;
 		}
-		
 		
 	}
 	
@@ -45,12 +48,18 @@ public class FrameParser{
 		filters.add(idFilter);
 		filters.add(idFilter);
 		filters.add(new LengthFilter());
-		filters.add(new DataFilter());
+		//filters.add(new DataFilter());
 		filters.add(new ChecksumFilter());
 	}
 	
 	public void parseTx(Frame frame) {
 		//Parse transmitted frame
 	}
+
+	public Frame getFrame() {
+		return frame;
+	}
+	
+	
 
 }
