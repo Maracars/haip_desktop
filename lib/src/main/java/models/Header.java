@@ -24,7 +24,10 @@ public class Header {
 	public void setCounter(String counter) {
 		this.counter = counter;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return startFrame + packetType + counter;
+	}
 	
 }
