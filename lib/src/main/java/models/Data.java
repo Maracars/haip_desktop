@@ -17,11 +17,6 @@ public class Data {
 	}
 
 
-	public Data (String type, Status status) {
-		this.type = type;
-		this.status = status;
-	}
-
 	public String getType() {
 		return type;
 	}
