@@ -2,22 +2,23 @@ package protocol;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import models.Frame;
 import serial.Serial;
 
 public class FrameParser{	
-	
-	Serial serialTx;
+
+	Serial serial;
 	int bytesCounter;
-	List<FrameFilter> filters;
 	Frame frame;
+	List<FrameFilter> filters;
 	
-	public FrameParser(Serial serialTx) {
-		this.serialTx = serialTx;
+	public FrameParser(Serial serial) {
+		this.serial = serial;
 		bytesCounter = 0;
 		frame = new Frame();
-		filters = new ArrayList<FrameFilter>();
+		filters = new ArrayList<>();
 		initializeFilters();
 	}
 
@@ -53,10 +54,20 @@ public class FrameParser{
 		
 	}
 	
-	public void parseTx(Frame frame) {
-		//Parse transmitted frame
+	public List<String> parseTx(Frame frame) {
+		// Parse transmitted frame
 		String fullString = frame.toString();
+
+		// Divide in bytes (substrings of length = 8)
 		List<String> stringList = splitStringByNumber(fullString, 8);
+
+		// Fill with zeros to get a full byte
+		for (final ListIterator<String> i = stringList.listIterator(); i.hasNext();) {
+			final String element = i.next();
+			i.set(fillWithZeros(element));
+		}
+
+		return stringList;
 	}
 
 	List<String> splitStringByNumber(String string, int subStringLength) {
@@ -67,6 +78,15 @@ public class FrameParser{
 			index += subStringLength;
 		}
 		return strings;
+	}
+
+	public String fillWithZeros(String binaryString) {
+		if (binaryString.length() < 8) {
+			for (int i = binaryString.length(); i < 8; i++) {
+				binaryString = "0" + binaryString;
+			}
+		}
+		return binaryString;
 	}
 
 	public Frame getFrame() {

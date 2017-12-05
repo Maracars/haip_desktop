@@ -7,7 +7,7 @@ import org.junit.Test;
 import models.Frame;
 import serial.Serial;
 
-public class TestFrameParser {
+public class TestFrameParserRx {
 	
 	private final static String PACKET = "0100000000000000111111110000000011111111";
 	private final static String HEADER = "01000000";

@@ -2,8 +2,11 @@ package models;
 
 public class Header {
 
+	// 3 bits
 	String startFrame;
+	// 2 bits
 	String packetType;
+	// 3 bits
 	String counter;
 
 	public Header(String startFrame, String packetType, String counter) {

@@ -1,13 +1,15 @@
-package main;
+package serial;
 
-import serial.Serial;
+import org.junit.Test;
+
 import java.util.Scanner;
 
-public class main {
+public class SerialTest {
 
     Serial serialRx, serialTx;
     Scanner scanner = new Scanner(System.in);
 
+    @Test
     public void testComm() {
         serialRx = new Serial();
         serialTx = new Serial();
@@ -28,7 +30,8 @@ public class main {
         }
     }
 
+    @Test
     public static void main(String[] args) {
-        new main().testComm();
+        new SerialTest().testComm();
     }
 }

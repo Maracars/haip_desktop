@@ -13,7 +13,6 @@ import jssc.SerialPortList;
 public class Serial implements SerialPortEventListener {
 
 	private static final int BAUD_RATE = 9600;
-	private static final int BYTE_LENGTH = 8;
 
 	SerialPort serialPort;
 	OutputStream outputStream;
@@ -72,7 +71,7 @@ public class Serial implements SerialPortEventListener {
 			}
 
 			// Fill with zeros to get a full byte
-			String binaryString = fillWithZeros(Integer.toBinaryString(readDecimal));
+			String binaryString = Integer.toBinaryString(readDecimal);
 
 			// Send data to parser
 			//frameParser.parse(binaryString)
@@ -87,22 +86,10 @@ public class Serial implements SerialPortEventListener {
 	public void writeByte() throws SerialPortException {
 		String binaryString = "101";
 
-		// Fill with zeros to get a full byte
-		binaryString = fillWithZeros(binaryString);
-
 		// Data is converted to decimal
 		int decimalToSend = Integer.parseInt(binaryString, 2);
 
 		// Data sent through serial port
 		serialPort.writeInt(decimalToSend);
-	}
-
-	public String fillWithZeros(String binaryString) {
-		if (binaryString.length() < BYTE_LENGTH) {
-			for (int i = binaryString.length(); i < BYTE_LENGTH; i++) {
-				binaryString = "0" + binaryString;
-			}
-		}
-		return binaryString;
 	}
 }
