@@ -1,17 +1,15 @@
 package serial;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
 
-import ui.dialogs.COMPortChooser;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
+import ui.dialogs.COMPortChooser;
 
 public class Serial implements SerialPortEventListener {
 
@@ -28,19 +26,11 @@ public class Serial implements SerialPortEventListener {
 
 	public Serial() {
 		serialPort = null;
-<<<<<<< HEAD
-		OutputStream outputStream = null;
-		InputStream inputStream = null;
-
-=======
-		outputStream = null;
-		inputStream = null;
 		isConnected = false;
 	}
 
 	// Starts serial connection
 	public void startConnection() throws SerialPortException, Exception {
->>>>>>> 779e7297065ce194dcb6015a318a2fdb5ee55882
 		String[] portNames = SerialPortList.getPortNames();
 		COMPortChooser portChooser;
 

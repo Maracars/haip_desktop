@@ -43,4 +43,10 @@ public class HeaderFilter implements FrameFilter {
 		return true;
 	}
 
+	@Override
+	public List<String> parseTx(Frame frame, List<String> byteList) {
+		byteList.add(frame.getHeader().toString());
+		return byteList;
+	}
+
 }

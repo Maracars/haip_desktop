@@ -2,18 +2,19 @@ package protocol;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
+import java.util.Observable;
 
 import models.Frame;
 import serial.Serial;
 
-public class FrameParser {
+public class FrameParser extends Observable {
 
+	private static final String MAX_LENGTH = "11111111";
 	Serial serial;
 	int bytesCounter;
 	Frame frame;
 	int dataCounter;
-	List<FrameFilter> filters;
+	private static List<FrameFilter> filters;
 
 	public FrameParser(Serial serial) {
 		this.serial = serial;
@@ -53,7 +54,6 @@ public class FrameParser {
 		if (frame.getLength() != null) {
 			if (dataCounter < Integer.parseInt(frame.getLength(), 2)) {
 				dataCounter++;
-				//frame = filters.get(bytesCounter+1).parseRx(frame, byteString);
 			} else {
 				bytesCounter++;
 			}
@@ -62,24 +62,25 @@ public class FrameParser {
 
 	public void resetCommunication() {
 		bytesCounter = 0;
+		dataCounter = 0;
 		frame = new Frame();
 	}
 
 	public void checkPacketFinal() {
 		if (frame.getChecksum() != null) {
-			//Terminamos de recibir el paquete.
-			bytesCounter = 0;
-			dataCounter = 0;
-			//Llamar al node logic
-			//frame = new Frame();
+			notifyNodeLogic();
+			resetCommunication();
 		} else {
-			if (dataCounter > Integer.parseInt(frame.getLength() == null ? "11111111" : frame.getLength(), 2)
+			if (dataCounter > Integer.parseInt(frame.getLength() == null ? MAX_LENGTH : frame.getLength(), 2)
 					|| dataCounter == 0) {
 				bytesCounter++;
-
 			}
-
 		}
+	}
+	
+	public void notifyNodeLogic() {
+		this.setChanged();
+		this.notifyObservers(frame);
 	}
 
 	public void parseData(String byteString) {
@@ -95,42 +96,17 @@ public class FrameParser {
 	}
 
 	public static List<String> parseTx(Frame frame) {
-		// Parse transmitted frame
-		String fullString = frame.toString();
-
-		// Divide in bytes (substrings of length = 8)
-		List<String> stringList = splitStringByNumber(fullString, 8);
-
-		// Fill with zeros to get a full byte
-		for (final ListIterator<String> i = stringList.listIterator(); i.hasNext(); ) {
-			final String element = i.next();
-			i.set(fillWithZeros(element));
+		List<String> byteList = new ArrayList<>();
+		for(FrameFilter filter : filters) {
+			byteList = filter.parseTx(frame, byteList);
 		}
-
-		return stringList;
-	}
-
-	static List<String> splitStringByNumber(String string, int subStringLength) {
-		List<String> strings = new ArrayList<>();
-		int index = 0;
-		while (index < string.length()) {
-			strings.add(string.substring(index, Math.min(index + subStringLength, string.length())));
-			index += subStringLength;
-		}
-		return strings;
-	}
-
-	public static String fillWithZeros(String binaryString) {
-		if (binaryString.length() < 8) {
-			for (int i = binaryString.length(); i < 8; i++) {
-				binaryString = "0" + binaryString;
-			}
-		}
-		return binaryString;
+		return byteList;
 	}
 
 	public Frame getFrame() {
 		return frame;
 	}
+	
+	
 
 }

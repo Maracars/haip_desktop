@@ -1,5 +1,7 @@
 package protocol;
 
+import java.util.List;
+
 import models.Data;
 import models.Frame;
 
@@ -21,6 +23,12 @@ public class DataFilter implements FrameFilter{
 	@Override
 	public boolean filter(Frame frame) {
 		return true;
+	}
+
+	@Override
+	public List<String> parseTx(Frame frame, List<String> byteList) {
+		byteList.add(frame.getData().toString());
+		return byteList;
 	}
 	
 }

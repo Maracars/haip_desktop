@@ -25,6 +25,13 @@ public class IdentificationFilter implements FrameFilter {
 		frame = filters.get(bytesCounter).parseRx(frame, byteString);
 		return frame;
 	}
+	
+	@Override
+	public List<String> parseTx(Frame frame, List<String> byteList) {
+		byteList = filters.get(bytesCounter).parseTx(frame, byteList);
+		bytesCounter++;
+		return byteList;
+	}
 
 	@Override
 	public boolean filter(Frame frame) {
@@ -37,6 +44,8 @@ public class IdentificationFilter implements FrameFilter {
 		filters.add(new OriginFilter());
 		filters.add(new DestinationFilter());
 	}
+	
+
 
 	public class OriginFilter implements FrameFilter {
 
@@ -53,6 +62,12 @@ public class IdentificationFilter implements FrameFilter {
 					!frame.getOriginId().equals(MASTER_ID))
 				return false;
 			return true;
+		}
+
+		@Override
+		public List<String> parseTx(Frame frame, List<String> byteList) {
+			byteList.add(frame.getOriginId().toString());
+			return byteList;
 		}
 
 	}
@@ -73,7 +88,12 @@ public class IdentificationFilter implements FrameFilter {
 			return true;
 		}
 
-	}
+		@Override
+		public List<String> parseTx(Frame frame, List<String> byteList) {
+			byteList.add(frame.getDestinationId());
+			return byteList;
+		}
 
+	}
 
 }
