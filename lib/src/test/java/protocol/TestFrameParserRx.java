@@ -10,6 +10,8 @@ import serial.Serial;
 public class TestFrameParserRx {
 	
 	private final static String PACKET = "0100000000000000111111110000000011111111";
+	private final static String PACKET_WITH_DATA_1_BYTE = "010000000000000011111111000000010010101011111111";
+	private final static String PACKET_WITH_DATA_2_BYTE = "01000000000000001111111100000010001010100010101011111111";
 	private final static String HEADER = "01000000";
 	private final static String ORIGIN_ID = "00000000";
 	private final static String DESTINATION_ID = "11111111";
@@ -57,5 +59,34 @@ public class TestFrameParserRx {
 		frameParser.parseRx("01011000");
 		Frame frame = frameParser.getFrame();
 		assertEquals("Parser error", null, frame.getOriginId());
+	}
+	
+	@Test
+	public void checkParseRxPacketDataParser1Byte() {
+		Serial serialTx = new Serial();
+		FrameParser frameParser = new FrameParser(serialTx);
+		frameParser.parseRx(HEADER);
+		frameParser.parseRx(ORIGIN_ID);
+		frameParser.parseRx(DESTINATION_ID);
+		frameParser.parseRx("00000001");
+		frameParser.parseRx("00101010");
+		frameParser.parseRx(CHECKSUM);
+		Frame frame = frameParser.getFrame();
+		assertEquals("Parser error", PACKET_WITH_DATA_1_BYTE, frame.toString());
+	}
+	
+	@Test
+	public void checkParseRxPacketDataParser2Byte() {
+		Serial serialTx = new Serial();
+		FrameParser frameParser = new FrameParser(serialTx);
+		frameParser.parseRx(HEADER);
+		frameParser.parseRx(ORIGIN_ID);
+		frameParser.parseRx(DESTINATION_ID);
+		frameParser.parseRx("00000010");
+		frameParser.parseRx("00101010");
+		frameParser.parseRx("00101010");
+		frameParser.parseRx(CHECKSUM);
+		Frame frame = frameParser.getFrame();
+		assertEquals("Parser error", PACKET_WITH_DATA_2_BYTE, frame.toString());
 	}
 }

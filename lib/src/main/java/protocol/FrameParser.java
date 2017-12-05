@@ -12,11 +12,13 @@ public class FrameParser{
 	Serial serial;
 	int bytesCounter;
 	Frame frame;
+	int dataCounter;
 	List<FrameFilter> filters;
 	
 	public FrameParser(Serial serial) {
 		this.serial = serial;
 		bytesCounter = 0;
+		dataCounter = 0;
 		frame = new Frame();
 		filters = new ArrayList<>();
 		initializeFilters();
@@ -28,30 +30,68 @@ public class FrameParser{
 		filters.add(idFilter);
 		filters.add(idFilter);
 		filters.add(new LengthFilter());
-		//filters.add(new DataFilter());
+		filters.add(new DataFilter());
 		filters.add(new ChecksumFilter());
 	}
 	
 	public void parseRx(String byteString) {
-		frame = filters.get(bytesCounter).parseRx(frame, byteString);
+		parseData(byteString);
 
-		if(!filters.get(bytesCounter).filter(frame)) {
+		if(!filterData()) {
 			//Si algún filtro falla, que hacemos?
 			bytesCounter = 0;
+			dataCounter = 0;
 			frame = new Frame();
 		}
 		
-		//Falta por ver como parseamos el DATA
+		checkPacketData(byteString);
 		
+		checkPacketFinal();
+	}
+	
+	public void checkPacketData(String byteString) {
+		if(frame.getLength() != null) {
+			if(dataCounter < Integer.parseInt(frame.getLength(), 2)) {
+				dataCounter++;
+				//frame = filters.get(bytesCounter+1).parseRx(frame, byteString);
+			}else{
+				bytesCounter++;
+			}
+		}
+	}
+	
+	public void resetCommunication() {
+		bytesCounter = 0;
+		frame = new Frame();
+	}
+	
+	public void checkPacketFinal() {
 		if(frame.getChecksum() != null) {
 			//Terminamos de recibir el paquete.
 			bytesCounter = 0;
+			dataCounter = 0;
 			//Llamar al node logic
 			//frame = new Frame();
 		}else{
-			bytesCounter++;
+			if(dataCounter > Integer.parseInt(frame.getLength() == null ? "11111111" : frame.getLength(), 2) 
+					|| dataCounter == 0) {
+				bytesCounter++;
+				
+			}
+				
 		}
-		
+	}
+
+	public void parseData(String byteString) {
+		if(dataCounter != 0) {
+			frame = filters.get(bytesCounter+1).parseRx(frame, byteString);
+		}else{
+			frame = filters.get(bytesCounter).parseRx(frame, byteString);
+		}
+	}
+	
+	public boolean filterData() {
+		return filters.get(bytesCounter).filter(frame);
 	}
 	
 	public List<String> parseTx(Frame frame) {

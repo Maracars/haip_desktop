@@ -17,8 +17,9 @@ public class Frame {
 		this.data = data;
 		this.checksum = checksum;
 	}
-
+	
 	public Frame() {
+		
 	}
 
 	public Header getHeader() {
@@ -60,7 +61,11 @@ public class Frame {
 
 	@Override
 	public String toString() {
-		return header.toString() + originId + destinationId + length + data.toString() + checksum;
+		String allData = header.toString() + originId + destinationId + length;
+		if(data != null)
+			allData += data.toString();
+		allData += checksum;
+		return allData;
 	}
 
 }
