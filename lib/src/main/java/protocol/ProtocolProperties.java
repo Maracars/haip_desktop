@@ -9,24 +9,45 @@ public final class ProtocolProperties {
     public static final int DESTINATION_ID = 8;
     public static final int LENGTH = 8;
     public static final int CHECKSUM = 8;
+    
+    public enum DataType {
+        STATUS {
+            @Override
+            public String toString() {
+                return "00";
+            }
+        },
+        REQUEST {
+            @Override
+            public String toString() {
+                return "01";
+            }
+        },
+        RESPONSE {
+            @Override
+            public String toString() {
+                return "10";
+            }
+        }
+    }
 
     public enum PacketType {
         DISCOVERY {
             @Override
             public String toString() {
-                return "";
+                return "00";
             }
         },
         ACK {
             @Override
             public String toString() {
-                return "bronze";
+                return "01";
             }
         },
         DATA {
             @Override
             public String toString() {
-                return "silver";
+                return "10";
             }
         }
     }
