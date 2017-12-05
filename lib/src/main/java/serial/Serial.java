@@ -83,9 +83,7 @@ public class Serial implements SerialPortEventListener {
 		}
 	}
 
-	public void writeByte() throws SerialPortException {
-		String binaryString = "101";
-
+	public void writeByte(String binaryString) throws SerialPortException {
 		// Data is converted to decimal
 		int decimalToSend = Integer.parseInt(binaryString, 2);
 
