@@ -1,4 +1,4 @@
-package dialogs;
+package ui.dialogs;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

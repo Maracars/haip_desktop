@@ -3,7 +3,7 @@ package serial;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import dialogs.COMPortChooser;
+import ui.dialogs.COMPortChooser;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
@@ -19,11 +19,17 @@ public class Serial implements SerialPortEventListener {
 	InputStream inputStream;
 	//FrameParser frameParser;
 
-	// Starts serial connection
-	public void startConnection() throws SerialPortException, Exception {
+	boolean isConnected;
+
+	public Serial() {
 		serialPort = null;
 		outputStream = null;
 		inputStream = null;
+		isConnected = false;
+	}
+
+	// Starts serial connection
+	public void startConnection() throws SerialPortException, Exception {
 		String[] portNames = SerialPortList.getPortNames();
 		COMPortChooser portChooser;
 
@@ -51,12 +57,21 @@ public class Serial implements SerialPortEventListener {
 			serialPort.openPort();
 			serialPort.addEventListener(this);
 			serialPort.setParams(BAUD_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+
+			isConnected = true;
 		}
 	}
 
 	// Closes serial connection if open
 	public void closeConnection() throws SerialPortException {
-		if (serialPort != null) serialPort.closePort();
+		if (serialPort != null) {
+			serialPort.closePort();
+			isConnected = false;
+		}
+	}
+
+	public boolean isConnected() {
+		return isConnected;
 	}
 
 	public void serialEvent(SerialPortEvent arg0) {
