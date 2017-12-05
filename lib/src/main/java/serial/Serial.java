@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
 
-import dialogs.COMPortChooser;
+import ui.dialogs.COMPortChooser;
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
@@ -24,12 +24,23 @@ public class Serial implements SerialPortEventListener {
 
 	//FrameParser frameParser;
 
-	// Starts serial connection
-	public void startConnection() throws SerialPortException, Exception {
+	boolean isConnected;
+
+	public Serial() {
 		serialPort = null;
+<<<<<<< HEAD
 		OutputStream outputStream = null;
 		InputStream inputStream = null;
 
+=======
+		outputStream = null;
+		inputStream = null;
+		isConnected = false;
+	}
+
+	// Starts serial connection
+	public void startConnection() throws SerialPortException, Exception {
+>>>>>>> 779e7297065ce194dcb6015a318a2fdb5ee55882
 		String[] portNames = SerialPortList.getPortNames();
 		COMPortChooser portChooser;
 
@@ -56,12 +67,21 @@ public class Serial implements SerialPortEventListener {
 			serialPort.openPort();
 			serialPort.addEventListener(this);
 			serialPort.setParams(BAUD_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+
+			isConnected = true;
 		}
 	}
 
 	// Closes serial connection if open
 	public void closeConnection() throws SerialPortException {
-		if (serialPort != null) serialPort.closePort();
+		if (serialPort != null) {
+			serialPort.closePort();
+			isConnected = false;
+		}
+	}
+
+	public boolean isConnected() {
+		return isConnected;
 	}
 
 	public void serialEvent(SerialPortEvent arg0) {
