@@ -2,8 +2,8 @@ package models;
 
 public class Status {
 
-	String position;
-	String action;
+	private String position;
+	private String action;
 
 	public Status(String position, String action) {
 		this.position = position;

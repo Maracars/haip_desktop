@@ -9,13 +9,10 @@ public class CRC8Test {
 
 	@Test
 	public void checkChecksum() {
-		CRC8 crc = new CRC8();
-		crc.reset();
-		crc.update("test".getBytes());
-		assertEquals(181, crc.getValue());
-		crc.reset();
-		crc.update("hello world".getBytes());
-		assertEquals(59, crc.getValue());
+
+		assertEquals("181", CRC8.toCRC8("test"));
+
+		assertEquals("59", CRC8.toCRC8("hello world"));
 
 	}
 

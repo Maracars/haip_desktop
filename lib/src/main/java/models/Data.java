@@ -5,8 +5,17 @@ public class Data {
 	//Request = 00
 	//Status = 01
 	//Response = 10
-	String type;
-	Status status;
+	private String type;
+	private Status status;
+
+	public Data() {
+	}
+
+	public Data(String type, Status status) {
+		this.type = type;
+		this.status = status;
+	}
+
 
 	public String getType() {
 		return type;

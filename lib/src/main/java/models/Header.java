@@ -2,9 +2,9 @@ package models;
 
 public class Header {
 
-	String startFrame;
-	String packetType;
-	String counter;
+	private String startFrame;
+	private String packetType;
+	private String counter;
 
 	public Header(String startFrame, String packetType, String counter) {
 		this.startFrame = startFrame;
