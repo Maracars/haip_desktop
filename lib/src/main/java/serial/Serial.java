@@ -2,6 +2,9 @@ package serial;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observer;
 
 import dialogs.COMPortChooser;
 import jssc.SerialPort;
@@ -14,16 +17,19 @@ public class Serial implements SerialPortEventListener {
 
 	private static final int BAUD_RATE = 9600;
 
-	SerialPort serialPort;
-	OutputStream outputStream;
-	InputStream inputStream;
+	private static SerialPort serialPort;
+
+
+	private ArrayList<Observer> observers = new ArrayList<>();
+
 	//FrameParser frameParser;
 
 	// Starts serial connection
 	public void startConnection() throws SerialPortException, Exception {
 		serialPort = null;
-		outputStream = null;
-		inputStream = null;
+		OutputStream outputStream = null;
+		InputStream inputStream = null;
+
 		String[] portNames = SerialPortList.getPortNames();
 		COMPortChooser portChooser;
 
@@ -42,8 +48,7 @@ public class Serial implements SerialPortEventListener {
 				portChooser = new COMPortChooser(null, portNames);
 				if (portChooser.getSelectedIndex() == -1) {
 					throw new Exception("One port must be chosen");
-				}
-				else {
+				} else {
 					serialPort = new SerialPort(portNames[portChooser.getSelectedIndex()]);
 				}
 			}
@@ -77,17 +82,33 @@ public class Serial implements SerialPortEventListener {
 			//frameParser.parse(binaryString)
 
 			System.out.println(binaryString);
-		}
-		catch (SerialPortException e) {
+		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void writeByte(String binaryString) throws SerialPortException {
+	public static void writeBytes(List<String> byteList) throws SerialPortException {
+		for (String strByte : byteList) {
+			writeByte(strByte);
+		}
+
+	}
+
+	public static void writeByte(String binaryString) throws SerialPortException {
 		// Data is converted to decimal
 		int decimalToSend = Integer.parseInt(binaryString, 2);
 
 		// Data sent through serial port
 		serialPort.writeInt(decimalToSend);
+	}
+
+
+	public ArrayList<Observer> getObservers() {
+		return observers;
+	}
+
+	public void addObserver(Observer observer) {
+		this.observers.add(observer);
+
 	}
 }

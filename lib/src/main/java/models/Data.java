@@ -10,7 +10,7 @@ public class Data {
 	//Response = 10
 	private String type;
 	private Status status;
-	List<String> data; //Hau da data dana gordetzeko oingoz, gero egitura begiratu bikoda
+	private List<String> data; //Hau da data dana gordetzeko oingoz, gero egitura begiratu bikoda
 
 	public Data() {
 		data = new ArrayList<String>();
@@ -20,16 +20,19 @@ public class Data {
 		this.type = type;
 		this.status = status;
 	}
-	
+
 	public String getType() {
 		return type;
 	}
+
 	public void setType(String type) {
 		this.type = type;
 	}
+
 	public Status getStatus() {
 		return status;
 	}
+
 	public void setStatus(Status status) {
 		this.status = status;
 	}
@@ -37,8 +40,8 @@ public class Data {
 	@Override
 	public String toString() {
 		String allData = "";
-		if(data != null)
-			for(String d : data) {
+		if (data != null)
+			for (String d : data) {
 				allData += d;
 			}
 		return allData;
@@ -51,6 +54,6 @@ public class Data {
 	public void setData(List<String> data) {
 		this.data = data;
 	}
-	
-	
+
+
 }

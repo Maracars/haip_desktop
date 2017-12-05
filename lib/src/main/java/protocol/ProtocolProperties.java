@@ -9,6 +9,8 @@ public final class ProtocolProperties {
 	public static final int DESTINATION_ID = 8;
 	public static final int LENGTH = 8;
 	public static final int CHECKSUM = 8;
+	// TODO This has to be defined
+	public static final long TIMEOUT = 10000000;
 
 	public enum DataType {
 		STATUS {
@@ -28,7 +30,14 @@ public final class ProtocolProperties {
 			public String toString() {
 				return "10";
 			}
+		},
+		NULL {
+			@Override
+			public String toString() {
+				return "";
+			}
 		}
+
 	}
 
 	public enum PacketType {
@@ -48,6 +57,12 @@ public final class ProtocolProperties {
 			@Override
 			public String toString() {
 				return "10";
+			}
+		},
+		TOKEN {
+			@Override
+			public String toString() {
+				return "11";
 			}
 		}
 	}

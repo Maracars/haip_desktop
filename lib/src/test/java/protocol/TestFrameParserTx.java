@@ -22,8 +22,7 @@ public class TestFrameParserTx {
                 "00000000", "11111111", "00000001",
                 new Data("01", new Status("110", "011")), "11111111");
         serial = new Serial();
-        frameParser = new FrameParser(serial);
-        stringList = frameParser.parseTx(frame);
+        stringList = FrameParser.parseTx(frame);
         System.out.println(stringList);
     }
 
