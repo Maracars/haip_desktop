@@ -5,19 +5,18 @@ import java.util.List;
 import java.util.Observable;
 
 import models.Frame;
-import serial.Serial;
 
-public class FrameParser extends Observable {
+public class FrameParser {
 
 	private static final String MAX_LENGTH = "11111111";
-	Serial serial;
-	int bytesCounter;
-	Frame frame;
-	int dataCounter;
+	static Frame frame;
 	private static List<FrameFilter> filters;
 
-	public FrameParser(Serial serial) {
-		this.serial = serial;
+	// TODO These should be parameters...
+	static int bytesCounter;
+	static int dataCounter;
+
+	static {
 		bytesCounter = 0;
 		dataCounter = 0;
 		frame = new Frame();
@@ -25,7 +24,7 @@ public class FrameParser extends Observable {
 		initializeFilters();
 	}
 
-	public void initializeFilters() {
+	private static void initializeFilters() {
 		filters.add(new HeaderFilter());
 		IdentificationFilter idFilter = new IdentificationFilter();
 		filters.add(idFilter);
@@ -35,7 +34,7 @@ public class FrameParser extends Observable {
 		filters.add(new ChecksumFilter());
 	}
 
-	public void parseRx(String byteString) {
+	public static void parseRx(String byteString) {
 		parseData(byteString);
 
 		if (!filterData()) {
@@ -46,11 +45,10 @@ public class FrameParser extends Observable {
 		}
 
 		checkPacketData(byteString);
-
 		checkPacketFinal();
 	}
 
-	public void checkPacketData(String byteString) {
+	private static void checkPacketData(String byteString) {
 		if (frame.getLength() != null) {
 			if (dataCounter < Integer.parseInt(frame.getLength(), 2)) {
 				dataCounter++;
@@ -60,15 +58,15 @@ public class FrameParser extends Observable {
 		}
 	}
 
-	public void resetCommunication() {
+	private static void resetCommunication() {
 		bytesCounter = 0;
 		dataCounter = 0;
 		frame = new Frame();
 	}
 
-	public void checkPacketFinal() {
+	private static void checkPacketFinal() {
 		if (frame.getChecksum() != null) {
-			notifyNodeLogic();
+			// notifyNodeLogic();
 			resetCommunication();
 		} else {
 			if (dataCounter > Integer.parseInt(frame.getLength() == null ? MAX_LENGTH : frame.getLength(), 2)
@@ -77,13 +75,9 @@ public class FrameParser extends Observable {
 			}
 		}
 	}
-	
-	public void notifyNodeLogic() {
-		this.setChanged();
-		this.notifyObservers(frame);
-	}
 
-	public void parseData(String byteString) {
+
+	private static void parseData(String byteString) {
 		if (dataCounter != 0) {
 			frame = filters.get(bytesCounter + 1).parseRx(frame, byteString);
 		} else {
@@ -91,22 +85,21 @@ public class FrameParser extends Observable {
 		}
 	}
 
-	public boolean filterData() {
+	private static boolean filterData() {
 		return filters.get(bytesCounter).filter(frame);
 	}
 
 	public static List<String> parseTx(Frame frame) {
 		List<String> byteList = new ArrayList<>();
-		for(FrameFilter filter : filters) {
+		for (FrameFilter filter : filters) {
 			byteList = filter.parseTx(frame, byteList);
 		}
 		return byteList;
 	}
 
-	public Frame getFrame() {
+	public static Frame getFrame() {
 		return frame;
 	}
-	
-	
+
 
 }

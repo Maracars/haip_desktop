@@ -9,6 +9,7 @@ import models.Header;
 import models.Status;
 import serial.Serial;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -21,6 +22,11 @@ public class NodeLogic implements Observer {
 
 	private Boolean received;
 	private String packet;
+	private ArrayList<String> lista;
+
+	public NodeLogic() {
+		lista = new ArrayList<>();
+	}
 
 	public void controllerIokse(Serial serial, String dest) {
 
@@ -52,8 +58,9 @@ public class NodeLogic implements Observer {
 	public void sendParsedFrame(Frame frame) {
 		List<String> listBytes = FrameParser.parseTx(frame);
 		try {
-			Serial.writeBytes(listBytes);
-		} catch (SerialPortException e) {
+			System.out.println(listBytes);
+			//Serial.writeBytes(listBytes);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -99,9 +106,9 @@ public class NodeLogic implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		System.out.println("Update called with Arguments: " + arg);
-		received = true;
-		packet = "" + arg;
+		lista.add(arg.toString());
+		System.out.println(lista);
+		Frame fr = createToken(ProtocolProperties.MASTER_ID, arg.toString());
 
 	}
 }
