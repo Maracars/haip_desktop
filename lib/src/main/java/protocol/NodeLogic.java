@@ -2,7 +2,6 @@ package protocol;
 
 import helpers.CRC8;
 import helpers.Helpers;
-import jssc.SerialPortException;
 import models.Data;
 import models.Frame;
 import models.Header;
@@ -17,12 +16,13 @@ import static protocol.ProtocolProperties.DataType;
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
 public class NodeLogic implements Observer, Runnable {
 
-	private Boolean received;
-	private String packet;
+	private Serial serial;
 	private List receivedList;
 	private ArrayList<Integer> connectedBoats;
 
-	public NodeLogic() {
+	@SuppressWarnings("unchecked")
+	public NodeLogic(Serial serial) {
+		this.serial = serial;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new ArrayList<>();
 		connectedBoats.add(1);
@@ -59,7 +59,7 @@ public class NodeLogic implements Observer, Runnable {
 		List<String> listBytes = FrameParser.parseTx(frame);
 		try {
 
-			Serial.writeStrings(listBytes);
+			serial.writeStrings(listBytes);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

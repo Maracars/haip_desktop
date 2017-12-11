@@ -13,9 +13,7 @@ import ui.dialogs.COMPortChooser;
 
 public class Serial extends Observable implements SerialPortEventListener {
 
-	private static final int BAUD_RATE = 9600;
-
-	private static SerialPort serialPort;
+	private SerialPort serialPort;
 	private String packet;
 	private boolean isConnected;
 
@@ -23,10 +21,15 @@ public class Serial extends Observable implements SerialPortEventListener {
 		packet = "";
 		serialPort = null;
 		isConnected = false;
+		try {
+			startConnection();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	// Starts serial connection
-	public void startConnection() throws SerialPortException, Exception {
+	protected void startConnection() throws Exception {
 		String[] portNames = SerialPortList.getPortNames();
 
 
@@ -52,7 +55,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 			//Open the port
 			serialPort.openPort();
 			serialPort.addEventListener(this);
-			serialPort.setParams(BAUD_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+			serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 
 			isConnected = true;
 		}
@@ -72,30 +75,32 @@ public class Serial extends Observable implements SerialPortEventListener {
 
 	public void serialEvent(SerialPortEvent arg0) {
 		try {
-			// Get int array from serial port
 			String readString = serialPort.readString();
+			System.out.println(readString);
 			packet += readString;
 			int result = FrameParser.parseRx(readString);
 			if (result == FrameParser.BAD_PACKET) {
 				packet = "";
 			} else if (result == FrameParser.FIN_PACKET) {
 				// TODO Parse packet to frame
-				notifyPacket(packet);
 			}
+			notifyPacket(packet);
+
 		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void writeStrings(List<String> stringList) throws SerialPortException {
+	public void writeStrings(List<String> stringList) throws SerialPortException {
 		for (String strByte : stringList) {
 			writeString(strByte);
 		}
 
 	}
 
-	public static void writeString(String string) throws SerialPortException {
+	public void writeString(String string) throws SerialPortException {
 		serialPort.writeString(string);
+		notifyPacket(string);
 	}
 
 	private void notifyPacket(String value) {

@@ -1,32 +1,26 @@
 package protocol;
 
+import jssc.SerialPortException;
+import serial.Serial;
+
 import java.util.Observable;
 import java.util.Scanner;
 
 
 public class ProbaObserver extends Observable {
-	private String watchedValue;
 
-	public static void main(String[] args) {
-		ProbaObserver watched = new ProbaObserver();
-		NodeLogic watcher = new NodeLogic();
+	public static void main(String[] args) throws SerialPortException {
+		Serial serial = new Serial();
+		NodeLogic watcher = new NodeLogic(serial);
 		Thread th = new Thread(watcher);
-		watched.addObserver(watcher);
+		serial.addObserver(watcher);
 		th.start();
 		Scanner scanner = new Scanner(System.in);
 		while (true) {
 			String line = scanner.nextLine();
-			watched.setValue(line);
+			serial.writeString(line);
 		}
 
-	}
-
-	private void setValue(String value) {
-		if (!value.equals(watchedValue)) {
-			watchedValue = value;
-			setChanged();
-			notifyObservers(value);
-		}
 	}
 
 

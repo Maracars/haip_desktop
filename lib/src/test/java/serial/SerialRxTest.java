@@ -6,28 +6,23 @@ import java.util.Scanner;
 
 public class SerialRxTest {
 
-    Serial serialRx;
-    Scanner scanner;
+	Serial serial;
+	Scanner scanner;
 
-    @Test
-    public void testComm() {
-        serialRx = new Serial();
-        scanner = new Scanner(System.in);
+	@Test
+	public void testComm() {
+		serial = new Serial();
+		scanner = new Scanner(System.in);
 
-        try {
-            serialRx.startConnection();
-            System.out.println("Rx is connected: " + serialRx.isConnected());
-            scanner.nextLine();
+		try {
+			System.out.println("Rx is connected: " + serial.isConnected());
 
-            serialRx.closeConnection();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+			scanner.nextLine();
 
-    @Test
-    public static void main(String[] args) {
-        new SerialRxTest().testComm();
-    }
+			serial.closeConnection();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }

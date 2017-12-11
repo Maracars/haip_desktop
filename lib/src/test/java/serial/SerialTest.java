@@ -6,32 +6,20 @@ import java.util.Scanner;
 
 public class SerialTest {
 
-	Serial serialRx, serialTx;
-	Scanner scanner = new Scanner(System.in);
+	private Serial serial;
 
 
 	@Test
 	public void testComm() {
-		serialRx = new Serial();
-		serialTx = new Serial();
-
+		serial = new Serial();
 		try {
-			serialRx.startConnection();
-			serialTx.startConnection();
-			scanner.nextLine();
-
-			serialTx.writeByte("101");
-			scanner.nextLine();
-
-			serialRx.closeConnection();
-			serialTx.closeConnection();
+			serial.writeString("10000001111");
+			System.out.println("Sent");
+			serial.closeConnection();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	@Test
-	public static void main(String[] args) {
-		new SerialTest().testComm();
-	}
+
 }
