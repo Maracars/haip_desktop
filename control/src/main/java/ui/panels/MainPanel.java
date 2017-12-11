@@ -60,16 +60,16 @@ public class MainPanel {
 	boolean systemInitialized;
 
 	public MainPanel() {
-		this.serial = new Serial();
-		this.systemInitialized = false;
-		this.initActions();
-		this.initTable();
-
 		window = new JFrame("Haip Ain't an Infor Project");
 		window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
 		window.setLocation(0, 0);
 		window.setSize(1300, 700);
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        this.serial = new Serial();
+        this.systemInitialized = false;
+        this.initActions();
+        this.initTable();
 
 		window.setJMenuBar(this.createMenuBar());
 		window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -209,13 +209,14 @@ public class MainPanel {
 		};
 	}
 
-	public void initTable() {
+	private void initTable() {
 		tableDataList = new ArrayList<>();
 		cellRenderer = new CellRenderer();
 		columnModel = new ColumnModel(cellRenderer);
 		tableModel = new TableModel(columnModel, tableDataList);
 		table = new JTable(tableModel, columnModel);
-		table.setRowHeight(30);
+		table.setRowHeight(this.window.getHeight() / 30);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 	}
 
 	public void updateTable() {

@@ -7,16 +7,16 @@ public class TableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 	
 	List<TableData> tableData;
-	ColumnModel columnas;
+	ColumnModel columnModel;
 	
-	public TableModel(ColumnModel columnas, List<TableData> tableData) {
+	public TableModel(ColumnModel columnModel, List<TableData> tableData) {
 		this.tableData = tableData;
-		this.columnas = columnas;
+		this.columnModel = columnModel;
 		this.fireTableDataChanged();
 	}
 	
-	public void remove(int indice) {
-		tableData.remove(indice);
+	public void remove(int index) {
+		tableData.remove(index);
 		this.fireTableDataChanged();
 	}
 	
@@ -27,7 +27,7 @@ public class TableModel extends AbstractTableModel {
 
 	@Override
 	public int getColumnCount() {
-		return columnas.getColumnCount();
+		return columnModel.getColumnCount();
 	}
 
 	@Override

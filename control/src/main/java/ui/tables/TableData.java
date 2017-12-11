@@ -7,23 +7,33 @@ public class TableData {
 	int desiredAction;
 	boolean allowed;
 	
-	public TableData(int shipID, int position) {
+	public TableData(int shipID, int position, int desiredAction, boolean allowed) {
 		this.shipID = shipID;
 		this.position = position;
-	}
-
-	public Class<?> getFieldClass(int index) {
-		switch (index) {
-			case 0: return Integer.class;
-			case 1: return Boolean.class;
-			default: return String.class;
-		}
+		this.desiredAction = desiredAction;
+		this.allowed = allowed;
 	}
 
 	public Object getFieldAt(int column) {
 		switch (column) {
 			case 0: return shipID;
-			case 1: return position;
+			case 1: {
+				switch (position) {
+					case 0: return "Docking Bay";
+					case 1: return "Transit Zone";
+					case 2: return "Outside";
+					default: return "Error: Illegal Position";
+				}
+			}
+			case 2: {
+				switch (desiredAction) {
+					case 0: return "Get Inside";
+					case 1: return "Get Outside";
+					case 2: return "Stay Idle";
+					default: return "Error: Illegal Action";
+				}
+			}
+			case 3: return allowed;
 			default: return null;
 		}
 	}

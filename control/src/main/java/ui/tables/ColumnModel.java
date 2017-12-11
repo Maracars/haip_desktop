@@ -10,8 +10,10 @@ public class ColumnModel extends DefaultTableColumnModel {
 	
 	public ColumnModel(CellRenderer cellRenderer) {
 		this.cellRenderer = cellRenderer;
-		this.addColumn(createColumn("Dato", 0, 100));
-		this.addColumn(createColumn("Valor", 1, 100));
+		this.addColumn(createColumn("Ship ID", 0, 100));
+		this.addColumn(createColumn("Position", 1, 100));
+		this.addColumn(createColumn("Desired Action", 2, 100));
+		this.addColumn(createColumn("Action allowed", 3, 100));
 	}
 	
 	private TableColumn createColumn(String text, int index, int width) {
