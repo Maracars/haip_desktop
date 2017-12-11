@@ -32,7 +32,7 @@ public class NodeLogic implements Observer, Runnable {
 
 		// TODO This is going to be called for each boat, here we should have a list of connected boats, those that are iddle...
 		Frame fr = createToken(ProtocolProperties.MASTER_ID, dest);
-		//sendParsedFrame(fr);
+		sendParsedFrame(fr);
 
 		long count = 0;
 		while (count++ < ProtocolProperties.TIMEOUT && receivedList.isEmpty()) {
@@ -40,17 +40,18 @@ public class NodeLogic implements Observer, Runnable {
 		if (!receivedList.isEmpty()) {
 			//TODO Here we must send the response to the request.
 			System.out.println("Ship number " + dest + " sent " + receivedList);
+			checkRequest(receivedList);
 			receivedList.clear();
 		} else {
 			System.out.println("timeout");
 		}
-		checkRequest();
 
 
 	}
 
+	// TODO Check status and give response to the boat
+	public void checkRequest(List receivedList) {
 
-	public void checkRequest() {
 	}
 
 
@@ -58,7 +59,7 @@ public class NodeLogic implements Observer, Runnable {
 		List<String> listBytes = FrameParser.parseTx(frame);
 		try {
 
-			Serial.writeBytes(listBytes);
+			Serial.writeStrings(listBytes);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -106,7 +107,6 @@ public class NodeLogic implements Observer, Runnable {
 	@Override
 	public void update(Observable o, Object arg) {
 		receivedList.add(arg.toString());
-		System.out.println("Aileau da");
 		Frame fr = createToken(ProtocolProperties.MASTER_ID, arg.toString());
 
 	}

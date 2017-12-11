@@ -1,32 +1,28 @@
 package serial;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Observer;
+import java.util.Observable;
 
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
+import protocol.FrameParser;
 import ui.dialogs.COMPortChooser;
 
-public class Serial implements SerialPortEventListener {
+public class Serial extends Observable implements SerialPortEventListener {
 
 	private static final int BAUD_RATE = 9600;
 
 	private static SerialPort serialPort;
-
-	private List<Observer> observers;
-
-	//FrameParser frameParser;
-
-	boolean isConnected;
+	private String packet;
+	private boolean isConnected;
 
 	public Serial() {
+		packet = "";
 		serialPort = null;
 		isConnected = false;
-		observers = new ArrayList<>();
 	}
 
 	// Starts serial connection
@@ -77,48 +73,36 @@ public class Serial implements SerialPortEventListener {
 	public void serialEvent(SerialPortEvent arg0) {
 		try {
 			// Get int array from serial port
-			int[] readIntArray = serialPort.readIntArray();
-
-			// Get decimal int
-			int readDecimal = 0;
-			for (int n : readIntArray) {
-				readDecimal = n;
+			String readString = serialPort.readString();
+			packet += readString;
+			int result = FrameParser.parseRx(readString);
+			if (result == FrameParser.BAD_PACKET) {
+				packet = "";
+			} else if (result == FrameParser.FIN_PACKET) {
+				// TODO Parse packet to frame
+				notifyPacket(packet);
 			}
-
-			// Fill with zeros to get a full byte
-			String binaryString = Integer.toBinaryString(readDecimal);
-
-			// Send data to parser
-			//frameParser.parse(binaryString)
-
-			System.out.println(binaryString);
-		}
-		catch (SerialPortException e) {
+		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void writeBytes(List<String> byteList) throws SerialPortException {
-		for (String strByte : byteList) {
-			writeByte(strByte);
+	public static void writeStrings(List<String> stringList) throws SerialPortException {
+		for (String strByte : stringList) {
+			writeString(strByte);
 		}
 
 	}
 
-	public static void writeByte(String binaryString) throws SerialPortException {
-		// Data is converted to decimal
-		int decimalToSend = Integer.parseInt(binaryString, 2);
-
-		// Data sent through serial port
-		serialPort.writeInt(decimalToSend);
+	public static void writeString(String string) throws SerialPortException {
+		serialPort.writeString(string);
 	}
 
-	public List<Observer> getObservers() {
-		return observers;
-	}
-
-	public void addObserver(Observer observer) {
-		this.observers.add(observer);
+	private void notifyPacket(String value) {
+		setChanged();
+		notifyObservers(value);
+		packet = "";
 
 	}
+
 }

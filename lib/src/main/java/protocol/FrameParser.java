@@ -8,9 +8,9 @@ import models.Frame;
 public class FrameParser {
 
 	private static final String MAX_LENGTH = "11111111";
-	private static final int FIN_PACKET = 1;
-	private static final int BAD_PACKET = -1;
-	private static final int UNFIN_PACKET = 0;
+	public static final int FIN_PACKET = 1;
+	public static final int BAD_PACKET = -1;
+	public static final int UNFIN_PACKET = 0;
 	public static Frame frame;
 	private static List<FrameFilter> filters;
 
