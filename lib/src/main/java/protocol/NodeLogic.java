@@ -114,10 +114,12 @@ public class NodeLogic implements Observer, Runnable {
 	@Override
 	public void run() {
 		while (true) {
+			// This loop is repeated x times before calling the discovery function.
 			for (Integer boat : connectedBoats) {
 
 				controllerIokse(boat.toString());
 			}
+
 		}
 	}
 }

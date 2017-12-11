@@ -21,7 +21,8 @@ public class COMPortChooser extends JDialog implements ActionListener {
 		this.setLocation(340, 100);
 		this.setContentPane(createWindowPanel());
 		// bOk is clicked when enter
-		this.window.getRootPane().setDefaultButton(bOk);
+
+		this.getRootPane().setDefaultButton(bOk);
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		this.setVisible(true);
 	}

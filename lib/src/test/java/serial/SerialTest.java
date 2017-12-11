@@ -1,5 +1,6 @@
 package serial;
 
+import jssc.SerialPortException;
 import org.junit.Test;
 
 import java.util.Scanner;
@@ -7,20 +8,32 @@ import java.util.Scanner;
 public class SerialTest {
 
 	private Serial serial;
+	Scanner scanner = new Scanner(System.in);
 
-
-	@Test
 	public void testComm() {
 		serial = new Serial();
-		try {
-			serial.writeString("10000001111");
-			System.out.println("Sent");
-			serial.closeConnection();
+		while (true) {
 
-		} catch (Exception e) {
-			e.printStackTrace();
+			try {
+				System.out.println("Write whatever: ");
+				String string = scanner.nextLine();
+				serial.writeString(string);
+
+			} catch (Exception e) {
+				try {
+					serial.closeConnection();
+				} catch (SerialPortException e1) {
+					e1.printStackTrace();
+				}
+			}
+
+
 		}
 	}
 
+	public static void main(String[] args) {
+		SerialTest serialTest = new SerialTest();
+		serialTest.testComm();
+	}
 
 }

@@ -29,7 +29,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 	}
 
 	// Starts serial connection
-	protected void startConnection() throws Exception {
+	public void startConnection() throws Exception {
 		String[] portNames = SerialPortList.getPortNames();
 
 
@@ -100,7 +100,6 @@ public class Serial extends Observable implements SerialPortEventListener {
 
 	public void writeString(String string) throws SerialPortException {
 		serialPort.writeString(string);
-		notifyPacket(string);
 	}
 
 	private void notifyPacket(String value) {
