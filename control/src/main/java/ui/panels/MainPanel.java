@@ -1,16 +1,9 @@
 package ui.panels;
 
-import jssc.SerialPortException;
-import serial.Serial;
-import ui.log.LogModel;
-import ui.tables.CellRenderer;
-import ui.tables.ColumnModel;
-import ui.tables.TableData;
-import ui.tables.TableModel;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -18,6 +11,31 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
+
+import jssc.SerialPortException;
+import serial.Serial;
+import ui.log.LogModel;
+import ui.tables.CellRenderer;
+import ui.tables.ColumnModel;
+import ui.tables.TableData;
+import ui.tables.TableModel;
 
 public class MainPanel {
 	// Window
