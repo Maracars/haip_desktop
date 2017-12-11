@@ -1,23 +1,20 @@
 package protocol;
 
-import models.Frame;
-
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.Frame;
+
 public class FrameParser {
 
-	private static final String MAX_LENGTH = "11111111";
-	static Frame frame;
+	public static final int FIN_PACKET = 1;
+	public static final int BAD_PACKET = -1;
+	public static final int UNFIN_PACKET = 0;
+	public static Frame frame;
 	private static List<FrameFilter> filters;
 
-	// TODO These should be parameters...
-	static int bytesCounter;
-	static int dataCounter;
-
 	static {
-		bytesCounter = 0;
-		dataCounter = 0;
 		frame = new Frame();
 		filters = new ArrayList<>();
 		initializeFilters();
@@ -25,67 +22,59 @@ public class FrameParser {
 
 	private static void initializeFilters() {
 		filters.add(new HeaderFilter());
-		IdentificationFilter idFilter = new IdentificationFilter();
-		filters.add(idFilter);
-		filters.add(idFilter);
+		filters.add(new OriginFilter());
+		filters.add(new DestinationFilter());
 		filters.add(new LengthFilter());
 		filters.add(new DataFilter());
 		filters.add(new ChecksumFilter());
 	}
 
-	public static void parseRx(String byteString) {
+	public static int parseRx(String byteString) {
+
+		if(!checkPacketSize(byteString))
+			return UNFIN_PACKET;
+
 		parseData(byteString);
 
 		if (!filterData()) {
-			//Si algún filtro falla, que hacemos?
-			bytesCounter = 0;
-			dataCounter = 0;
-			frame = new Frame();
+			resetCommunication();
+			return BAD_PACKET;
 		}
-
-		checkPacketData(byteString);
-		checkPacketFinal();
+		
+		return checkPacketFinal();
 	}
 
-	private static void checkPacketData(String byteString) {
-		if (frame.getLength() != null) {
-			if (dataCounter < Integer.parseInt(frame.getLength(), 2)) {
-				dataCounter++;
-			} else {
-				bytesCounter++;
-			}
-		}
+	private static boolean checkPacketSize(String byteString) {
+		if(new BigInteger(byteString, 2).toByteArray().length >= 5) 
+			return true;
+		return false;	
 	}
 
-	private static void resetCommunication() {
-		bytesCounter = 0;
-		dataCounter = 0;
+	public static void resetCommunication() {
 		frame = new Frame();
 	}
 
-	private static void checkPacketFinal() {
+	private static int checkPacketFinal() {
 		if (frame.getChecksum() != null) {
-			// notifyNodeLogic();
-			resetCommunication();
-		} else {
-			if (dataCounter > Integer.parseInt(frame.getLength() == null ? MAX_LENGTH : frame.getLength(), 2)
-					|| dataCounter == 0) {
-				bytesCounter++;
-			}
+			return FIN_PACKET;
 		}
+		return UNFIN_PACKET;
 	}
 
-
 	private static void parseData(String byteString) {
-		if (dataCounter != 0) {
-			frame = filters.get(bytesCounter + 1).parseRx(frame, byteString);
-		} else {
-			frame = filters.get(bytesCounter).parseRx(frame, byteString);
+		for (FrameFilter filter : filters) {
+			frame = filter.parseRx(frame, byteString);
 		}
 	}
 
 	private static boolean filterData() {
-		return filters.get(bytesCounter).filter(frame);
+		boolean filtered = true;
+		for (FrameFilter filter : filters) {
+			if(!filter.filter(frame)) {
+				filtered = false;
+			}
+		}
+		return filtered;
 	}
 
 	public static List<String> parseTx(Frame frame) {
@@ -94,11 +83,6 @@ public class FrameParser {
 			byteList = filter.parseTx(frame, byteList);
 		}
 		return byteList;
-	}
-
-	public static Frame getFrame() {
-		return frame;
-	}
-
+	}  
 
 }

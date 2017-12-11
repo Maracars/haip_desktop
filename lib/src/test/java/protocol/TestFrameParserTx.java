@@ -12,7 +12,6 @@ import java.util.List;
 public class TestFrameParserTx {
 
     Frame frame;
-    FrameParser frameParser;
     Serial serial;
     List<String> stringList;
 

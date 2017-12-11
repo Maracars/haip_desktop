@@ -3,6 +3,7 @@ package protocol;
 public final class ProtocolProperties {
 
 	public static final int START_FRAME = 3;
+	public static final int HEADER = 8;
 	public static final int PACKET_TYPE = 2;
 	public static final int COUNTER = 3;
 	public static final int ORIGIN_ID = 8;
@@ -10,7 +11,7 @@ public final class ProtocolProperties {
 	public static final int LENGTH = 8;
 	public static final int CHECKSUM = 8;
 	// TODO This has to be defined
-	public static final long TIMEOUT = 10000000;
+	public static final long TIMEOUT = 100000000;
 
 	public enum DataType {
 		STATUS {

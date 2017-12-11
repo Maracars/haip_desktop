@@ -1,33 +1,34 @@
 package serial;
 
-import jssc.*;
+import java.util.List;
+import java.util.Observable;
+
+import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
+import jssc.SerialPortException;
+import jssc.SerialPortList;
+import protocol.FrameParser;
 import ui.dialogs.COMPortChooser;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observer;
-
-public class Serial implements SerialPortEventListener {
+public class Serial extends Observable implements SerialPortEventListener {
 
 	private static final int BAUD_RATE = 9600;
 
 	private static SerialPort serialPort;
-
-	private List<Observer> observers;
-
-	//FrameParser frameParser;
-
-	boolean isConnected;
+	private String packet;
+	private boolean isConnected;
 
 	public Serial() {
+		packet = "";
 		serialPort = null;
 		isConnected = false;
-		observers = new ArrayList<>();
 	}
 
 	// Starts serial connection
 	public void startConnection() throws SerialPortException, Exception {
 		String[] portNames = SerialPortList.getPortNames();
+
 
 		// No port connected
 		if (portNames.length == 0) {
@@ -71,36 +72,37 @@ public class Serial implements SerialPortEventListener {
 
 	public void serialEvent(SerialPortEvent arg0) {
 		try {
-			// Get binary string from serial port
-			String binaryString = serialPort.readString();
-			System.out.println(binaryString);
-
-			// Send data to parser
-			//frameParser.parse(binaryString)
-		}
-		catch (SerialPortException e) {
+			// Get int array from serial port
+			String readString = serialPort.readString();
+			packet += readString;
+			int result = FrameParser.parseRx(readString);
+			if (result == FrameParser.BAD_PACKET) {
+				packet = "";
+			} else if (result == FrameParser.FIN_PACKET) {
+				// TODO Parse packet to frame
+				notifyPacket(packet);
+			}
+		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void writeBytes(List<String> byteList) throws SerialPortException {
-		for (String strByte : byteList) {
+	public static void writeStrings(List<String> stringList) throws SerialPortException {
+		for (String strByte : stringList) {
 			writeString(strByte);
 		}
 
 	}
 
 	public static void writeString(String string) throws SerialPortException {
-		// Data sent through serial port
 		serialPort.writeString(string);
 	}
 
-	public List<Observer> getObservers() {
-		return observers;
-	}
-
-	public void addObserver(Observer observer) {
-		this.observers.add(observer);
+	private void notifyPacket(String value) {
+		setChanged();
+		notifyObservers(value);
+		packet = "";
 
 	}
+
 }

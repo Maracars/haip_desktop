@@ -27,10 +27,14 @@ public class HeaderFilter implements FrameFilter {
 	public Frame parseRx(Frame frame, String byteString) {
 		Header header = new Header();
 		// TODO Here instead of substrings we should create our own funct. e.g. getFramePart(byteString, START_FRAME)
-		header.setStartFrame(byteString.substring(0, START_FRAME));
-		header.setPacketType(byteString.substring(START_FRAME, START_FRAME + PACKET_TYPE));
-		header.setCounter(byteString.substring(START_FRAME + PACKET_TYPE, START_FRAME + PACKET_TYPE + COUNTER));
-		frame.setHeader(header);
+		try {
+			header.setStartFrame(byteString.substring(0, START_FRAME));
+			header.setPacketType(byteString.substring(START_FRAME, START_FRAME + PACKET_TYPE));
+			header.setCounter(byteString.substring(START_FRAME + PACKET_TYPE, START_FRAME + PACKET_TYPE + COUNTER));
+			frame.setHeader(header);
+		} catch (StringIndexOutOfBoundsException e) {
+			frame.setHeader(null);
+		}
 		return frame;
 	}
 

@@ -8,57 +8,57 @@ import models.Header;
 import models.Status;
 import serial.Serial;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
 
 import static protocol.ProtocolProperties.DataType;
 import static protocol.ProtocolProperties.PacketType;
 
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
-public class NodeLogic implements Observer {
+public class NodeLogic implements Observer, Runnable {
 
 	private Boolean received;
 	private String packet;
-	private ArrayList<String> lista;
+	private List receivedList;
+	private ArrayList<Integer> connectedBoats;
 
 	public NodeLogic() {
-		lista = new ArrayList<>();
+		receivedList = Collections.synchronizedList(new ArrayList());
+		connectedBoats = new ArrayList<>();
+		connectedBoats.add(1);
 	}
 
-	public void controllerIokse(Serial serial, String dest) {
+	public void controllerIokse(String dest) {
 
-		received = false;
-		//TODO The observable is not still implemented, this would be a global variable in Serial, after parsing the txur, we change and notifyObservers
-		// Gut exampol http://www.tutorialspoint.com/java/util/observable_addobserver.htm
-		serial.addObserver(this);
-
+		// TODO This is going to be called for each boat, here we should have a list of connected boats, those that are iddle...
 		Frame fr = createToken(ProtocolProperties.MASTER_ID, dest);
 		sendParsedFrame(fr);
 
 		long count = 0;
-		while (count < ProtocolProperties.TIMEOUT || received) {
-			count++;
+		while (count++ < ProtocolProperties.TIMEOUT && receivedList.isEmpty()) {
 		}
-		if (received) {
+		if (!receivedList.isEmpty()) {
 			//TODO Here we must send the response to the request.
-			System.out.println("We have received the request of the boat");
+			System.out.println("Ship number " + dest + " sent " + receivedList);
+			checkRequest(receivedList);
+			receivedList.clear();
+		} else {
+			System.out.println("timeout");
 		}
 
-		checkRequest();
 
 	}
 
-	public void checkRequest() {
+	// TODO Check status and give response to the boat
+	public void checkRequest(List receivedList) {
+
 	}
 
 
 	public void sendParsedFrame(Frame frame) {
 		List<String> listBytes = FrameParser.parseTx(frame);
 		try {
-			System.out.println(listBytes);
-			//Serial.writeBytes(listBytes);
+
+			Serial.writeStrings(listBytes);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -105,9 +105,18 @@ public class NodeLogic implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		lista.add(arg.toString());
-		System.out.println(lista);
+		receivedList.add(arg.toString());
 		Frame fr = createToken(ProtocolProperties.MASTER_ID, arg.toString());
 
+	}
+
+	@Override
+	public void run() {
+		while (true) {
+			for (Integer boat : connectedBoats) {
+
+				controllerIokse(boat.toString());
+			}
+		}
 	}
 }
