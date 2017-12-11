@@ -11,6 +11,11 @@ public class ProbaObserver extends Observable {
 
 	public static void main(String[] args) throws SerialPortException {
 		Serial serial = new Serial();
+		try {
+			serial.openConnection();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		NodeLogic watcher = new NodeLogic(serial);
 		Thread th = new Thread(watcher);
 		serial.addObserver(watcher);

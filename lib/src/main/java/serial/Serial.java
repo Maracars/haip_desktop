@@ -18,20 +18,14 @@ public class Serial extends Observable implements SerialPortEventListener {
 	private boolean isConnected;
 
 	public Serial() {
-		packet = "";
 		serialPort = null;
 		isConnected = false;
-		try {
-			startConnection();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		packet = "";
 	}
 
-	// Starts serial connection
-	public void startConnection() throws Exception {
+	// Opens serial connection
+	public void openConnection() throws Exception {
 		String[] portNames = SerialPortList.getPortNames();
-
 
 		// No port connected
 		if (portNames.length == 0) {
@@ -65,7 +59,9 @@ public class Serial extends Observable implements SerialPortEventListener {
 	public void closeConnection() throws SerialPortException {
 		if (serialPort != null) {
 			serialPort.closePort();
+			serialPort = null;
 			isConnected = false;
+			packet = "";
 		}
 	}
 

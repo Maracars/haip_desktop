@@ -15,12 +15,14 @@ public class SerialRxTest {
 		scanner = new Scanner(System.in);
 
 		try {
-			System.out.println("Rx is connected: " + serial.isConnected());
+			serial.openConnection();
 
+			System.out.println("Rx is connected: " + serial.isConnected());
 			scanner.nextLine();
 
 			serial.closeConnection();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

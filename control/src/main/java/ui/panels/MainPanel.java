@@ -12,21 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import jssc.SerialPortException;
@@ -74,38 +60,22 @@ public class MainPanel {
 	boolean systemInitialized;
 
 	public MainPanel() {
+		this.serial = new Serial();
+		this.systemInitialized = false;
 		this.initActions();
 		this.initTable();
-		this.systemInitialized = false;
 
 		window = new JFrame("Haip Ain't an Infor Project");
+		window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
 		window.setLocation(0, 0);
 		window.setSize(1300, 700);
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
 
-		window.setJMenuBar(createMenuBar());
-		window.getContentPane().add(createSplitPane(), BorderLayout.CENTER);
+		window.setJMenuBar(this.createMenuBar());
+		window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		window.addWindowListener(this.createWindowClosingAdapter());
 
-		window.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				/* Before closing window, check if communication and system are disabled
-				* If not, disable and close them before exiting */
-				if (serial != null) {
-					try {
-						serial.closeConnection();
-					} catch (SerialPortException e1) {
-						e1.printStackTrace();
-					}
-					serial = null;
-				}
-				if (systemInitialized) {
-					systemInitialized = false;
-				}
-				((JFrame)e.getSource()).dispose();
-			}
-		});
+		window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
 
 		window.setVisible(true);
 	}
@@ -208,13 +178,60 @@ public class MainPanel {
 		return menuExit;
 	}
 
+	private WindowAdapter createWindowClosingAdapter() {
+		return new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				/* Before closing window, check if communication and system are disabled
+				 * If not, disable and close them before exiting */
+				if (!serial.isConnected() && !systemInitialized) {
+					((JFrame)e.getSource()).dispose();
+				}
+				else {
+					int dialogResult = JOptionPane.showConfirmDialog(window,
+							((systemInitialized) ?
+									"System is initialized.\n" : "Serial connection is established.\n")
+									+ "Do you really want to exit?",
+							"Warning",
+							JOptionPane.YES_NO_OPTION);
+
+					if (dialogResult == JOptionPane.YES_OPTION) {
+						stopSystem();
+						try {
+							serial.closeConnection();
+						} catch (SerialPortException e1) {
+							e1.printStackTrace();
+						}
+						((JFrame)e.getSource()).dispose();
+					}
+				}
+			}
+		};
+	}
+
+	public void initTable() {
+		tableDataList = new ArrayList<>();
+		cellRenderer = new CellRenderer();
+		columnModel = new ColumnModel(cellRenderer);
+		tableModel = new TableModel(columnModel, tableDataList);
+		table = new JTable(tableModel, columnModel);
+		table.setRowHeight(30);
+	}
+
+	public void updateTable() {
+		table.repaint();
+	}
+
 	private void initActions() {
-		exitAction = new ExitAction("Exit", new ImageIcon("control/src/main/resources/icons/exit.png"),
-				"Exit", KeyEvent.VK_X);
-		commAction = new CommAction("Connect", new ImageIcon("control/src/main/resources/icons/comm.png"),
+		exitAction = new ExitAction("Exit",
+                new ImageIcon("control/src/main/resources/icons/exit.png"),
+                "Exit", KeyEvent.VK_X);
+		commAction = new CommAction("Connect",
+                new ImageIcon("control/src/main/resources/icons/comm.png"),
 				"Connection", KeyEvent.VK_C);
-		initAction = new InitAction("Initialize system", new ImageIcon("control/src/main/resources/icons/start.png"),
-				"Initialize system", KeyEvent.VK_I);
+		initAction = new InitAction("Initialize system",
+                new ImageIcon("control/src/main/resources/icons/start.png"),
+                "Initialize system", KeyEvent.VK_I);
 	}
 
 	public class ExitAction extends AbstractAction {
@@ -254,27 +271,25 @@ public class MainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (serial == null) {
-				serial = new Serial();
+			if (!serial.isConnected()) {
 				try {
-					serial.startConnection();
+					serial.openConnection();
+					commButton.setText("Disconnect");
+					initButton.setEnabled(true);
 				}
 				catch (Exception e) {
 					e.printStackTrace();
 				}
-				commButton.setText("Disconnect");
-				initButton.setEnabled(true);
 			}
 			else {
 				try {
 					serial.closeConnection();
+					commButton.setText("Connect");
+					initButton.setEnabled(false);
 				}
 				catch (SerialPortException e) {
 					e.printStackTrace();
 				}
-				serial = null;
-				commButton.setText("Connect");
-				initButton.setEnabled(false);
 			}
 		}
 	}
@@ -296,7 +311,7 @@ public class MainPanel {
 		public void actionPerformed(ActionEvent arg0) {
 			if (!systemInitialized) {
 				// Init System
-				systemInitialized = true;
+				initSystem();
 
 				initButton.setText("Stop system");
 				initButton.setIcon(new ImageIcon("control/src/main/resources/icons/start.png"));
@@ -304,7 +319,7 @@ public class MainPanel {
 			}
 			else {
 				// Stop System
-				systemInitialized = false;
+				stopSystem();
 
 				initButton.setText("Initialize system");
 				initButton.setIcon(new ImageIcon("control/src/main/resources/icons/stop.png"));
@@ -313,16 +328,13 @@ public class MainPanel {
 		}
 	}
 
-	public void initTable() {
-		tableDataList = new ArrayList<>();
-		cellRenderer = new CellRenderer();
-		columnModel = new ColumnModel(cellRenderer);
-		tableModel = new TableModel(columnModel, tableDataList);
-		table = new JTable(tableModel, columnModel);
-		table.setRowHeight(30);
+	public void initSystem() {
+		// TODO Init System
+		systemInitialized = true;
 	}
 
-	public void updateTable() {
-		table.repaint();
+	public void stopSystem() {
+		// TODO Stop System
+		systemInitialized = false;
 	}
 }

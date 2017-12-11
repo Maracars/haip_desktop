@@ -15,7 +15,7 @@ public class SerialTxTest {
 		scanner = new Scanner(System.in);
 
 		try {
-			serialTx.startConnection();
+			serialTx.openConnection();
 			System.out.println("Tx is connected: " + serialTx.isConnected());
 			scanner.nextLine();
 
@@ -23,7 +23,8 @@ public class SerialTxTest {
 			scanner.nextLine();
 
 			serialTx.closeConnection();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

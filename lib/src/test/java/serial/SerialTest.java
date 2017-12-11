@@ -15,18 +15,15 @@ public class SerialTest {
 		while (true) {
 
 			try {
+				serial.openConnection();
 				System.out.println("Write whatever: ");
 				String string = scanner.nextLine();
 				serial.writeString(string);
-
-			} catch (Exception e) {
-				try {
-					serial.closeConnection();
-				} catch (SerialPortException e1) {
-					e1.printStackTrace();
-				}
+				serial.closeConnection();
 			}
-
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 
 		}
 	}
