@@ -18,6 +18,7 @@ public class TestFrameParserRx {
 	private final static String LENGTH = "00000000";
 	private final static String CHECKSUM = "11111111";
 
+	// TODO All these should be different, we receive byte by byte or whatever, but we should parse everything in one
 	@Test
 	public void checkParseRxOk() {
 		Serial serialTx = new Serial();

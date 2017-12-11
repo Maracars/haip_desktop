@@ -18,12 +18,11 @@ public class TestFrameParserTx {
 
     @Test
     public void testFrameParserTx() {
-    		FrameParser parser = new FrameParser(null);
         frame = new Frame(new Header("010", "00", "000"),
                 "00000000", "11111111", "00000001",
                 new Data("01", new Status("110", "011")), "11111111");
         serial = new Serial();
-        stringList = parser.parseTx(frame);
+        stringList = FrameParser.parseTx(frame);
         System.out.println(stringList);
     }
 }
