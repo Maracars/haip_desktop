@@ -82,7 +82,7 @@ public class MainPanel {
 		window.setLocation(0, 0);
 		window.setSize(1300, 700);
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		window.setIconImage((new ImageIcon("lib/src/main/resources/HAIP_squaredLogo.png").getImage()));
+		window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
 
 		window.setJMenuBar(createMenuBar());
 		window.getContentPane().add(createSplitPane(), BorderLayout.CENTER);
@@ -133,7 +133,7 @@ public class MainPanel {
 	private Component createLogoPanel() {
 		this.logoPanel = null;
 		try {
-			logoPanel = new ImagePanel("lib/src/main/resources/HAIP_logo.png");
+			logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -182,7 +182,7 @@ public class MainPanel {
 	private Component createTab1() {
 		ImagePanel imagePanel = null;
 		try {
-			imagePanel = new ImagePanel("lib/src/main/resources/HAIP_logo.png");
+			imagePanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -209,11 +209,11 @@ public class MainPanel {
 	}
 
 	private void initActions() {
-		exitAction = new ExitAction("Exit", new ImageIcon("lib/src/main/resources/icons/exit.png"),
+		exitAction = new ExitAction("Exit", new ImageIcon("control/src/main/resources/icons/exit.png"),
 				"Exit", KeyEvent.VK_X);
-		commAction = new CommAction("Connect", new ImageIcon("lib/src/main/resources/icons/comm.png"),
+		commAction = new CommAction("Connect", new ImageIcon("control/src/main/resources/icons/comm.png"),
 				"Connection", KeyEvent.VK_C);
-		initAction = new InitAction("Initialize system", new ImageIcon("lib/src/main/resources/icons/start.png"),
+		initAction = new InitAction("Initialize system", new ImageIcon("control/src/main/resources/icons/start.png"),
 				"Initialize system", KeyEvent.VK_I);
 	}
 
@@ -299,7 +299,7 @@ public class MainPanel {
 				systemInitialized = true;
 
 				initButton.setText("Stop system");
-				initButton.setIcon(new ImageIcon("lib/src/main/resources/icons/start.png"));
+				initButton.setIcon(new ImageIcon("control/src/main/resources/icons/start.png"));
 				commButton.setEnabled(false);
 			}
 			else {
@@ -307,7 +307,7 @@ public class MainPanel {
 				systemInitialized = false;
 
 				initButton.setText("Initialize system");
-				initButton.setIcon(new ImageIcon("lib/src/main/resources/icons/stop.png"));
+				initButton.setIcon(new ImageIcon("control/src/main/resources/icons/stop.png"));
 				commButton.setEnabled(true);
 			}
 		}
