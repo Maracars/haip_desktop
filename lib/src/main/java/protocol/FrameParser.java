@@ -8,6 +8,9 @@ import models.Frame;
 public class FrameParser {
 
 	private static final String MAX_LENGTH = "11111111";
+	private static final int FIN_PACKET = 1;
+	private static final int BAD_PACKET = -1;
+	private static final int UNFIN_PACKET = 0;
 	public static Frame frame;
 	private static List<FrameFilter> filters;
 
@@ -32,16 +35,17 @@ public class FrameParser {
 		filters.add(new ChecksumFilter());
 	}
 
-	public static void parseRx(String byteString) {
+	public static int parseRx(String byteString) {
 		parseData(byteString);
 
 		if (!filterData()) {
 			//Si algún filtro falla, que hacemos?
 			resetCommunication();
+			return BAD_PACKET;
 		}
 
 		checkPacketData(byteString);
-		checkPacketFinal();
+		return checkPacketFinal();
 	}
 
 	private static void checkPacketData(String byteString) {
@@ -60,16 +64,18 @@ public class FrameParser {
 		frame = new Frame();
 	}
 
-	private static void checkPacketFinal() {
+	private static int checkPacketFinal() {
 		if (frame.getChecksum() != null) {
 			// notifyNodeLogic();
 			//resetCommunication();
+			return FIN_PACKET;
 		} else {
 			if (dataCounter > Integer.parseInt(frame.getLength() == null ? MAX_LENGTH : frame.getLength(), 2)
 					|| dataCounter == 0) {
 				bytesCounter++;
 			}
 		}
+		return UNFIN_PACKET;
 	}
 
 	private static void parseData(String byteString) {
@@ -90,6 +96,6 @@ public class FrameParser {
 			byteList = filter.parseTx(frame, byteList);
 		}
 		return byteList;
-	}
+	}  
 
 }
