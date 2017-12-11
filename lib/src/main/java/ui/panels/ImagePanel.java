@@ -1,6 +1,6 @@
 package ui.panels;
 
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -12,11 +12,16 @@ public class ImagePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private BufferedImage image;
+	int width, height;
 
 	public ImagePanel(String imagePath) {
 		try {                
 			image = ImageIO.read(new File(imagePath));
-		} catch (IOException ex) {
+
+			this.width = this.image.getWidth() / 2;
+			this.height = this.image.getHeight() / 2;
+		}
+		catch (IOException ex) {
 			// handle exception...
 		}
 	}
@@ -25,7 +30,8 @@ public class ImagePanel extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.drawImage(image,
-				(this.getWidth() / 2) - (this.image.getWidth() / 2),
-				this.getHeight() / 2 - (this.image.getHeight() / 2), this);           
+				(this.getWidth() / 2) - this.width,
+				this.getHeight() / 2 - this.height,
+				this);
 	}
 }

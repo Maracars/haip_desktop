@@ -1,47 +1,51 @@
 package ui.panels;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.monitor.CounterMonitor;
 import javax.swing.*;
 
 import jssc.SerialPortException;
 import serial.Serial;
+import ui.log.LogModel;
 import ui.tables.CellRenderer;
 import ui.tables.ColumnModel;
 import ui.tables.TableData;
 import ui.tables.TableModel;
 
 public class MainPanel {
-
-	//Ventana
+	// Window
 	JFrame window;
 
-	//Paneles
-	JTabbedPane mainPanel;
+	// Panels
+	JSplitPane splitPane;
+	JTabbedPane tabbedPane;
 
-	//Elementos Barra
+	// Menu Bar Elements
 	JMenuBar menuBar;
 	JMenu menuExit;
 
-	//Acciones
+	// Actions
 	AbstractAction exitAction;
 
-	//Elementos
+	// Table Elements
 	JTable table;
 	CellRenderer cellRenderer;
 	TableModel tableModel;
 	ColumnModel columnModel;
 	List<TableData> tableDataList;
 
-	//Boton de empezar/parar
+	// Log Elements
+	LogModel logModel;
+
+	// Buttons
 	JButton CommButton;
 
-	//Comunicacion con la FPGA
+	// Serial Communication
 	Serial serial;
 
 	public MainPanel() {
@@ -52,10 +56,10 @@ public class MainPanel {
 		window.setLocation(0, 0);
 		window.setSize(1300, 700);
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
-		window.setIconImage((new ImageIcon("lib/src/main/resources/HAIP_logo.png").getImage()));
+		window.setIconImage((new ImageIcon("lib/src/main/resources/HAIP_squaredLogo.png").getImage()));
 
 		window.setJMenuBar(createMenuBar());
-		window.getContentPane().add(createMainPanel(), BorderLayout.CENTER);
+		window.getContentPane().add(createSplitPane(), BorderLayout.CENTER);
 
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setVisible(true);
@@ -74,19 +78,54 @@ public class MainPanel {
 		table.repaint();
 	}
 
-	private Component createMainPanel() {
-		this.mainPanel = new JTabbedPane();
+	private Component createSplitPane() {
+		this.splitPane = new JSplitPane();
+
+		this.splitPane.setLeftComponent(createLeftPanel());
+		this.splitPane.setRightComponent(createTabbedPane());
+		this.splitPane.setDividerLocation(300);
+
+		return splitPane;
+	}
+
+	private Component createLeftPanel() {
+		JPanel panel = new JPanel(new BorderLayout(10, 10));
+
+		panel.add(createLogPanel(), BorderLayout.CENTER);
+		panel.add(createButtonsPanel(), BorderLayout.SOUTH);
+
+		return panel;
+	}
+
+	private Component createLogPanel() {
+		logModel = new LogModel();
+		return new LogPanel(logModel);
+	}
+
+	private Component createButtonsPanel() {
+		JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
+		CommAction commAction = new CommAction("Connect", new ImageIcon("lib/src/main/resources/icons/com.png"),
+				"Connection", KeyEvent.VK_ENTER);
+
+		CommButton = new JButton(commAction);
+		panel.add(CommButton);
+
+		return panel;
+	}
+
+	private Component createTabbedPane() {
+		this.tabbedPane = new JTabbedPane();
 		Icon icon = null;
 
 		JComponent panel1 = (JComponent) createTab1();
-		mainPanel.addTab("Tab 1", icon, panel1, "Does nothing");
-		mainPanel.setMnemonicAt(0, KeyEvent.VK_1);
+		tabbedPane.addTab("Tab 1", icon, panel1, "Does nothing");
+		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
 		JComponent panel2 = (JComponent) createTab2();
-		mainPanel.addTab("Tab 2", icon, panel2, "Does nothing");
-		mainPanel.setMnemonicAt(0, KeyEvent.VK_2);
+		tabbedPane.addTab("Tab 2", icon, panel2, "Does nothing");
+		tabbedPane.setMnemonicAt(0, KeyEvent.VK_2);
 
-		return mainPanel;
+		return tabbedPane;
 	}
 
 	private Component createTab1() {
@@ -94,25 +133,11 @@ public class MainPanel {
 	}
 
 	private Component createTab2() {
-		JScrollPane panelScrollTabla = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane panelScrollTabla = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		panelScrollTabla.setViewportView(table);
 		return panelScrollTabla;
 	}
-
-	/*private Component crearPanelLog() {
-		modeloLog = new ModeloLog();
-		return new PanelLog(modeloLog);
-	}*/
-
-	/*private Component crearPanelBotones() {
-		JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
-		ExitAction accCom = new ExitAction("Establecer comunicaci�n", new ImageIcon("icons/com.png"), "Comunicacion", KeyEvent.VK_ENTER);
-
-		CommButton = new JButton(accCom);
-		panel.add(CommButton);
-
-		return panel;
-	}*/
 
 	private JMenuBar createMenuBar() {
 		menuBar = new JMenuBar();
@@ -121,24 +146,27 @@ public class MainPanel {
 	}
 
 	private JMenu createExitMenu() {
-		menuExit = new JMenu("Salir");
+		menuExit = new JMenu("Exit");
 		menuExit.add(exitAction);
 		return menuExit;
 	}
 
 	private void initActions() {
-		exitAction = new ExitAction("Salir", new ImageIcon("icons/salir.png"), "Salir", KeyEvent.VK_S);
+		exitAction = new ExitAction("Exit", new ImageIcon("lib/src/main/resources/icons/exit.png"),
+				"Exit", KeyEvent.VK_S);
 	}
 
 	public class ExitAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 		String text;
+		Icon icon;
 
-		public ExitAction(String text, Icon icon, String descripcion, Integer nemonic) {
-			super(text);
+		public ExitAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
 			this.text = text;
-			this.putValue(Action.SHORT_DESCRIPTION, descripcion);
-			this.putValue(Action.MNEMONIC_KEY, nemonic);
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
 		}
 
 		@Override
@@ -153,12 +181,14 @@ public class MainPanel {
 	public class CommAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 		String text;
+		Icon icon;
 
-		public CommAction(String text, Icon icon, String description, Integer nemonic) {
-			super(text);
+		public CommAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
 			this.text = text;
+			this.icon = icon;
 			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, nemonic);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
 		}
 
 		@Override

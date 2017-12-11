@@ -17,8 +17,7 @@ public class Serial implements SerialPortEventListener {
 
 	private static SerialPort serialPort;
 
-
-	private ArrayList<Observer> observers = new ArrayList<>();
+	private List<Observer> observers;
 
 	//FrameParser frameParser;
 
@@ -27,12 +26,13 @@ public class Serial implements SerialPortEventListener {
 	public Serial() {
 		serialPort = null;
 		isConnected = false;
+		observers = new ArrayList<>();
 	}
 
 	// Starts serial connection
 	public void startConnection() throws SerialPortException, Exception {
 		String[] portNames = SerialPortList.getPortNames();
-		COMPortChooser portChooser;
+
 
 		// No port connected
 		if (portNames.length == 0) {
@@ -46,7 +46,7 @@ public class Serial implements SerialPortEventListener {
 			}
 			// More than one port connected
 			else {
-				portChooser = new COMPortChooser(null, portNames);
+				COMPortChooser portChooser = new COMPortChooser(null, portNames);
 				if (portChooser.getSelectedIndex() == -1) {
 					throw new Exception("One port must be chosen");
 				} else {
@@ -92,7 +92,8 @@ public class Serial implements SerialPortEventListener {
 			//frameParser.parse(binaryString)
 
 			System.out.println(binaryString);
-		} catch (SerialPortException e) {
+		}
+		catch (SerialPortException e) {
 			e.printStackTrace();
 		}
 	}
@@ -112,8 +113,7 @@ public class Serial implements SerialPortEventListener {
 		serialPort.writeInt(decimalToSend);
 	}
 
-
-	public ArrayList<Observer> getObservers() {
+	public List<Observer> getObservers() {
 		return observers;
 	}
 
