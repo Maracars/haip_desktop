@@ -20,7 +20,7 @@ public class SerialTest {
 			serialTx.startConnection();
 			scanner.nextLine();
 
-			serialTx.writeByte("101");
+			serialTx.writeString("10101011");
 			scanner.nextLine();
 
 			serialRx.closeConnection();

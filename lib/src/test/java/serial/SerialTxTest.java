@@ -19,9 +19,7 @@ public class SerialTxTest {
             System.out.println("Tx is connected: " + serialTx.isConnected());
             scanner.nextLine();
 
-            serialTx.writeByte("10101011");
-            scanner.nextLine();
-
+            serialTx.writeString("10101011");
             serialTx.closeConnection();
         }
         catch (Exception e) {

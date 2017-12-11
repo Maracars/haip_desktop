@@ -1,11 +1,7 @@
 package ui.log;
 
-import java.awt.Color;
-import java.awt.Component;
-
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
+import java.awt.*;
 
 public class LogAdapter implements ListCellRenderer<String> {
 	

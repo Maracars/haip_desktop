@@ -1,10 +1,9 @@
 package protocol;
 
+import models.Frame;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-
-import models.Frame;
 
 public class FrameParser {
 

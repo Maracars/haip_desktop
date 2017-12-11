@@ -1,9 +1,9 @@
 package protocol;
 
-import java.util.List;
-
 import models.Data;
 import models.Frame;
+
+import java.util.List;
 
 public class DataFilter implements FrameFilter{
 	

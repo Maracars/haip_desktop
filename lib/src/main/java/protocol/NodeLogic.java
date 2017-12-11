@@ -2,7 +2,6 @@ package protocol;
 
 import helpers.CRC8;
 import helpers.Helpers;
-import jssc.SerialPortException;
 import models.Data;
 import models.Frame;
 import models.Header;
@@ -14,8 +13,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import static protocol.ProtocolProperties.PacketType;
 import static protocol.ProtocolProperties.DataType;
+import static protocol.ProtocolProperties.PacketType;
 
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
 public class NodeLogic implements Observer {

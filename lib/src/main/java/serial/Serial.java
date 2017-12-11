@@ -1,15 +1,11 @@
 package serial;
 
+import jssc.*;
+import ui.dialogs.COMPortChooser;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observer;
-
-import jssc.SerialPort;
-import jssc.SerialPortEvent;
-import jssc.SerialPortEventListener;
-import jssc.SerialPortException;
-import jssc.SerialPortList;
-import ui.dialogs.COMPortChooser;
 
 public class Serial implements SerialPortEventListener {
 
@@ -32,7 +28,6 @@ public class Serial implements SerialPortEventListener {
 	// Starts serial connection
 	public void startConnection() throws SerialPortException, Exception {
 		String[] portNames = SerialPortList.getPortNames();
-
 
 		// No port connected
 		if (portNames.length == 0) {
@@ -76,22 +71,12 @@ public class Serial implements SerialPortEventListener {
 
 	public void serialEvent(SerialPortEvent arg0) {
 		try {
-			// Get int array from serial port
-			int[] readIntArray = serialPort.readIntArray();
-
-			// Get decimal int
-			int readDecimal = 0;
-			for (int n : readIntArray) {
-				readDecimal = n;
-			}
-
-			// Fill with zeros to get a full byte
-			String binaryString = Integer.toBinaryString(readDecimal);
+			// Get binary string from serial port
+			String binaryString = serialPort.readString();
+			System.out.println(binaryString);
 
 			// Send data to parser
 			//frameParser.parse(binaryString)
-
-			System.out.println(binaryString);
 		}
 		catch (SerialPortException e) {
 			e.printStackTrace();
@@ -100,17 +85,14 @@ public class Serial implements SerialPortEventListener {
 
 	public static void writeBytes(List<String> byteList) throws SerialPortException {
 		for (String strByte : byteList) {
-			writeByte(strByte);
+			writeString(strByte);
 		}
 
 	}
 
-	public static void writeByte(String binaryString) throws SerialPortException {
-		// Data is converted to decimal
-		int decimalToSend = Integer.parseInt(binaryString, 2);
-
+	public static void writeString(String string) throws SerialPortException {
 		// Data sent through serial port
-		serialPort.writeInt(decimalToSend);
+		serialPort.writeString(string);
 	}
 
 	public List<Observer> getObservers() {

@@ -1,13 +1,12 @@
 package protocol;
 
+import models.Frame;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import models.Frame;
-
-import static protocol.ProtocolProperties.PacketType;
-
 import static protocol.ProtocolProperties.MASTER_ID;
+import static protocol.ProtocolProperties.PacketType;
 
 public class IdentificationFilter implements FrameFilter {
 

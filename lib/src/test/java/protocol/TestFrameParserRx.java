@@ -1,11 +1,10 @@
 package protocol;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import models.Frame;
+import org.junit.Test;
 import serial.Serial;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestFrameParserRx {
 	
@@ -21,8 +20,8 @@ public class TestFrameParserRx {
 	// TODO All these should be different, we receive byte by byte or whatever, but we should parse everything in one
 	@Test
 	public void checkParseRxOk() {
-		Serial serialTx = new Serial();
-		FrameParser frameParser = new FrameParser(serialTx);
+		Serial serial = new Serial();
+		FrameParser frameParser = new FrameParser();
 		frameParser.parseRx(HEADER);
 		frameParser.parseRx(ORIGIN_ID);
 		frameParser.parseRx(DESTINATION_ID);
@@ -35,7 +34,7 @@ public class TestFrameParserRx {
 	@Test
 	public void checkParseRxBadOrigin() {
 		Serial serialTx = new Serial();
-		FrameParser frameParser = new FrameParser(serialTx);
+		FrameParser frameParser = new FrameParser();
 		frameParser.parseRx(HEADER);
 		frameParser.parseRx("00000001");
 		Frame frame = frameParser.getFrame();
@@ -45,7 +44,7 @@ public class TestFrameParserRx {
 	@Test
 	public void checkParseRxOringAndDestinationEqual() {
 		Serial serialTx = new Serial();
-		FrameParser frameParser = new FrameParser(serialTx);
+		FrameParser frameParser = new FrameParser();
 		frameParser.parseRx(HEADER);
 		frameParser.parseRx("00000000");
 		frameParser.parseRx("00000000");
@@ -56,7 +55,7 @@ public class TestFrameParserRx {
 	@Test
 	public void checkParseRxPacketFilterNotExist() {
 		Serial serialTx = new Serial();
-		FrameParser frameParser = new FrameParser(serialTx);
+		FrameParser frameParser = new FrameParser();
 		frameParser.parseRx("01011000");
 		Frame frame = frameParser.getFrame();
 		assertEquals("Parser error", null, frame.getOriginId());
@@ -65,7 +64,7 @@ public class TestFrameParserRx {
 	@Test
 	public void checkParseRxPacketDataParser1Byte() {
 		Serial serialTx = new Serial();
-		FrameParser frameParser = new FrameParser(serialTx);
+		FrameParser frameParser = new FrameParser();
 		frameParser.parseRx(HEADER);
 		frameParser.parseRx(ORIGIN_ID);
 		frameParser.parseRx(DESTINATION_ID);
@@ -79,7 +78,7 @@ public class TestFrameParserRx {
 	@Test
 	public void checkParseRxPacketDataParser2Byte() {
 		Serial serialTx = new Serial();
-		FrameParser frameParser = new FrameParser(serialTx);
+		FrameParser frameParser = new FrameParser();
 		frameParser.parseRx(HEADER);
 		frameParser.parseRx(ORIGIN_ID);
 		frameParser.parseRx(DESTINATION_ID);
