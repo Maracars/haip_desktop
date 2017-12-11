@@ -6,13 +6,19 @@ import java.util.List;
 
 import models.Frame;
 import protocol.ProtocolProperties.PacketType;
+import static protocol.ProtocolProperties.HEADER;
+import static protocol.ProtocolProperties.ORIGIN_ID;
 
 public class OriginFilter implements FrameFilter {
 
 
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
-		frame.setOriginId(byteString);
+		try {
+			frame.setOriginId(byteString.substring(HEADER, HEADER + ORIGIN_ID));
+		} catch (StringIndexOutOfBoundsException e) {
+			frame.setOriginId(null);
+		}
 		return frame;
 	}
 

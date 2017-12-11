@@ -3,6 +3,7 @@ package protocol;
 public final class ProtocolProperties {
 
 	public static final int START_FRAME = 3;
+	public static final int HEADER = 8;
 	public static final int PACKET_TYPE = 2;
 	public static final int COUNTER = 3;
 	public static final int ORIGIN_ID = 8;

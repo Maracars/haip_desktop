@@ -18,9 +18,7 @@ public class Frame {
 		this.checksum = checksum;
 	}
 	
-	public Frame() {
-		
-	}
+	public Frame() {}
 
 	public Header getHeader() {
 		return header;

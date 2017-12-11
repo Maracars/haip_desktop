@@ -11,6 +11,22 @@ public class Data {
 	private String type;
 	private Status status;
 	private List<String> data; //Hau da data dana gordetzeko oingoz, gero egitura begiratu bikoda
+	private String allData;
+
+	public Data(String allData) {
+		this.allData = allData;
+	}
+	
+	
+	public String getAllData() {
+		return allData;
+	}
+
+
+	public void setAllData(String allData) {
+		this.allData = allData;
+	}
+
 
 	public Data() {
 		data = new ArrayList<String>();

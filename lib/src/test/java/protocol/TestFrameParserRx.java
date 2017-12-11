@@ -26,11 +26,7 @@ public class TestFrameParserRx {
 	// TODO All these should be different, we receive byte by byte or whatever, but we should parse everything in one
 	@Test
 	public void checkParseRxOk() {
-		FrameParser.parseRx(HEADER);
-		FrameParser.parseRx(ORIGIN_ID);
-		FrameParser.parseRx(DESTINATION_ID);
-		FrameParser.parseRx(LENGTH);
-		FrameParser.parseRx(CHECKSUM);
+		FrameParser.parseRx(PACKET);
 		assertEquals("Parser error", PACKET, FrameParser.frame.toString());
 	}
 
@@ -57,25 +53,13 @@ public class TestFrameParserRx {
 
 	@Test
 	public void checkParseRxPacketDataParser1Byte() {
-		FrameParser.parseRx(HEADER);
-		FrameParser.parseRx(ORIGIN_ID);
-		FrameParser.parseRx(DESTINATION_ID);
-		FrameParser.parseRx("00000001");
-		FrameParser.parseRx("00101010");
-		FrameParser.parseRx(CHECKSUM);
+		FrameParser.parseRx(PACKET_WITH_DATA_1_BYTE);
 		assertEquals("Parser error", PACKET_WITH_DATA_1_BYTE, FrameParser.frame.toString());
 	}
 
 	@Test
 	public void checkParseRxPacketDataParser2Byte() {
-
-		FrameParser.parseRx(HEADER);
-		FrameParser.parseRx(ORIGIN_ID);
-		FrameParser.parseRx(DESTINATION_ID);
-		FrameParser.parseRx("00000010");
-		FrameParser.parseRx("00101010");
-		FrameParser.parseRx("00101010");
-		FrameParser.parseRx(CHECKSUM);
+		FrameParser.parseRx(PACKET_WITH_DATA_2_BYTE);
 		assertEquals("Parser error", PACKET_WITH_DATA_2_BYTE, FrameParser.frame.toString());
 	}
 }
