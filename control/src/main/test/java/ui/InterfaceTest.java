@@ -1,10 +1,9 @@
 package ui;
 
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-
 import org.junit.Test;
 import ui.panels.MainPanel;
+
+import javax.swing.*;
 
 public class InterfaceTest {
 

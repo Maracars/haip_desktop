@@ -10,8 +10,8 @@ import serial.Serial;
 
 import java.util.*;
 
-import static protocol.ProtocolProperties.PacketType;
 import static protocol.ProtocolProperties.DataType;
+import static protocol.ProtocolProperties.PacketType;
 
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
 public class NodeLogic implements Observer, Runnable {

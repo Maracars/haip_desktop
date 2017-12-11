@@ -1,11 +1,10 @@
 package ui.log;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.ListModel;
+import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LogModel implements ListModel<String> {
 

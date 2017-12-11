@@ -1,11 +1,7 @@
 package ui.panels;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
+import java.awt.*;
 
 public class TextPanel extends JPanel {
 	private static final long serialVersionUID = 1L;

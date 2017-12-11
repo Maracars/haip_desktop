@@ -16,6 +16,7 @@ public class SerialTest {
 			serial.writeString("10000001111");
 			System.out.println("Sent");
 			serial.closeConnection();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

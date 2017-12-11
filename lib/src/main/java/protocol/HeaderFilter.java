@@ -1,14 +1,12 @@
 package protocol;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import models.Frame;
 import models.Header;
 
-import static protocol.ProtocolProperties.COUNTER;
-import static protocol.ProtocolProperties.PACKET_TYPE;
-import static protocol.ProtocolProperties.START_FRAME;
+import java.util.ArrayList;
+import java.util.List;
+
+import static protocol.ProtocolProperties.*;
 
 public class HeaderFilter implements FrameFilter {
 

@@ -1,8 +1,8 @@
 package protocol;
 
-import java.util.List;
+import models.Frame;
 
-import  models.Frame;
+import java.util.List;
 
 public interface FrameFilter {
 	
