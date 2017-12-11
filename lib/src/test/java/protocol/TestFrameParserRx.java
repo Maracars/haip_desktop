@@ -19,6 +19,7 @@ public class TestFrameParserRx {
 	private final static String CHECKSUM = "11111111";
 
 	// TODO All these should be different, we receive byte by byte or whatever, but we should parse everything in one
+	/*
 	@Test
 	public void checkParseRxOk() {
 		Serial serialTx = new Serial();
@@ -89,5 +90,5 @@ public class TestFrameParserRx {
 		frameParser.parseRx(CHECKSUM);
 		Frame frame = frameParser.getFrame();
 		assertEquals("Parser error", PACKET_WITH_DATA_2_BYTE, frame.toString());
-	}
+	}*/
 }

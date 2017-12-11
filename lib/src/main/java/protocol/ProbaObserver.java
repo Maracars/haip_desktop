@@ -10,8 +10,10 @@ public class ProbaObserver extends Observable {
 	public static void main(String[] args) {
 		ProbaObserver watched = new ProbaObserver();
 		NodeLogic watcher = new NodeLogic();
-		Scanner scanner = new Scanner(System.in);
+		Thread th = new Thread(watcher);
 		watched.addObserver(watcher);
+		th.start();
+		Scanner scanner = new Scanner(System.in);
 		while (true) {
 			String line = scanner.nextLine();
 			watched.setValue(line);
