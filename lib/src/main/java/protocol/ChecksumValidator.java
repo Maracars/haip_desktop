@@ -3,7 +3,7 @@ package protocol;
 import helpers.CRC8;
 import models.Frame;
 
-public class ChecksumValidator implements Validator{
+public class ChecksumValidator implements Validator {
 
 	@Override
 	public boolean validate(Frame frame) {

@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import jssc.SerialPortException;
+import protocol.SerialObserver;
 import serial.Serial;
 import ui.log.LogModel;
 import ui.tables.CellRenderer;
@@ -24,71 +25,56 @@ public class MainPanel {
 	// Window
 	JFrame window;
 
-	// Panels
-	JSplitPane splitPane;
-	JTabbedPane tabbedPane;
-    JPanel leftPanel;
-	ImagePanel logoPanel;
-
-	// Menu Bar Elements
-	JMenuBar menuBar;
-	JMenu menuExit;
-
 	// Actions
 	AbstractAction exitAction, commAction, initAction;
 
 	// Table Elements
 	JTable table;
-	CellRenderer cellRenderer;
-	TableModel tableModel;
-	ColumnModel columnModel;
 	List<TableData> tableDataList;
-
-	// Log Elements
-	LogModel logModel;
 
 	// Buttons
 	JButton commButton, initButton;
 
 	// Serial Communication
 	Serial serial;
+	SerialObserver serialObserver;
 
 	// System Initialized
 	boolean systemInitialized;
 
-	public MainPanel() {
-		window = new JFrame("Haip Ain't an Infor Project");
-		window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
-		window.setLocation(0, 0);
-		window.setSize(1300, 700);
-		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+	public MainPanel(Serial serial) {
+        this.window = new JFrame("Haip Ain't an Infor Project");
+        this.window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
+        this.window.setLocation(0, 0);
+        this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
 
-        this.serial = new Serial();
-        this.systemInitialized = false;
         this.initActions();
         this.initTable();
+        this.serial = serial;
+        this.serialObserver = new SerialObserver(this.serial, this.tableDataList);
+        this.systemInitialized = false;
 
-		window.setJMenuBar(this.createMenuBar());
-		window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		window.addWindowListener(this.createWindowClosingAdapter());
+        this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        this.window.addWindowListener(this.createWindowClosingAdapter());
+        this.window.setJMenuBar(this.createMenuBar());
+        this.window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
 
-		window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
-
-		window.setVisible(true);
+        this.window.setVisible(true);
+        this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
 	private Component createSplitPane() {
-		this.splitPane = new JSplitPane();
+		JSplitPane splitPane = new JSplitPane();
 
-		this.splitPane.setDividerLocation(this.window.getWidth() / 4);
-		this.splitPane.setLeftComponent(createLeftPanel());
-		this.splitPane.setRightComponent(createTabbedPane());
+		splitPane.setDividerLocation(this.window.getWidth() / 6);
+		splitPane.setLeftComponent(createLeftPanel());
+		splitPane.setRightComponent(createTabbedPane());
 
 		return splitPane;
 	}
 
 	private Component createLeftPanel() {
-		leftPanel = new JPanel(new BorderLayout(10, 10));
+        JPanel leftPanel = new JPanel(new BorderLayout(10, 10));
 
         leftPanel.add(createLogoPanel(), BorderLayout.NORTH);
         leftPanel.add(createLogPanel(), BorderLayout.CENTER);
@@ -98,20 +84,20 @@ public class MainPanel {
 	}
 
 	private Component createLogoPanel() {
-		this.logoPanel = null;
+        ImagePanel logoPanel = null;
 		try {
-			logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
+            logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		logoPanel.scaleImage(this.splitPane.getDividerLocation(), this.splitPane.getDividerLocation());
+        logoPanel.scaleImage(this.window.getWidth() / 6, this.window.getWidth() / 6);
 
 		return logoPanel;
 	}
 
 	private Component createLogPanel() {
-		logModel = new LogModel();
+        LogModel logModel = new LogModel();
 		return new LogPanel(logModel);
 	}
 
@@ -120,11 +106,11 @@ public class MainPanel {
 		panel.setBorder(new EmptyBorder(0, 10, 10, 10));
 
 		this.commButton = new JButton(this.commAction);
-		this.commButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 10));
+		this.commButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
 		panel.add(commButton);
 
 		this.initButton = new JButton(this.initAction);
-		this.initButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 10));
+		this.initButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
 		this.initButton.setEnabled(false);
 		panel.add(initButton);
 
@@ -132,7 +118,7 @@ public class MainPanel {
 	}
 
 	private Component createTabbedPane() {
-		this.tabbedPane = new JTabbedPane();
+        JTabbedPane tabbedPane = new JTabbedPane();
 		Icon icon = null;
 
 		JComponent panel1 = (JComponent) createTab1();
@@ -164,13 +150,13 @@ public class MainPanel {
 	}
 
 	private JMenuBar createMenuBar() {
-		menuBar = new JMenuBar();
+        JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createExitMenu());
 		return menuBar;
 	}
 
 	private JMenu createExitMenu() {
-		menuExit = new JMenu("Exit");
+        JMenu menuExit = new JMenu("Exit");
 		menuExit.add(exitAction);
 		return menuExit;
 	}
@@ -208,9 +194,9 @@ public class MainPanel {
 
 	private void initTable() {
 		tableDataList = new ArrayList<>();
-		cellRenderer = new CellRenderer();
-		columnModel = new ColumnModel(cellRenderer);
-		tableModel = new TableModel(columnModel, tableDataList);
+        CellRenderer cellRenderer = new CellRenderer();
+        ColumnModel columnModel = new ColumnModel(cellRenderer);
+        TableModel tableModel = new TableModel(columnModel, tableDataList);
 
 		table = new JTable(tableModel, columnModel);
 		table.setRowHeight(this.window.getHeight() / 20);

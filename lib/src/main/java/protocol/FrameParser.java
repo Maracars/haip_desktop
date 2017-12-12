@@ -23,6 +23,10 @@ public class FrameParser {
 		initializeParsers();
 	}
 
+	public static Frame getFrame() {
+		return frame;
+	}
+
 	private static void initializeValidators() {
 		validators.add(new HeaderValidator());
 		validators.add(new OriginValidator());

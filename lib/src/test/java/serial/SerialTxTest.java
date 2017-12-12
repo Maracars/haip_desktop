@@ -2,32 +2,25 @@ package serial;
 
 import org.junit.Test;
 
-import java.util.Scanner;
-
 public class SerialTxTest {
 
 	Serial serialTx;
-	Scanner scanner;
 
 	@Test
 	public void testComm() {
 		serialTx = new Serial();
-		scanner = new Scanner(System.in);
 
 		try {
 			serialTx.openConnection();
-			System.out.println("Tx is connected: " + serialTx.isConnected());
-			scanner.nextLine();
-
-			serialTx.writeString("10101011");
-			scanner.nextLine();
-
+			serialTx.writeString("10101000" + "10101010" + "00000000" + "00000001" + "01100111" + "01001100");
 			serialTx.closeConnection();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	public static void main(String[] args) {
+		new SerialTxTest().testComm();
+	}
 
 }

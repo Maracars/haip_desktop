@@ -1,6 +1,7 @@
 package ui;
 
 import org.junit.Test;
+import serial.Serial;
 import ui.panels.MainPanel;
 
 import javax.swing.*;
@@ -9,7 +10,8 @@ public class InterfaceTest {
 
 	@Test
 	public void openUI() {
-		new MainPanel();
+		Serial serial = new Serial();
+		new MainPanel(serial);
 	}
 
 	@Test

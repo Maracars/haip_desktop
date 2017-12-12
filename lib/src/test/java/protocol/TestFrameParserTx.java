@@ -16,9 +16,9 @@ public class TestFrameParserTx {
 
     @Test
     public void testFrameParserTx() {
-        frame = new Frame(new Header("010", "00", "000"),
+        frame = new Frame(new Header("101", "01", "000"),
                 "00000000", "11111111", "00000001",
-                new Data("01", new Status("110", "011", "111")), "11111111");
+                new Data("01", new Status("10", "01", "11")), "11111111");
 
         stringList = FrameParser.parseTx(frame);
         System.out.println(stringList);

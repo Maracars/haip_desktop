@@ -15,7 +15,11 @@ public class ChecksumParser implements Parser{
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
 		try {
-			frame.setChecksum(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + Integer.parseInt(frame.getLength(),2)*8 , HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + Integer.parseInt(frame.getLength(),2)*8 + CHECKSUM));
+			frame.setChecksum(byteString.substring(
+					HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + Integer.parseInt(frame.getLength(),
+							2)*8 ,
+					HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + Integer.parseInt(frame.getLength(),
+							2)*8 + CHECKSUM));
 		} catch (StringIndexOutOfBoundsException | NumberFormatException e) {
 			frame.setChecksum(null);
 		}
