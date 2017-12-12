@@ -21,7 +21,7 @@ public class OriginParser implements Parser{
 
 	@Override
 	public List<String> parseTx(Frame frame, List<String> byteList) {
-		byteList.add(frame.getOriginId().toString());
+		byteList.add(frame.getOriginId());
 		return byteList;
 	}
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 import models.Frame;
 
-public class LengthParser implements Parser{
+public class LengthParser implements Parser {
 
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
@@ -23,8 +23,8 @@ public class LengthParser implements Parser{
 
 	@Override
 	public List<String> parseTx(Frame frame, List<String> byteList) {
-		// TODO Auto-generated method stub
-		return null;
+		byteList.add(frame.getLength());
+		return byteList;
 	}
 
 }

@@ -1,7 +1,5 @@
 package serial;
 
-import jssc.SerialPortException;
-import org.junit.Test;
 
 import java.util.Scanner;
 

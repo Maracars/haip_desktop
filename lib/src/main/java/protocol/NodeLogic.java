@@ -31,7 +31,7 @@ public class NodeLogic implements Observer, Runnable {
 	public void controllerIokse(String dest) {
 
 		// TODO This is going to be called for each boat, here we should have a list of connected boats, those that are iddle...
-		Frame fr = createToken(ProtocolProperties.MASTER_ID, dest);
+		Frame fr = createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(dest));
 		sendParsedFrame(fr);
 
 		long count = 0;
@@ -74,9 +74,6 @@ public class NodeLogic implements Observer, Runnable {
 		return createFrame(PacketType.DISCOVERY, origin, dest);
 	}
 
-	public Frame createAck(String origin, String dest) {
-		return createFrame(PacketType.ACK, origin, dest);
-	}
 
 	// TODO These two functions can be set into one, but like this may be more legible
 	public Frame createRequest(String origin, String dest, Status status) {
@@ -97,9 +94,11 @@ public class NodeLogic implements Observer, Runnable {
 	public Frame createFrame(Status status, PacketType type, DataType dataType, String origin, String dest) {
 
 		Data data = new Data(dataType.toString(), status);
+		String dataStr = Helpers.toByteBinString(data.toString());
 		// TODO The start frame has to be set and also how counter's work
 		Header header = new Header("101", type.toString(), "000");
-		Frame frame = new Frame(header, origin, dest, Helpers.strLenToBin(data.toString()), data, CRC8.toCRC8(data.toString()));
+		String checksum = Helpers.toByteBinString(CRC8.toCRC8(dataStr));
+		Frame frame = new Frame(header, origin, dest, Helpers.toByteBinString("" + dataStr.length()), data, checksum);
 
 		return frame;
 	}
