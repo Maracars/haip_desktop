@@ -13,22 +13,27 @@ public class CellRenderer extends DefaultTableCellRenderer{
 		
 		super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		JLabel label = new JLabel();
-		switch (column) {
-		case 0:
-			this.setHorizontalAlignment(LEFT);
-			this.setFont(new Font("Arial", Font.PLAIN, 16));
-			break;
-			
-		case 1:
-			
-			label.setText("" + value);
-			
-			label.setFont(new Font("Arial", Font.BOLD, 16));
-			label.setForeground(Color.red);
+
+		/*switch (column) {}*/
+
+		if (value.getClass().equals(Boolean.class)) {
 			label.setHorizontalAlignment(LEFT);
-			
-		return label;
-	  }
+			label.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+			label.setText("" + value);
+
+			if ((Boolean) value == true) {
+				label.setForeground(Color.DARK_GRAY);
+			}
+			else {
+				label.setForeground(Color.RED);
+			}
+			return label;
+		}
+		else {
+			this.setHorizontalAlignment(LEFT);
+			this.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+		}
+
 		this.setOpaque(true);
 		return this;
 	}

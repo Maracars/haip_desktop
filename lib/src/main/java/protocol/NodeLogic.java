@@ -87,7 +87,7 @@ public class NodeLogic implements Observer, Runnable {
 
 	public Frame createFrame(PacketType type, String origin, String dest) {
 
-		return createFrame(new Status("", ""), type, DataType.NULL, origin, dest);
+		return createFrame(new Status("", "", ""), type, DataType.NULL, origin, dest);
 	}
 
 

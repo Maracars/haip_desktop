@@ -1,9 +1,6 @@
 package ui.panels;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -214,13 +211,11 @@ public class MainPanel {
 		cellRenderer = new CellRenderer();
 		columnModel = new ColumnModel(cellRenderer);
 		tableModel = new TableModel(columnModel, tableDataList);
-		table = new JTable(tableModel, columnModel);
-		table.setRowHeight(this.window.getHeight() / 30);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-	}
 
-	public void updateTable() {
-		table.repaint();
+		table = new JTable(tableModel, columnModel);
+		table.setRowHeight(this.window.getHeight() / 20);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
 	}
 
 	private void initActions() {
