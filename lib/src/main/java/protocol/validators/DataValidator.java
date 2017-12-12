@@ -27,10 +27,10 @@ public class DataValidator implements Validator {
 		if (!Helpers.isInEnums(ActionType.class, status.getAction()))
 			return false;
 
-		if (Helpers.isInEnums(StatusType.class, status.getStatus()))
+		if (!Helpers.isInEnums(StatusType.class, status.getStatus()))
 			return false;
 
-		if (Helpers.isInEnums(PermissionType.class, status.getPermission()))
+		if (!Helpers.isInEnums(PermissionType.class, status.getPermission()))
 			return false;
 
 		return true;

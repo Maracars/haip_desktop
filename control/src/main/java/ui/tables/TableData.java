@@ -4,14 +4,14 @@ public class TableData {
 
 	int shipID;
 	int position;
-	int desiredAction;
-	boolean allowed;
+	int action;
+	boolean permission;
 	
-	public TableData(int shipID, int position, int desiredAction, boolean allowed) {
+	public TableData(int shipID, int position, int action, boolean permission) {
 		this.shipID = shipID;
 		this.position = position;
-		this.desiredAction = desiredAction;
-		this.allowed = allowed;
+		this.action = action;
+		this.permission = permission;
 	}
 
 	public Object getFieldAt(int column) {
@@ -26,14 +26,14 @@ public class TableData {
 				}
 			}
 			case 2: {
-				switch (desiredAction) {
+				switch (action) {
 					case 0: return "Get Inside";
 					case 1: return "Get Outside";
 					case 2: return "Stay Idle";
 					default: return "Error: Illegal Action";
 				}
 			}
-			case 3: return allowed;
+			case 3: return permission;
 			default: return null;
 		}
 	}

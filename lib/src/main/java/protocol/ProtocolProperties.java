@@ -91,7 +91,7 @@ public final class ProtocolProperties {
 
 	public enum PermissionType {
 		DENY("00"),
-		ALLOW("01");
+		ALLOW("11");
 		private String string;
 
 		PermissionType(String name) {

@@ -17,13 +17,22 @@ import models.Status;
 
 public class DataParser implements Parser{
 
+	// Type, Status, Action, Permission (2 bits each)
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
 		try {
-			Status status = new Status(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE, HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + STATUS), 
-					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS, HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + STATUS + ACTION), 
-					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION, HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + STATUS + ACTION + PERMISSION));
-			Data data = new Data(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH, HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE), status);
+			String type = byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH,
+					HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE);
+			Status status = new Status(
+					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE,
+							HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS),
+					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS,
+							HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION),
+					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION,
+							HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION + PERMISSION));
+
+			Data data = new Data(type, status);
+
 			frame.setData(data);
 		} catch (StringIndexOutOfBoundsException | NumberFormatException e) {
 			frame.setData(null);

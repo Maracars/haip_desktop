@@ -31,12 +31,8 @@ public class CRC8 {
 		update((byte) b);
 	}
 
-	public static long getValue() {
+	public static int getValue() {
 		return (crc & 0xFF);
-	}
-
-	public static String getStrVal() {
-		return "" + getValue();
 	}
 
 	public static void reset() {
@@ -46,6 +42,15 @@ public class CRC8 {
 	public static String toCRC8(String string) {
 		reset();
 		update(string.getBytes());
-		return getStrVal();
+		return fillWithZeros(Integer.toBinaryString(getValue()));
+	}
+
+	public static String fillWithZeros(String binaryString) {
+		if (binaryString.length() < 8) {
+			for (int i = binaryString.length(); i < 8; i++) {
+				binaryString = "0" + binaryString;
+			}
+		}
+		return binaryString;
 	}
 }

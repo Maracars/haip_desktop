@@ -75,15 +75,17 @@ public class Serial extends Observable implements SerialPortEventListener {
             String readString = serialPort.readString();
             //System.out.println(readString);
             packet += readString;
-            System.out.println(packet);
+            //System.out.println(packet);
 
-            int result = FrameParser.parseRx(packet);
-            if (result == FrameParser.BAD_PACKET) {
-                packet = "";
-            } else if (result == FrameParser.FIN_PACKET) {
-                // TODO Parse packet to frame
-                notifyPacket(packet);
-                notifyFrame(FrameParser.getFrame());
+            if (packet.length() >= 6*8) {
+                int result = FrameParser.parseRx(packet);
+                if (result == FrameParser.BAD_PACKET) {
+                    packet = "";
+                } else if (result == FrameParser.FIN_PACKET) {
+                    // TODO Parse packet to frame
+                    notifyPacket(packet);
+                    notifyFrame(FrameParser.getFrame());
+                }
             }
         } catch (SerialPortException e) {
             e.printStackTrace();
@@ -108,7 +110,6 @@ public class Serial extends Observable implements SerialPortEventListener {
     }
 
     private void notifyFrame(Frame value) {
-        System.out.println("Haip");
         setChanged();
         notifyObservers(value);
     }

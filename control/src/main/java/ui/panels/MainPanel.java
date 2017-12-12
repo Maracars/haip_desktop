@@ -8,11 +8,14 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import jssc.SerialPortException;
+import models.Frame;
 import protocol.SerialObserver;
 import serial.Serial;
 import ui.log.LogModel;
@@ -21,7 +24,7 @@ import ui.tables.ColumnModel;
 import ui.tables.TableData;
 import ui.tables.TableModel;
 
-public class MainPanel {
+public class MainPanel implements Observer {
 	// Window
 	JFrame window;
 
@@ -31,13 +34,14 @@ public class MainPanel {
 	// Table Elements
 	JTable table;
 	List<TableData> tableDataList;
+	Frame frame;
 
 	// Buttons
 	JButton commButton, initButton;
 
 	// Serial Communication
 	Serial serial;
-	SerialObserver serialObserver;
+	//SerialObserver serialObserver;
 
 	// System Initialized
 	boolean systemInitialized;
@@ -51,7 +55,9 @@ public class MainPanel {
         this.initActions();
         this.initTable();
         this.serial = serial;
-        this.serialObserver = new SerialObserver(this.serial, this.tableDataList);
+		this.serial.addObserver(this);
+		this.frame = null;
+        //this.serialObserver = new SerialObserver(this.serial, this.tableDataList);
         this.systemInitialized = false;
 
         this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -61,6 +67,12 @@ public class MainPanel {
 
         this.window.setVisible(true);
         this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+
+		this.tableDataList.add(new TableData(
+				Integer.parseInt("10101010", 2),
+				Integer.parseInt("10", 2),
+				Integer.parseInt("01", 2),
+				false));
 	}
 
 	private Component createSplitPane() {
@@ -193,15 +205,15 @@ public class MainPanel {
 	}
 
 	private void initTable() {
-		tableDataList = new ArrayList<>();
+		this.tableDataList = new ArrayList<>();
         CellRenderer cellRenderer = new CellRenderer();
         ColumnModel columnModel = new ColumnModel(cellRenderer);
         TableModel tableModel = new TableModel(columnModel, tableDataList);
 
-		table = new JTable(tableModel, columnModel);
-		table.setRowHeight(this.window.getHeight() / 20);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
+		this.table = new JTable(tableModel, columnModel);
+		this.table.setRowHeight(this.window.getHeight() / 20);
+		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
 	}
 
 	private void initActions() {
@@ -214,6 +226,27 @@ public class MainPanel {
 		initAction = new InitAction("Initialize system",
                 new ImageIcon("control/src/main/resources/icons/start.png"),
                 "Initialize system", KeyEvent.VK_I);
+	}
+
+	@Override
+	public void update(Observable observable, Object object) {
+		if (object.getClass().equals(models.Frame.class)) {
+			this.frame = (Frame) object;
+
+			int shipID = Integer.parseInt(this.frame.getOriginId(), 2);
+			int status = Integer.parseInt(this.frame.getData().getStatus().getStatus(), 2);
+			int action = Integer.parseInt(this.frame.getData().getStatus().getAction(), 2);
+
+			TableData tableData = new TableData(shipID, status, action, false);
+			this.tableDataList.add(tableData);
+
+			/*this.tableDataList.add(new TableData(
+					Integer.parseInt("10101011", 2),
+					Integer.parseInt("10", 2),
+					Integer.parseInt("01", 2),
+					false));
+			this.table.repaint();*/
+		}
 	}
 
 	public class ExitAction extends AbstractAction {

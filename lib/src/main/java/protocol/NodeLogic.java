@@ -74,7 +74,9 @@ public class NodeLogic implements Observer, Runnable {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		receivedList.add(arg.toString());
+		if (arg.getClass().equals(String.class)) {
+			receivedList.add(arg.toString());
+		}
 	}
 
 	@Override
