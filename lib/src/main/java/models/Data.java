@@ -1,36 +1,11 @@
 package models;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Data {
 
-	//Request = 00
-	//Status = 01
-	//Response = 10
 	private String type;
 	private Status status;
-	private List<String> data; //Hau da data dana gordetzeko oingoz, gero egitura begiratu bikoda
-	private String allData;
 
-	public Data(String allData) {
-		this.allData = allData;
-	}
-	
-	
-	public String getAllData() {
-		return allData;
-	}
-
-
-	public void setAllData(String allData) {
-		this.allData = allData;
-	}
-
-
-	public Data() {
-		data = new ArrayList<String>();
-	}
+	public Data() {}
 
 	public Data(String type, Status status) {
 		this.type = type;
@@ -55,21 +30,9 @@ public class Data {
 
 	@Override
 	public String toString() {
-		String allData = "";
-		if (data != null)
-			for (String d : data) {
-				allData += d;
-			}
-		return allData;
+		return type + status.toString();
 	}
 
-	public List<String> getData() {
-		return data;
-	}
-
-	public void setData(List<String> data) {
-		this.data = data;
-	}
 
 
 }
