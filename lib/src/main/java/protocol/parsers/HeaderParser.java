@@ -1,4 +1,4 @@
-package protocol;
+package protocol.parsers;
 
 import static protocol.ProtocolProperties.COUNTER;
 import static protocol.ProtocolProperties.PACKET_TYPE;

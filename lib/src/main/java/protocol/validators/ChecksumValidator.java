@@ -1,4 +1,4 @@
-package protocol;
+package protocol.validators;
 
 import helpers.CRC8;
 import models.Frame;

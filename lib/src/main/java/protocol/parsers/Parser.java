@@ -1,4 +1,4 @@
-package protocol;
+package protocol.parsers;
 
 import java.util.List;
 

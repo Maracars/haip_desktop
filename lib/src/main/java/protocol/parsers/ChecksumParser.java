@@ -1,4 +1,4 @@
-package protocol;
+package protocol.parsers;
 
 import static protocol.ProtocolProperties.CHECKSUM;
 import static protocol.ProtocolProperties.DESTINATION_ID;

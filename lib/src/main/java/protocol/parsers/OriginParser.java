@@ -1,4 +1,4 @@
-package protocol;
+package protocol.parsers;
 
 import static protocol.ProtocolProperties.HEADER;
 import static protocol.ProtocolProperties.ORIGIN_ID;

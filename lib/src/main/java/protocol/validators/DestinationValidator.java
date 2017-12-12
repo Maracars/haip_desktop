@@ -1,6 +1,7 @@
-package protocol;
+package protocol.validators;
 
 import models.Frame;
+
 import static protocol.ProtocolProperties.MASTER_ID;
 
 public class DestinationValidator implements Validator{

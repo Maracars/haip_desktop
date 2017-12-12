@@ -1,8 +1,9 @@
-package protocol;
+package protocol.validators;
 
 import java.util.Arrays;
 
 import models.Frame;
+import protocol.ProtocolProperties;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.DataType;
 import protocol.ProtocolProperties.PermissionType;

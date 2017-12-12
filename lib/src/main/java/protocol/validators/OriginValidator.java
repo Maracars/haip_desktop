@@ -1,4 +1,4 @@
-package protocol;
+package protocol.validators;
 
 import static protocol.ProtocolProperties.MASTER_ID;
 
