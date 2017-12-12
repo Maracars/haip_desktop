@@ -16,6 +16,8 @@ public final class ProtocolProperties {
 	public static final int STATUS = 2;
 	public static final int ACTION = 2;
 	public static final int PERMISSION = 2;
+	
+	public static final String START_FRAME_VALUE = "101";
 
 	public enum DataType {
 		STATUS {
