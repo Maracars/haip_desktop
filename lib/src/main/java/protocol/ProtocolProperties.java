@@ -73,6 +73,69 @@ public final class ProtocolProperties {
 			}
 		}
 	}
+	
+	public enum ActionType {
+		IDDLE {
+
+			@Override
+			public String toString() {
+				return "10";
+			}
+			
+		},
+		ENTER {
+			@Override
+			public String toString() {
+				return "00";
+			}
+		},
+		LEAVE {
+			@Override
+			public String toString() {
+				return "01";
+			}
+		}
+	}
+	
+	public enum StatusType {
+		PARKING {
+			@Override
+			public String toString() {
+				return "00";
+			}
+			
+		},
+		TRANSIT {
+			@Override
+			public String toString() {
+				return "01";
+			}
+			
+		},
+		SEA {
+			@Override
+			public String toString() {
+				return "10";
+			}
+		}
+	}
+	
+	public enum PermissionType {
+		ENTER {
+			@Override
+			public String toString() {
+				return "00";
+			}
+			
+		},
+		LEAVE {
+			@Override
+			public String toString() {
+				return "01";
+			}
+			
+		}
+	}
 
 	public static final String MASTER_ID = "00000000";
 
