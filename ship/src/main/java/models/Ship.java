@@ -1,4 +1,6 @@
-package models;
+package java.models;
+
+import models.Status;
 
 import java.util.List;
 

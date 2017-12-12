@@ -16,7 +16,7 @@ public final class ProtocolProperties {
 	public static final int STATUS = 2;
 	public static final int ACTION = 2;
 	public static final int PERMISSION = 2;
-	
+
 	public static final String START_FRAME_VALUE = "101";
 	public static final int LOOP_CONNECTED_BOATS = 3;
 	public static final int LOOP_IDDLE_BOATS = 2;
@@ -24,122 +24,86 @@ public final class ProtocolProperties {
 
 
 	public enum DataType {
-		STATUS {
-			@Override
-			public String toString() {
-				return "00";
-			}
-		},
-		REQUEST {
-			@Override
-			public String toString() {
-				return "01";
-			}
-		},
-		RESPONSE {
-			@Override
-			public String toString() {
-				return "10";
-			}
-		},
-		NULL {
-			@Override
-			public String toString() {
-				return "";
-			}
+		STATUS("00"),
+		REQUEST("01"),
+		RESPONSE("10"),
+		NULL("");
+		private String string;
+
+		DataType(String name) {
+			string = name;
 		}
 
+		@Override
+		public String toString() {
+			return string;
+		}
 	}
 
 	public enum PacketType {
-		DISCOVERY {
-			@Override
-			public String toString() {
-				return "00";
-			}
-		},
-		ACK {
-			@Override
-			public String toString() {
-				return "01";
-			}
-		},
-		DATA {
-			@Override
-			public String toString() {
-				return "10";
-			}
-		},
-		TOKEN {
-			@Override
-			public String toString() {
-				return "11";
-			}
-		}
-	}
-	
-	public enum ActionType {
-		IDDLE {
+		DISCOVERY("00"),
+		ACK("01"),
+		DATA("10"),
+		TOKEN("11");
+		private String string;
 
-			@Override
-			public String toString() {
-				return "10";
-			}
-			
-		},
-		ENTER {
-			@Override
-			public String toString() {
-				return "00";
-			}
-		},
-		LEAVE {
-			@Override
-			public String toString() {
-				return "01";
-			}
+		PacketType(String name) {
+			string = name;
+		}
+
+		@Override
+		public String toString() {
+			return string;
 		}
 	}
-	
+
+	public enum ActionType {
+		IDDLE("10"),
+		ENTER("00"),
+		LEAVE("01");
+		private String string;
+
+		ActionType(String name) {
+			string = name;
+		}
+
+		@Override
+		public String toString() {
+			return string;
+		}
+	}
+
 	public enum StatusType {
-		PARKING {
-			@Override
-			public String toString() {
-				return "00";
-			}
-			
-		},
-		TRANSIT {
-			@Override
-			public String toString() {
-				return "01";
-			}
-			
-		},
-		SEA {
-			@Override
-			public String toString() {
-				return "10";
-			}
+		PARKING("00"),
+		TRANSIT("01"),
+		SEA("10");
+		private String string;
+
+		StatusType(String name) {
+			string = name;
+		}
+
+		@Override
+		public String toString() {
+			return string;
 		}
 	}
-	
+
 	public enum PermissionType {
-		DENY {
-			@Override
-			public String toString() {
-				return "00";
-			}
-			
-		},
-		ALLOW {
-			@Override
-			public String toString() {
-				return "01";
-			}
-			
+		DENY("00"),
+		ALLOW("01");
+		private String string;
+
+		PermissionType(String name) {
+			string = name;
+		}
+
+		@Override
+		public String toString() {
+			return string;
 		}
 	}
+
 
 	public static final String MASTER_ID = "00000000";
 
