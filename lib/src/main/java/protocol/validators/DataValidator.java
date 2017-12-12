@@ -1,37 +1,40 @@
 package protocol.validators;
 
-import java.util.Arrays;
-
+import helpers.Helpers;
+import models.Data;
 import models.Frame;
-import protocol.ProtocolProperties;
+import models.Status;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.DataType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
 
-public class DataValidator implements Validator{
-	
-	
+public class DataValidator implements Validator {
+
 
 	@Override
 	public boolean validate(Frame frame) {
 		//Check if length and real data length are equal
-		if(Integer.parseInt(frame.getLength(), 2) != (frame.getData().toString().length()/8))
+		Data data = frame.getData();
+		Status status = data.getStatus();
+		// TODO Here we should make a list of classes and comparable things
+		if (Integer.parseInt(frame.getLength(), 2) != (data.toString().length() / 8))
 			return false;
-		//Check if data type is valid
-		if(!Arrays.asList(DataType.values()).contains(frame.getData().getType()))
+
+		if (!Helpers.isInEnums(DataType.class, data.getType()))
 			return false;
-		//Check if action type is valid
-		if(!Arrays.asList(ActionType.values()).contains(frame.getData().getStatus().getAction()))
+
+		if (!Helpers.isInEnums(ActionType.class, status.getAction()))
 			return false;
-		//Check if status type is valid
-		if(!Arrays.asList(StatusType.values()).contains(frame.getData().getStatus().getStatus()))
+
+		if (Helpers.isInEnums(StatusType.class, status.getStatus()))
 			return false;
-		//Check if permission is valid
-		if(!Arrays.asList(PermissionType.values()).contains(frame.getData().getStatus().getPermission()))
+
+		if (Helpers.isInEnums(PermissionType.class, status.getPermission()))
 			return false;
+
 		return true;
-		
+
 	}
 
 

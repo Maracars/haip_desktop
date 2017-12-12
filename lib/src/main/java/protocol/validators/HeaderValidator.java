@@ -1,6 +1,8 @@
 package protocol.validators;
 
+import helpers.Helpers;
 import models.Frame;
+import protocol.ProtocolProperties.PacketType;
 
 import static protocol.ProtocolProperties.START_FRAME_VALUE;
 
@@ -11,11 +13,8 @@ public class HeaderValidator implements Validator {
 		if (!frame.getHeader().getStartFrame().equals(START_FRAME_VALUE)) {
 			return false;
 		}
+		return Helpers.isInEnums(PacketType.class, frame.getHeader().getPacketType());
 
-		/*List<String> jaja = Stream.of(PacketType.values()).map(PacketType::toString).filter(s -> s == frame.getHeader().getPacketType())
-				.collect(Collectors.toList());*/
-
-		return true;
 	}
 
 }
