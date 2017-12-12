@@ -12,6 +12,10 @@ public final class ProtocolProperties {
 	public static final int CHECKSUM = 8;
 	// TODO This has to be defined
 	public static final long TIMEOUT = 1000000000;
+	public static final int TYPE = 2;
+	public static final int STATUS = 2;
+	public static final int ACTION = 2;
+	public static final int PERMISSION = 2;
 
 	public enum DataType {
 		STATUS {
