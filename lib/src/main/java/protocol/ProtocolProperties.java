@@ -125,14 +125,14 @@ public final class ProtocolProperties {
 	}
 	
 	public enum PermissionType {
-		ENTER {
+		DENY {
 			@Override
 			public String toString() {
 				return "00";
 			}
 			
 		},
-		LEAVE {
+		ALLOW {
 			@Override
 			public String toString() {
 				return "01";
