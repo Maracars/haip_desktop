@@ -18,6 +18,10 @@ public final class ProtocolProperties {
 	public static final int PERMISSION = 2;
 	
 	public static final String START_FRAME_VALUE = "101";
+	public static final int LOOP_CONNECTED_BOATS = 3;
+	public static final int LOOP_IDDLE_BOATS = 2;
+	public static final int TIMEOUTED_LOOP_LIMIT = 5;
+
 
 	public enum DataType {
 		STATUS {

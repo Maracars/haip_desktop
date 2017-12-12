@@ -19,19 +19,24 @@ public class NodeLogic implements Observer, Runnable {
 	private Serial serial;
 	private List receivedList;
 	private ArrayList<Integer> connectedBoats;
+	private ArrayList<Integer> iddledBoats;
+	private HashMap<Integer, Integer> timeouts;
 
 	@SuppressWarnings("unchecked")
 	public NodeLogic(Serial serial) {
 		this.serial = serial;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new ArrayList<>();
+		iddledBoats = new ArrayList<>();
+		timeouts = new HashMap<>();
 		connectedBoats.add(1);
 	}
 
-	public void controllerIokse(String dest) {
+	public void controllerIokse(String boat) {
 
+		Integer boat_id = Integer.parseInt(boat);
 		// TODO This is going to be called for each boat, here we should have a list of connected boats, those that are iddle...
-		Frame fr = createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(dest));
+		Frame fr = createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat));
 		sendParsedFrame(fr);
 
 		long count = 0;
@@ -39,13 +44,16 @@ public class NodeLogic implements Observer, Runnable {
 		}
 		if (!receivedList.isEmpty()) {
 			//TODO Here we must send the response to the request.
-			System.out.println("Ship number " + dest + " sent " + receivedList);
+			if (iddledBoats.contains(boat_id)) addConnectedBoat(boat_id);
+			System.out.println("Ship number " + boat + " sent " + receivedList);
 			checkRequest(receivedList);
 			receivedList.clear();
 		} else {
 			System.out.println("timeout");
-		}
+			timeouts.put(boat_id, timeouts.getOrDefault(boat_id, 0) + 1);
 
+			if (timeouts.get(boat_id) >= ProtocolProperties.TIMEOUTED_LOOP_LIMIT) addIddleBoat(boat_id);
+		}
 
 	}
 
@@ -95,12 +103,24 @@ public class NodeLogic implements Observer, Runnable {
 
 		Data data = new Data(dataType.toString(), status);
 		String dataStr = Helpers.toByteBinString(data.toString());
-		// TODO The start frame has to be set and also how counter's work
-		Header header = new Header("101", type.toString(), "000");
+		// TODO We have think about how the counter work
+		Header header = new Header(ProtocolProperties.START_FRAME_VALUE, type.toString(), "000");
 		String checksum = Helpers.toByteBinString(CRC8.toCRC8(dataStr));
 		Frame frame = new Frame(header, origin, dest, Helpers.toByteBinString("" + dataStr.length()), data, checksum);
 
 		return frame;
+	}
+
+	private void addConnectedBoat(Integer boat) {
+		connectedBoats.add(boat);
+		iddledBoats.remove(boat);
+		timeouts.put(boat, 0);
+	}
+
+	private void addIddleBoat(Integer boat) {
+		System.out.println("Iddle boat added: " + boat);
+		iddledBoats.add(boat);
+		connectedBoats.remove(boat);
 	}
 
 	@Override
@@ -114,10 +134,20 @@ public class NodeLogic implements Observer, Runnable {
 	public void run() {
 		while (true) {
 			// This loop is repeated x times before calling the discovery function.
-			for (Integer boat : connectedBoats) {
+			for (int i = 0; i < ProtocolProperties.LOOP_IDDLE_BOATS; i++) {
 
-				controllerIokse(boat.toString());
+				for (int j = 0; j < ProtocolProperties.LOOP_CONNECTED_BOATS; j++) {
+					for (Integer boat : connectedBoats) {
+
+						controllerIokse(boat.toString());
+					}
+				}
+				for (Integer boat : iddledBoats) {
+
+					controllerIokse(boat.toString());
+				}
 			}
+
 
 		}
 	}
