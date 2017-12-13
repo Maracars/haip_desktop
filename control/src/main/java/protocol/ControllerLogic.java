@@ -5,6 +5,7 @@ import models.*;
 import serial.Serial;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static protocol.ProtocolProperties.ActionType;
 import static protocol.ProtocolProperties.StatusType;
@@ -14,8 +15,8 @@ public class ControllerLogic implements Observer, Runnable {
 
 	private Serial serial;
 	private List<Frame> receivedList;
-	private ArrayList<Integer> connectedBoats;
-	private ArrayList<Integer> idleBoats;
+	private Set<Integer> connectedBoats;
+	private Set<Integer> idleBoats;
 	private HashMap<Integer, Integer> timeouts;
 	private Port port;
 
@@ -24,8 +25,9 @@ public class ControllerLogic implements Observer, Runnable {
 		this.serial = serial;
 		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
-		connectedBoats = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7));
-		idleBoats = new ArrayList<>();
+		connectedBoats = new CopyOnWriteArraySet<>();
+		connectedBoats.add(3);
+		idleBoats = new CopyOnWriteArraySet<>();
 		timeouts = new HashMap<>();
 	}
 
@@ -35,7 +37,7 @@ public class ControllerLogic implements Observer, Runnable {
 
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat));
 		if (serial == null) {
-			System.out.println(fr );
+			System.out.println("Sent parsed token to boat number " + boat_id);
 		} else {
 			Helpers.sendParsedFrame(fr, serial);
 
@@ -47,23 +49,22 @@ public class ControllerLogic implements Observer, Runnable {
 		}
 		// TODO Here we take the first packet received, dunno if we must ensure we have just one...
 		// Here we check that we have received something or has timed out, and that the boat that has sent is the one we want
-		if (!receivedList.isEmpty() && receivedList.get(0).getOriginId().equals(boat)) {
-			if (receivedList.get(0).getData().getStatus().getAction().equals(ActionType.IDDLE.toString())) {
-				System.out.println("idle");
+		if (!receivedList.isEmpty() && receivedList.get(0).getOriginId().equals(Helpers.toByteBinString(boat))) {
+			if (receivedList.get(0).getData().getStatus().getAction().equals(ActionType.IDLE.toString())) {
 				addTimeout(boat_id);
 			} else {
 				//TODO Here we must send the response to the request.
 				if (idleBoats.contains(boat_id)) addConnectedBoat(boat_id);
 				System.out.println("Ship number " + boat + " sent " + receivedList);
 				checkRequest(receivedList.get(0));
-				receivedList.clear();
 			}
 
 		} else {
-			System.out.println("timeout");
 			addTimeout(boat_id);
 
 		}
+		receivedList.clear();
+
 
 	}
 
@@ -82,10 +83,21 @@ public class ControllerLogic implements Observer, Runnable {
 
 		if (status_str.equals(StatusType.PARKING.toString()) && action_str.equals(ActionType.LEAVE.toString())) {
 			boolean okay = port.addToTransitionZone(ship, action_str);
-
+			if (okay) {
+				System.out.println("Ship :" + frame.getOriginId() + " is going to the transit zone, to leave the dock");
+			}
 			//TODO Taking into account if there's place in the transition zone(okay), send the response to the boat
 
 		} else if (status_str.equals(StatusType.TRANSIT.toString())) {
+
+			if (action_str.equals(ActionType.LEAVE.toString())) {
+				System.out.println("Ship :" + frame.getOriginId() + " is going from the transit zone to the sea. Goodbye!");
+
+			}
+			if (action_str.equals(ActionType.ENTER.toString())) {
+				System.out.println("Ship :" + frame.getOriginId() + " is going from the transit zone to the dock");
+			}
+
 			// TODO Here we should give the permission to leave or enter, taking what's asked.
 
 		} else if (status_str.equals(StatusType.SEA.toString()) && action_str.equals(ActionType.ENTER.toString())) {
@@ -93,8 +105,16 @@ public class ControllerLogic implements Observer, Runnable {
 			// TODO We have to send the id of this mooring in the data
 			boolean okay = port.addToTransitionZone(ship, action_str);
 			//TODO Taking into account if there's place in the transition zone(okay), send the response to the boat
+			if (okay) {
+				System.out.println("Ship :" + frame.getOriginId() + " is going to the transit zone, to enter to the dock");
+				System.out.println("The mooring assigned: " + freeMooring.getId());
+			}
 
 
+		} else {
+			//TODO Here we must say that the packet is not valid, in order the client to know
+
+			System.out.println("Invalid state");
 		}
 
 	}
@@ -106,36 +126,32 @@ public class ControllerLogic implements Observer, Runnable {
 	}
 
 	private void addIdleBoat(Integer boat) {
-		System.out.println("Idle boat added: " + boat);
 		idleBoats.add(boat);
+		System.out.println("Idle boat added: " + boat + " these are the idle boats: " + idleBoats);
 		connectedBoats.remove(boat);
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		System.out.println(arg);
 		receivedList.add((Frame) arg);
 	}
 
 	@Override
 	public void run() {
 		while (true) {
-			// This loop is repeated x times before calling the discovery function.
 			for (int i = 0; i < ProtocolProperties.LOOP_IDLE_BOATS; i++) {
 
 				for (int j = 0; j < ProtocolProperties.LOOP_CONNECTED_BOATS; j++) {
 					for (Integer boat : connectedBoats) {
-
 						controllerIokse(boat.toString());
 					}
 				}
 				for (Integer boat : idleBoats) {
-
 					controllerIokse(boat.toString());
 				}
+
+
 			}
-
-
 		}
 	}
 }

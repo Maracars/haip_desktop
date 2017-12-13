@@ -1,10 +1,7 @@
 package protocol;
 
 import jssc.SerialPortException;
-import models.Dock;
-import models.Mooring;
-import models.Port;
-import models.Status;
+import models.*;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -37,16 +34,21 @@ public class ProbaObserver extends Observable {
 
 	public void initMoorings(ArrayList<Mooring> moorings) {
 		for (Integer i = 0; i < 10; i++) {
-			moorings.add(new Mooring(i.toString()));
+			Ship ship = null;
+			if (i == 2 ) {
+				ship = new Ship("00000010");
+
+			}
+			moorings.add(new Mooring(i.toString(), ship));
+
 		}
-		Status status = new Status(ProtocolProperties.StatusType.SEA.toString(), ProtocolProperties.ActionType.ENTER.toString(), ProtocolProperties.PermissionType.ASK.toString());
+		Status status = new Status(ProtocolProperties.StatusType.PARKING.toString(), ProtocolProperties.ActionType.IDLE.toString(), ProtocolProperties.PermissionType.ASK.toString());
 
 		System.out.println("jajajjaaiokese" + FrameCreator.createResponse("00000001", "00000000", status));
 	}
 
 	public void setWatched(String string) {
 		watched += string;
-		System.out.println(watched);
 
 		int result = FrameParser.parseRx(watched);
 		if (result == FrameParser.BAD_PACKET) {

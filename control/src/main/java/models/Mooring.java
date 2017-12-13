@@ -11,9 +11,15 @@ public class Mooring {
 		this.ship = null;
 	}
 
+	public Mooring(String id, Ship ship) {
+		this.id = id;
+		this.ship = null;
+	}
+
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}

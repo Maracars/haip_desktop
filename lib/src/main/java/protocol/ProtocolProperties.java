@@ -22,7 +22,7 @@ public final class ProtocolProperties {
 	public static final String START_FRAME_VALUE = "101";
 	public static final int LOOP_CONNECTED_BOATS = 3;
 	public static final int LOOP_IDLE_BOATS = 2;
-	public static final int TIMEOUTED_LOOP_LIMIT = 5;
+	public static final int TIMEOUTED_LOOP_LIMIT = 2;
 	public static final int TRANSIT_ZONE_SHIP_LIMIT = 3;
 
 
@@ -80,7 +80,7 @@ public final class ProtocolProperties {
 	}
 
 	public enum ActionType {
-		IDDLE("10"),
+		IDLE("10"),
 		ENTER("00"),
 		LEAVE("01");
 		private String string;
