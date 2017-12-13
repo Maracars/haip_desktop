@@ -1,15 +1,31 @@
 package protocol;
 
-import models.Frame;
-import protocol.parsers.*;
-import protocol.validators.*;
+import static protocol.ProtocolProperties.CHECKSUM;
+import static protocol.ProtocolProperties.DESTINATION_ID;
+import static protocol.ProtocolProperties.HEADER;
+import static protocol.ProtocolProperties.INF;
+import static protocol.ProtocolProperties.LENGTH;
+import static protocol.ProtocolProperties.ORIGIN_ID;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static protocol.ProtocolProperties.*;
+import models.Frame;
+import protocol.parsers.ChecksumParser;
+import protocol.parsers.DataParser;
+import protocol.parsers.DestinationParser;
+import protocol.parsers.HeaderParser;
+import protocol.parsers.LengthParser;
+import protocol.parsers.OriginParser;
+import protocol.parsers.Parser;
+import protocol.validators.ChecksumValidator;
+import protocol.validators.DataValidator;
+import protocol.validators.DestinationValidator;
+import protocol.validators.HeaderValidator;
+import protocol.validators.LengthValidator;
+import protocol.validators.OriginValidator;
+import protocol.validators.Validator;
 
 public class FrameParser {
 
@@ -63,11 +79,18 @@ public class FrameParser {
 	}
 
 	private static boolean checkPacketSize(String byteString) {
-		int length = Integer.parseInt(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID,
-				HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH));
+		try {
+			
+			int length = Integer.parseInt(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID,
+					HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH),2);
 
-		return (byteString.length() == (HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH
-				+ (INF * length) + CHECKSUM));
+			return (byteString.length() >= (HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH
+					+ (INF * length) + CHECKSUM));
+			
+		}catch (StringIndexOutOfBoundsException e) {
+			return false;
+		}
+
 	}
 
 	public static void resetCommunication() {
