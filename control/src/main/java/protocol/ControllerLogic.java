@@ -24,10 +24,9 @@ public class ControllerLogic implements Observer, Runnable {
 		this.serial = serial;
 		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
-		connectedBoats = new ArrayList<>();
+		connectedBoats = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7));
 		idleBoats = new ArrayList<>();
 		timeouts = new HashMap<>();
-		connectedBoats.add(1);
 	}
 
 	public void controllerIokse(String boat) {
@@ -35,7 +34,12 @@ public class ControllerLogic implements Observer, Runnable {
 		Integer boat_id = Integer.parseInt(boat);
 
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat));
-		Helpers.sendParsedFrame(fr, serial);
+		if (serial == null) {
+			System.out.println(fr );
+		} else {
+			Helpers.sendParsedFrame(fr, serial);
+
+		}
 
 		long count = 0;
 		//noinspection StatementWithEmptyBody
@@ -109,7 +113,7 @@ public class ControllerLogic implements Observer, Runnable {
 
 	@Override
 	public void update(Observable o, Object arg) {
-
+		System.out.println(arg);
 		receivedList.add((Frame) arg);
 	}
 

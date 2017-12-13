@@ -6,6 +6,11 @@ public class Mooring {
 	// If null is available, if has ship is not available
 	private Ship ship;
 
+	public Mooring(String id) {
+		this.id = id;
+		this.ship = null;
+	}
+
 	public String getId() {
 		return id;
 	}
