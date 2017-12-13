@@ -15,7 +15,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import jssc.SerialPortException;
+import models.Data;
 import models.Frame;
+import models.Header;
+import models.Status;
 import protocol.SerialObserver;
 import serial.Serial;
 import ui.log.LogModel;
@@ -24,7 +27,7 @@ import ui.tables.ColumnModel;
 import ui.tables.TableData;
 import ui.tables.TableModel;
 
-public class MainPanel implements Observer {
+public class MainPanel {
 	// Window
 	JFrame window;
 
@@ -33,15 +36,14 @@ public class MainPanel implements Observer {
 
 	// Table Elements
 	JTable table;
-	List<TableData> tableDataList;
-	Frame frame;
+	TableModel tableModel;
 
 	// Buttons
 	JButton commButton, initButton;
 
 	// Serial Communication
 	Serial serial;
-	//SerialObserver serialObserver;
+	SerialObserver serialObserver;
 
 	// System Initialized
 	boolean systemInitialized;
@@ -52,13 +54,7 @@ public class MainPanel implements Observer {
         this.window.setLocation(0, 0);
         this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
 
-        this.initActions();
-        this.initTable();
-        this.serial = serial;
-		this.serial.addObserver(this);
-		this.frame = null;
-        //this.serialObserver = new SerialObserver(this.serial, this.tableDataList);
-        this.systemInitialized = false;
+        this.initThings(serial);
 
         this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.window.addWindowListener(this.createWindowClosingAdapter());
@@ -67,12 +63,17 @@ public class MainPanel implements Observer {
 
         this.window.setVisible(true);
         this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+	}
 
-		this.tableDataList.add(new TableData(
-				Integer.parseInt("10101010", 2),
-				Integer.parseInt("10", 2),
-				Integer.parseInt("01", 2),
-				false));
+	private void initThings(Serial serial) {
+		this.initActions();
+		this.initTable();
+
+		this.serial = serial;
+		this.serialObserver = new SerialObserver(this.serial, this.tableModel);
+		this.serial.addObserver(this.serialObserver);
+
+		this.systemInitialized = false;
 	}
 
 	private Component createSplitPane() {
@@ -205,10 +206,9 @@ public class MainPanel implements Observer {
 	}
 
 	private void initTable() {
-		this.tableDataList = new ArrayList<>();
         CellRenderer cellRenderer = new CellRenderer();
         ColumnModel columnModel = new ColumnModel(cellRenderer);
-        TableModel tableModel = new TableModel(columnModel, tableDataList);
+        this.tableModel = new TableModel(columnModel);
 
 		this.table = new JTable(tableModel, columnModel);
 		this.table.setRowHeight(this.window.getHeight() / 20);
@@ -226,27 +226,6 @@ public class MainPanel implements Observer {
 		initAction = new InitAction("Initialize system",
                 new ImageIcon("control/src/main/resources/icons/start.png"),
                 "Initialize system", KeyEvent.VK_I);
-	}
-
-	@Override
-	public void update(Observable observable, Object object) {
-		if (object.getClass().equals(models.Frame.class)) {
-			this.frame = (Frame) object;
-
-			int shipID = Integer.parseInt(this.frame.getOriginId(), 2);
-			int status = Integer.parseInt(this.frame.getData().getStatus().getStatus(), 2);
-			int action = Integer.parseInt(this.frame.getData().getStatus().getAction(), 2);
-
-			TableData tableData = new TableData(shipID, status, action, false);
-			this.tableDataList.add(tableData);
-
-			/*this.tableDataList.add(new TableData(
-					Integer.parseInt("10101011", 2),
-					Integer.parseInt("10", 2),
-					Integer.parseInt("01", 2),
-					false));
-			this.table.repaint();*/
-		}
 	}
 
 	public class ExitAction extends AbstractAction {
@@ -285,7 +264,7 @@ public class MainPanel implements Observer {
 		}
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent arg0) {
 			if (!serial.isConnected()) {
 				try {
 					serial.openConnection();

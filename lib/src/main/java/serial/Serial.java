@@ -36,6 +36,7 @@ public class Serial extends Observable implements SerialPortEventListener {
         else {
             // Only one port connected
             if (portNames.length == 1) {
+                COMPortChooser portChooser = new COMPortChooser(null, portNames);
                 serialPort = new SerialPort(portNames[0]);
             }
             // More than one port connected

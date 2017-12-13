@@ -17,12 +17,17 @@ public class COMPortChooser extends JDialog implements ActionListener {
 		super(window, "Choose a serial port", true);
 		this.window = window;
 		this.portStrings = portStrings;
-		this.setSize(600, 600);
-		this.setLocation(340, 100);
-		this.setContentPane(createWindowPanel());
-		// bOk is clicked when enter
 
-		this.getRootPane().setDefaultButton(bOk);
+		this.setSize((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 6),
+				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2);
+
+		this.setLocation((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 5),
+				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() - this.getHeight());
+
+		this.setContentPane(createWindowPanel());
+
+		// bOk is clicked when enter
+		this.getRootPane().setDefaultButton(this.bOk);
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		this.setVisible(true);
 	}
@@ -48,7 +53,6 @@ public class COMPortChooser extends JDialog implements ActionListener {
 		bOk.setPreferredSize(new Dimension(100, 20));
 		bOk.setMinimumSize(new Dimension(100, 20));
 		bOk.setMaximumSize(new Dimension(100, 20));
-
 
 		panel.add(bOk);
 		return panel;

@@ -1,28 +1,34 @@
 package ui.tables;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 	
-	List<TableData> tableData;
+	List<TableData> tableDataList;
 	ColumnModel columnModel;
 	
-	public TableModel(ColumnModel columnModel, List<TableData> tableData) {
-		this.tableData = tableData;
+	public TableModel(ColumnModel columnModel) {
+		this.tableDataList = new ArrayList<>();
 		this.columnModel = columnModel;
+		this.fireTableDataChanged();
+	}
+
+	public void add(TableData tableData) {
+		this.tableDataList.add(tableData);
 		this.fireTableDataChanged();
 	}
 	
 	public void remove(int index) {
-		tableData.remove(index);
+		this.tableDataList.remove(index);
 		this.fireTableDataChanged();
 	}
 	
 	@Override
 	public int getRowCount() {
-		return tableData.size();
+		return tableDataList.size();
 	}
 
 	@Override
@@ -32,7 +38,7 @@ public class TableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TableData data = tableData.get(rowIndex);
+		TableData data = tableDataList.get(rowIndex);
 		return data.getFieldAt(columnIndex);
 	}
 	
