@@ -1,8 +1,7 @@
 package protocol;
 
 import helpers.Helpers;
-import models.Frame;
-import models.Status;
+import models.*;
 import serial.Serial;
 
 import java.util.*;
@@ -18,10 +17,12 @@ public class ControllerLogic implements Observer, Runnable {
 	private ArrayList<Integer> connectedBoats;
 	private ArrayList<Integer> idleBoats;
 	private HashMap<Integer, Integer> timeouts;
+	private Port port;
 
 	@SuppressWarnings("unchecked")
-	public ControllerLogic(Serial serial) {
+	public ControllerLogic(Serial serial, Port port) {
 		this.serial = serial;
+		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new ArrayList<>();
 		idleBoats = new ArrayList<>();
@@ -73,13 +74,22 @@ public class ControllerLogic implements Observer, Runnable {
 		Status status = frame.getData().getStatus();
 		String status_str = status.getStatus();
 		String action_str = status.getAction();
+		Ship ship = new Ship(frame.getOriginId());
 
 		if (status_str.equals(StatusType.PARKING.toString()) && action_str.equals(ActionType.LEAVE.toString())) {
+			boolean okay = port.addToTransitionZone(ship, action_str);
 
+			//TODO Taking into account if there's place in the transition zone(okay), send the response to the boat
 
 		} else if (status_str.equals(StatusType.TRANSIT.toString())) {
+			// TODO Here we should give the permission to leave or enter, taking what's asked.
 
 		} else if (status_str.equals(StatusType.SEA.toString()) && action_str.equals(ActionType.ENTER.toString())) {
+			Mooring freeMooring = port.getFreeMooring(ship);
+			// TODO We have to send the id of this mooring in the data
+			boolean okay = port.addToTransitionZone(ship, action_str);
+			//TODO Taking into account if there's place in the transition zone(okay), send the response to the boat
+
 
 		}
 
