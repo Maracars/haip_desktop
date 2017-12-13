@@ -1,7 +1,5 @@
 package protocol;
 
-import java.util.Arrays;
-
 public final class ProtocolProperties {
 
 	public static final int START_FRAME = 3;
@@ -25,7 +23,7 @@ public final class ProtocolProperties {
 	public static final int LOOP_CONNECTED_BOATS = 3;
 	public static final int LOOP_IDLE_BOATS = 2;
 	public static final int TIMEOUTED_LOOP_LIMIT = 5;
-	public static final int TRANSIT_ZONE_SHIP_LIMIT= 3;
+	public static final int TRANSIT_ZONE_SHIP_LIMIT = 3;
 
 
 	public enum DataType {
@@ -43,10 +41,10 @@ public final class ProtocolProperties {
 		public String toString() {
 			return string;
 		}
-		
+
 		public static DataType getName(String value) {
-			for(DataType dt : DataType.values()) {
-				if(value.equals(dt.toString())) {
+			for (DataType dt : DataType.values()) {
+				if (value.equals(dt.toString())) {
 					return dt;
 				}
 			}
@@ -69,16 +67,16 @@ public final class ProtocolProperties {
 		public String toString() {
 			return string;
 		}
-		
+
 		public static PacketType getName(String value) {
-			for(PacketType pt : PacketType.values()) {
-				if(value.equals(pt.toString())) {
+			for (PacketType pt : PacketType.values()) {
+				if (value.equals(pt.toString())) {
 					return pt;
 				}
 			}
 			return null;
 		}
-	
+
 	}
 
 	public enum ActionType {
@@ -95,10 +93,10 @@ public final class ProtocolProperties {
 		public String toString() {
 			return string;
 		}
-		
+
 		public static ActionType getName(String value) {
-			for(ActionType at : ActionType.values()) {
-				if(value.equals(at.toString())) {
+			for (ActionType at : ActionType.values()) {
+				if (value.equals(at.toString())) {
 					return at;
 				}
 			}
@@ -120,10 +118,10 @@ public final class ProtocolProperties {
 		public String toString() {
 			return string;
 		}
-		
+
 		public static StatusType getName(String value) {
-			for(StatusType st : StatusType.values()) {
-				if(value.equals(st.toString())) {
+			for (StatusType st : StatusType.values()) {
+				if (value.equals(st.toString())) {
 					return st;
 				}
 			}
@@ -133,7 +131,9 @@ public final class ProtocolProperties {
 
 	public enum PermissionType {
 		DENY("00"),
-		ALLOW("11");
+		ALLOW("11"),
+		ASK("10");
+
 		private String string;
 
 		PermissionType(String name) {
@@ -144,16 +144,16 @@ public final class ProtocolProperties {
 		public String toString() {
 			return string;
 		}
-		
+
 		public static PermissionType getName(String value) {
-			for(PermissionType pt : PermissionType.values()) {
-				if(value.equals(pt.toString())) {
+			for (PermissionType pt : PermissionType.values()) {
+				if (value.equals(pt.toString())) {
 					return pt;
 				}
 			}
 			return null;
 		}
-		
+
 	}
 
 	public static final String MASTER_ID = "00000000";

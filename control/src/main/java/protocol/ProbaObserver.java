@@ -4,6 +4,7 @@ import jssc.SerialPortException;
 import models.Dock;
 import models.Mooring;
 import models.Port;
+import models.Status;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -35,9 +36,12 @@ public class ProbaObserver extends Observable {
 
 
 	public void initMoorings(ArrayList<Mooring> moorings) {
-		for (Integer i = 0; i < 50; i++) {
+		for (Integer i = 0; i < 10; i++) {
 			moorings.add(new Mooring(i.toString()));
 		}
+		Status status = new Status(ProtocolProperties.StatusType.SEA.toString(), ProtocolProperties.ActionType.ENTER.toString(), ProtocolProperties.PermissionType.ASK.toString());
+
+		System.out.println("jajajjaaiokese" + FrameCreator.createResponse("00000001", "00000000", status));
 	}
 
 	public void setWatched(String string) {

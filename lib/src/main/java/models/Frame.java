@@ -18,6 +18,14 @@ public class Frame {
 		this.checksum = checksum;
 	}
 
+	public Frame(Header header, String originId, String destinationId, String length, Data data) {
+		this.header = header;
+		this.originId = originId;
+		this.destinationId = destinationId;
+		this.length = length;
+		this.data = data;
+	}
+
 	public Frame() {
 	}
 
@@ -71,9 +79,8 @@ public class Frame {
 
 	@Override
 	public String toString() {
-		return header.toString() + originId + destinationId + length + ((data == null) ? "": data.toString())  + checksum;
+		return header.toString() + originId + destinationId + length + ((data == null) ? "" : data.toString()) + checksum;
 	}
-	
-	
+
 
 }

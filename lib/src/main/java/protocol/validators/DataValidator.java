@@ -18,7 +18,7 @@ public class DataValidator implements Validator {
 	@Override
 	public boolean validate(Frame frame) {
 		//Check if length and real data length are equal
-		if(frame.getData() != null) {
+		if (frame.getData() != null) {
 			Data data = frame.getData();
 			Status status = data.getStatus();
 
@@ -28,8 +28,7 @@ public class DataValidator implements Validator {
 				put(StatusType.class, status.getStatus());
 				put(PermissionType.class, status.getPermission());
 			}};
-			// TODO Here we should make a list of classes and comparable things
-			if (Integer.parseInt(frame.getLength(), 2) != (data.toString().length() / 8))
+			if (Integer.parseInt(frame.getLength(), 2) != (data.toString().length()))
 				return false;
 
 			for (Map.Entry<Class, String> entry : validator.entrySet()) {
@@ -38,7 +37,6 @@ public class DataValidator implements Validator {
 					return false;
 				}
 			}
-			return true;
 		}
 		return true;
 
