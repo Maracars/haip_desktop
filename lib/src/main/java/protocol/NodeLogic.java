@@ -17,7 +17,7 @@ public class NodeLogic implements Observer, Runnable {
 	private Serial serial;
 	private List receivedList;
 	private ArrayList<Integer> connectedBoats;
-	private ArrayList<Integer> iddledBoats;
+	private ArrayList<Integer> idleBoats;
 	private HashMap<Integer, Integer> timeouts;
 
 	@SuppressWarnings("unchecked")
@@ -25,7 +25,7 @@ public class NodeLogic implements Observer, Runnable {
 		this.serial = serial;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new ArrayList<>();
-		iddledBoats = new ArrayList<>();
+		idleBoats = new ArrayList<>();
 		timeouts = new HashMap<>();
 		connectedBoats.add(1);
 	}
@@ -33,7 +33,7 @@ public class NodeLogic implements Observer, Runnable {
 	public void controllerIokse(String boat) {
 
 		Integer boat_id = Integer.parseInt(boat);
-		// TODO This is going to be called for each boat, here we should have a list of connected boats, those that are iddle...
+		// TODO This is going to be called for each boat, here we should have a list of connected boats, those that are idle...
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat));
 		Helpers.sendParsedFrame(fr, serial);
 
@@ -42,7 +42,7 @@ public class NodeLogic implements Observer, Runnable {
 		}
 		if (!receivedList.isEmpty()) {
 			//TODO Here we must send the response to the request.
-			if (iddledBoats.contains(boat_id)) addConnectedBoat(boat_id);
+			if (idleBoats.contains(boat_id)) addConnectedBoat(boat_id);
 			System.out.println("Ship number " + boat + " sent " + receivedList);
 			checkRequest(receivedList);
 			receivedList.clear();
@@ -50,7 +50,7 @@ public class NodeLogic implements Observer, Runnable {
 			System.out.println("timeout");
 			timeouts.put(boat_id, timeouts.getOrDefault(boat_id, 0) + 1);
 
-			if (timeouts.get(boat_id) >= ProtocolProperties.TIMEOUTED_LOOP_LIMIT) addIddleBoat(boat_id);
+			if (timeouts.get(boat_id) >= ProtocolProperties.TIMEOUTED_LOOP_LIMIT) addIdleBoat(boat_id);
 		}
 
 	}
@@ -62,21 +62,19 @@ public class NodeLogic implements Observer, Runnable {
 
 	private void addConnectedBoat(Integer boat) {
 		connectedBoats.add(boat);
-		iddledBoats.remove(boat);
+		idleBoats.remove(boat);
 		timeouts.put(boat, 0);
 	}
 
-	private void addIddleBoat(Integer boat) {
-		System.out.println("Iddle boat added: " + boat);
-		iddledBoats.add(boat);
+	private void addIdleBoat(Integer boat) {
+		System.out.println("Idle boat added: " + boat);
+		idleBoats.add(boat);
 		connectedBoats.remove(boat);
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if (arg.getClass().equals(String.class)) {
-			receivedList.add(arg.toString());
-		}
+		receivedList.add(arg);
 	}
 
 	@Override
@@ -91,7 +89,7 @@ public class NodeLogic implements Observer, Runnable {
 						controllerIokse(boat.toString());
 					}
 				}
-				for (Integer boat : iddledBoats) {
+				for (Integer boat : idleBoats) {
 
 					controllerIokse(boat.toString());
 				}
