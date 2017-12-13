@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static protocol.ProtocolProperties.*;
+
 public class FrameParser {
 
 	public static final int FIN_PACKET = 1;
@@ -61,7 +63,11 @@ public class FrameParser {
 	}
 
 	private static boolean checkPacketSize(String byteString) {
-		return new BigInteger(byteString, 2).toByteArray().length >= 5;
+		int length = Integer.parseInt(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID,
+				HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH));
+
+		return (byteString.length() >= (HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH
+				+ (INF * length) + CHECKSUM));
 	}
 
 	public static void resetCommunication() {

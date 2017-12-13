@@ -77,15 +77,11 @@ public class Serial extends Observable implements SerialPortEventListener {
             packet += readString;
             //System.out.println(packet);
 
-            if (packet.length() >= 6*8) {
-                int result = FrameParser.parseRx(packet);
-                if (result == FrameParser.BAD_PACKET) {
-                    packet = "";
-                } else if (result == FrameParser.FIN_PACKET) {
-                    // TODO Parse packet to frame
-                    notifyPacket(packet);
-                    notifyFrame(FrameParser.getFrame());
-                }
+            int result = FrameParser.parseRx(packet);
+            if (result == FrameParser.BAD_PACKET) {
+                packet = "";
+            } else if (result == FrameParser.FIN_PACKET) {
+                notifyFrame(FrameParser.getFrame());
             }
         } catch (SerialPortException e) {
             e.printStackTrace();
@@ -103,15 +99,10 @@ public class Serial extends Observable implements SerialPortEventListener {
         serialPort.writeString(string);
     }
 
-    private void notifyPacket(String value) {
-        setChanged();
-        notifyObservers(value);
-        packet = "";
-    }
-
     private void notifyFrame(Frame value) {
         setChanged();
         notifyObservers(value);
+        packet = "";
     }
 
 }

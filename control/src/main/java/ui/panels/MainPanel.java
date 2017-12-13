@@ -15,10 +15,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import jssc.SerialPortException;
-import models.Data;
+import models.*;
 import models.Frame;
-import models.Header;
-import models.Status;
 import protocol.SerialObserver;
 import serial.Serial;
 import ui.log.LogModel;
@@ -49,20 +47,16 @@ public class MainPanel {
 	boolean systemInitialized;
 
 	public MainPanel(Serial serial) {
-        this.window = new JFrame("Haip Ain't an Infor Project");
-        this.window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
-        this.window.setLocation(0, 0);
-        this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
-
+		this.createJFrame();
         this.initThings(serial);
+        this.addContentToJFrame();
+	}
 
-        this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        this.window.addWindowListener(this.createWindowClosingAdapter());
-        this.window.setJMenuBar(this.createMenuBar());
-        this.window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
-
-        this.window.setVisible(true);
-        this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+	private void createJFrame() {
+		this.window = new JFrame("Haip Ain't an Infor Project");
+		this.window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
+		this.window.setLocation(0, 0);
+		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
 	}
 
 	private void initThings(Serial serial) {
@@ -74,6 +68,16 @@ public class MainPanel {
 		this.serial.addObserver(this.serialObserver);
 
 		this.systemInitialized = false;
+	}
+
+	private void addContentToJFrame() {
+		this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		this.window.addWindowListener(this.createWindowClosingAdapter());
+		this.window.setJMenuBar(this.createMenuBar());
+		this.window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
+
+		this.window.setVisible(true);
+		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
 	private Component createSplitPane() {

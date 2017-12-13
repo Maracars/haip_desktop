@@ -9,6 +9,7 @@ public final class ProtocolProperties {
 	public static final int ORIGIN_ID = 8;
 	public static final int DESTINATION_ID = 8;
 	public static final int LENGTH = 8;
+	public static final int INF = 8;
 	public static final int CHECKSUM = 8;
 	// TODO This has to be defined
 	public static final long TIMEOUT = 1000000000;
