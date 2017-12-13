@@ -1,37 +1,5 @@
 package ui.panels;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-
 import helpers.Helpers;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
@@ -41,16 +9,32 @@ import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.StatusType;
 import serial.Serial;
 import ui.log.LogModel;
+import ui.log.LogPanel;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+
+import static ui.panels.ActionMessages.*;
 
 public class MainPanel {
 	// Window
 	JFrame window;
 
-	// Actions
-	AbstractAction exitAction, commAction, initAction, decisionAction;
+	// Log Elements
+	LogModel logModel;
 
 	// Buttons
-	JButton commButton, initButton, actionButton;
+	JButton connectButton, waitForDiscoveryAction, actionButton;
+
+	// Actions
+	AbstractAction exitAction, connectAction, initAction, decisionAction;
 
 	// Serial Communication
 	Serial serial;
@@ -59,7 +43,7 @@ public class MainPanel {
 	Ship ship;
 
 	// System Initialized
-	boolean systemInitialized;
+	boolean shipDiscovered;
 
 	public MainPanel(Serial serial, Ship ship) {
 		this.createJFrame();
@@ -69,13 +53,14 @@ public class MainPanel {
 
 	private void createJFrame() {
 		this.window = new JFrame("Haip Ain't an Infor Project");
-		this.window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
+		this.window.setIconImage((new ImageIcon("ship/src/main/resources/HAIP_squaredLogo.png").getImage()));
 		this.window.setLocation(0, 0);
 		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
 		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
 	private void initThings(Serial serial, Ship ship) {
+		IconFontSwing.register(FontAwesome.getIconFont());
 		this.initActions();
 
 		this.serial = serial;
@@ -84,7 +69,7 @@ public class MainPanel {
 
 		this.ship = ship;
 
-		this.systemInitialized = false;
+		this.shipDiscovered = false;
 	}
 
 	private void addContentToJFrame() {
@@ -99,7 +84,7 @@ public class MainPanel {
 	private Component createSplitPane() {
 		JSplitPane splitPane = new JSplitPane();
 
-		splitPane.setDividerLocation(this.window.getWidth() / 8);
+		splitPane.setDividerLocation(this.window.getWidth() / 7);
 		splitPane.setLeftComponent(createLeftPanel());
 		splitPane.setRightComponent(createShipPanel());
 
@@ -119,7 +104,9 @@ public class MainPanel {
 		panel.setBorder(new EmptyBorder(0, 10, 10, 10));
 
 		this.actionButton = new JButton(this.decisionAction);
-		this.actionButton.setPreferredSize(new Dimension(300,100));
+		this.actionButton.setPreferredSize(new Dimension(this.window.getHeight() / 3,
+				this.window.getHeight() / 10));
+		this.actionButton.setEnabled(false);
 		panel.add(actionButton);
 		return panel;
 	}
@@ -145,7 +132,7 @@ public class MainPanel {
 
 	private Component createInfoPanel() {
 		JPanel infoPanel = new JPanel(new GridLayout(1,2));
-		infoPanel.setPreferredSize(new Dimension(this.window.getWidth(), this.window.getHeight()/3));
+		infoPanel.setPreferredSize(new Dimension(this.window.getWidth(), this.window.getHeight() / 3));
 		JLabel statusLabel = new JLabel("STATUS");
 		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
 		statusLabel.setBorder(statusBorder);
@@ -174,18 +161,18 @@ public class MainPanel {
 	private Component createLogoPanel() {
 		ImagePanel logoPanel = null;
 		try {
-			logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
+			logoPanel = new ImagePanel("ship/src/main/resources/HAIP_logo.png");
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		logoPanel.scaleImage(this.window.getWidth() / 8, this.window.getWidth() / 8);
+		logoPanel.scaleImage(this.window.getWidth() / 7, this.window.getWidth() / 7);
 
 		return logoPanel;
 	}
 
 	private Component createLogPanel() {
-		LogModel logModel = new LogModel();
+		this.logModel = new LogModel();
 		return new LogPanel(logModel);
 	}
 
@@ -193,29 +180,30 @@ public class MainPanel {
 		JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
 		panel.setBorder(new EmptyBorder(0, 10, 10, 10));
 
-		this.commButton = new JButton(this.commAction);
-		this.commButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
-		panel.add(commButton);
+		this.connectButton = new JButton(this.connectAction);
+		this.connectButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
+		panel.add(connectButton);
 
-		this.initButton = new JButton(this.initAction);
-		this.initButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
-		this.initButton.setEnabled(false);
-		panel.add(initButton);
+		this.waitForDiscoveryAction = new JButton(this.initAction);
+		this.waitForDiscoveryAction.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
+		this.waitForDiscoveryAction.setEnabled(false);
+		panel.add(waitForDiscoveryAction);
 
 		return panel;
 	}
 
 	private void initActions() {
 		exitAction = new ExitAction("Exit",
-				new ImageIcon("control/src/main/resources/icons/exit.png"),
+				IconFontSwing.buildIcon(FontAwesome.WINDOW_CLOSE, 32),
 				"Exit", KeyEvent.VK_X);
-		commAction = new CommAction("Connect",
-				new ImageIcon("control/src/main/resources/icons/comm.png"),
+		connectAction = new ConnectAction("Connect to board",
+				IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
 				"Connection", KeyEvent.VK_C);
-		initAction = new InitAction("Initialize system",
-				new ImageIcon("control/src/main/resources/icons/start.png"),
-				"Initialize system", KeyEvent.VK_I);
-		decisionAction = new DecisionAction("Save Action", IconFontSwing.buildIcon(FontAwesome.CHECK, 32),
+		initAction = new WaitForDiscoveryAction("Wait for discovery",
+				IconFontSwing.buildIcon(FontAwesome.WIFI, 32),
+				"Wait for the ship to be discovered by the port controller", KeyEvent.VK_W);
+		decisionAction = new DecisionAction("Save Action",
+				IconFontSwing.buildIcon(FontAwesome.CHECK, 32),
 				"Save Action", KeyEvent.VK_ACCEPT);
 	}
 
@@ -225,19 +213,19 @@ public class MainPanel {
 			public void windowClosing(WindowEvent e) {
 				/* Before closing window, check if communication and system are disabled
 				 * If not, disable and close them before exiting */
-				if (!serial.isConnected() && !systemInitialized) {
+				if (!serial.isConnected() && !shipDiscovered) {
 					((JFrame)e.getSource()).dispose();
 				}
 				else {
 					int dialogResult = JOptionPane.showConfirmDialog(window,
-							((systemInitialized) ?
-									"System is initialized.\n" : "Serial connection is established.\n")
+							((shipDiscovered) ?
+									"Communications are ongoing.\n" : "Serial connection is established.\n")
 							+ "Do you really want to exit?",
 							"Warning",
 							JOptionPane.YES_NO_OPTION);
 
 					if (dialogResult == JOptionPane.YES_OPTION) {
-						stopSystem();
+						rejectCommunications();
 						try {
 							serial.closeConnection();
 						} catch (SerialPortException e1) {
@@ -305,12 +293,12 @@ public class MainPanel {
 
 	}
 
-	public class CommAction extends AbstractAction {
+	public class ConnectAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 		String text;
 		Icon icon;
 
-		public CommAction(String text, Icon icon, String description, Integer mnemonic) {
+		public ConnectAction(String text, Icon icon, String description, Integer mnemonic) {
 			super(text, icon);
 			this.text = text;
 			this.icon = icon;
@@ -323,32 +311,34 @@ public class MainPanel {
 			if (!serial.isConnected()) {
 				try {
 					serial.openConnection();
-					commButton.setText("Disconnect");
-					initButton.setEnabled(true);
+					connectButton.setText("Disconnect from board");
+					waitForDiscoveryAction.setEnabled(true);
+					logModel.add(CONNECTION_ESTABLISHED);
 				}
 				catch (Exception e) {
-					e.printStackTrace();
+					logModel.add(e.getMessage());
 				}
 			}
 			else {
 				try {
 					serial.closeConnection();
-					commButton.setText("Connect");
-					initButton.setEnabled(false);
+					connectButton.setText("Connect to board");
+					waitForDiscoveryAction.setEnabled(false);
+					logModel.add(CONNECTION_CLOSED);
 				}
 				catch (SerialPortException e) {
-					e.printStackTrace();
+					logModel.add(e.getMessage());
 				}
 			}
 		}
 	}
 
-	public class InitAction extends AbstractAction {
+	public class WaitForDiscoveryAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 		String text;
 		Icon icon;
 
-		public InitAction(String text, Icon icon, String description, Integer mnemonic) {
+		public WaitForDiscoveryAction(String text, Icon icon, String description, Integer mnemonic) {
 			super(text, icon);
 			this.text = text;
 			this.icon = icon;
@@ -358,32 +348,34 @@ public class MainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (!systemInitialized) {
-				// Init System
-				initSystem();
+			if (!shipDiscovered) {
+				// Wait for discovery
+				waitForDiscovery();
 
-				initButton.setText("Stop system");
-				initButton.setIcon(new ImageIcon("control/src/main/resources/icons/start.png"));
-				commButton.setEnabled(false);
+				waitForDiscoveryAction.setText("Reject communications");
+				connectButton.setEnabled(false);
+				actionButton.setEnabled(true);
+				logModel.add(SYSTEM_INITIALIZED);
 			}
 			else {
-				// Stop System
-				stopSystem();
+				// Reject communications
+				rejectCommunications();
 
-				initButton.setText("Initialize system");
-				initButton.setIcon(new ImageIcon("control/src/main/resources/icons/stop.png"));
-				commButton.setEnabled(true);
+				waitForDiscoveryAction.setText("Wait for discovery");
+				connectButton.setEnabled(true);
+				actionButton.setEnabled(false);
+				logModel.add(SYSTEM_STOPPED);
 			}
 		}
 	}
 
-	public void initSystem() {
-		// TODO Init System
-		systemInitialized = true;
+	public void waitForDiscovery() {
+		// TODO
+		shipDiscovered = true;
 	}
 
-	public void stopSystem() {
-		// TODO Stop System
-		systemInitialized = false;
+	public void rejectCommunications() {
+		// TODO
+		shipDiscovered = false;
 	}
 }

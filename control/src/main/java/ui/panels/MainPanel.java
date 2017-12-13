@@ -1,5 +1,7 @@
 package ui.panels;
 
+import jiconfont.icons.FontAwesome;
+import jiconfont.swing.IconFontSwing;
 import jssc.SerialPortException;
 import protocol.SerialObserver;
 import serial.Serial;
@@ -24,9 +26,6 @@ public class MainPanel {
 	// Window
 	JFrame window;
 
-	// Actions
-	AbstractAction exitAction, commAction, initAction;
-
 	// Table Elements
 	JTable table;
 	TableModel tableModel;
@@ -35,7 +34,10 @@ public class MainPanel {
 	LogModel logModel;
 
 	// Buttons
-	JButton commButton, initButton;
+	JButton connectButton, initButton;
+
+	// Actions
+	AbstractAction exitAction, connectAction, initAction;
 
 	// Serial Communication
 	Serial serial;
@@ -59,6 +61,7 @@ public class MainPanel {
 	}
 
 	private void initThings(Serial serial) {
+		IconFontSwing.register(FontAwesome.getIconFont());
 		this.initActions();
 		this.initTable();
 
@@ -120,9 +123,9 @@ public class MainPanel {
 		JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
 		panel.setBorder(new EmptyBorder(0, 10, 10, 10));
 
-		this.commButton = new JButton(this.commAction);
-		this.commButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
-		panel.add(commButton);
+		this.connectButton = new JButton(this.connectAction);
+		this.connectButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
+		panel.add(connectButton);
 
 		this.initButton = new JButton(this.initAction);
 		this.initButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
@@ -220,13 +223,13 @@ public class MainPanel {
 
 	private void initActions() {
 		exitAction = new ExitAction("Exit",
-                new ImageIcon("control/src/main/resources/icons/exit.png"),
+				IconFontSwing.buildIcon(FontAwesome.WINDOW_CLOSE, 32),
                 "Exit", KeyEvent.VK_X);
-		commAction = new CommAction("Connect",
-                new ImageIcon("control/src/main/resources/icons/comm.png"),
+		connectAction = new ConnectAction("Connect to board",
+				IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
 				"Connection", KeyEvent.VK_C);
 		initAction = new InitAction("Initialize system",
-                new ImageIcon("control/src/main/resources/icons/start.png"),
+				IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32),
                 "Initialize system", KeyEvent.VK_I);
 	}
 
@@ -252,12 +255,12 @@ public class MainPanel {
 		}
 	}
 
-	public class CommAction extends AbstractAction {
+	public class ConnectAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 		String text;
 		Icon icon;
 
-		public CommAction(String text, Icon icon, String description, Integer mnemonic) {
+		public ConnectAction(String text, Icon icon, String description, Integer mnemonic) {
 			super(text, icon);
 			this.text = text;
 			this.icon = icon;
@@ -270,7 +273,7 @@ public class MainPanel {
 			if (!serial.isConnected()) {
 				try {
 					serial.openConnection();
-					commButton.setText("Disconnect");
+					connectButton.setText("Disconnect from board");
 					initButton.setEnabled(true);
 					logModel.add(CONNECTION_ESTABLISHED);
 				}
@@ -281,7 +284,7 @@ public class MainPanel {
 			else {
 				try {
 					serial.closeConnection();
-					commButton.setText("Connect");
+					connectButton.setText("Connect to board");
 					initButton.setEnabled(false);
 					logModel.add(CONNECTION_CLOSED);
 				}
@@ -312,8 +315,8 @@ public class MainPanel {
 				initSystem();
 
 				initButton.setText("Stop system");
-				initButton.setIcon(new ImageIcon("control/src/main/resources/icons/start.png"));
-				commButton.setEnabled(false);
+				initButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
+				connectButton.setEnabled(false);
 				logModel.add(SYSTEM_INITIALIZED);
 			}
 			else {
@@ -321,8 +324,8 @@ public class MainPanel {
 				stopSystem();
 
 				initButton.setText("Initialize system");
-				initButton.setIcon(new ImageIcon("control/src/main/resources/icons/stop.png"));
-				commButton.setEnabled(true);
+				initButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
+				connectButton.setEnabled(true);
 				logModel.add(SYSTEM_STOPPED);
 			}
 		}

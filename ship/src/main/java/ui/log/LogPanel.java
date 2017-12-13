@@ -1,13 +1,7 @@
-package ui.panels;
+package ui.log;
 
-import java.awt.Color;
-
-import javax.swing.BorderFactory;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-
-import ui.log.LogAdapter;
-import ui.log.LogModel;
+import javax.swing.*;
+import java.awt.*;
 
 public class LogPanel extends JScrollPane {
 	private static final long serialVersionUID = 1L;

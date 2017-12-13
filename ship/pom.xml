@@ -13,6 +13,7 @@
 	<version>1.0-ALFA</version>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>com.mu.popbl.haip</groupId>
 			<artifactId>lib</artifactId>
@@ -37,6 +38,7 @@
 			<artifactId>jiconfont-font_awesome</artifactId>
 			<version>4.7.0.0</version>
 		</dependency>
+
 	</dependencies>
 
 </project>

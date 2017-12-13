@@ -49,7 +49,7 @@ public class ControllerLogic implements Observer, Runnable {
 		// Here we check that we have received something or has timed out, and that the boat that has sent is the one we want
 		if (!receivedList.isEmpty() && receivedList.get(0).getOriginId().equals(boat)) {
 			if (receivedList.get(0).getData().getStatus().getAction().equals(ActionType.IDDLE.toString())) {
-				System.out.println("iddle");
+				System.out.println("idle");
 				addTimeout(boat_id);
 			} else {
 				//TODO Here we must send the response to the request.
@@ -121,7 +121,7 @@ public class ControllerLogic implements Observer, Runnable {
 	public void run() {
 		while (true) {
 			// This loop is repeated x times before calling the discovery function.
-			for (int i = 0; i < ProtocolProperties.LOOP_IDDLE_BOATS; i++) {
+			for (int i = 0; i < ProtocolProperties.LOOP_IDLE_BOATS; i++) {
 
 				for (int j = 0; j < ProtocolProperties.LOOP_CONNECTED_BOATS; j++) {
 					for (Integer boat : connectedBoats) {
