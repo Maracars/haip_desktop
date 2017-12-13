@@ -1,5 +1,7 @@
 package protocol;
 
+import java.util.Arrays;
+
 public final class ProtocolProperties {
 
 	public static final int START_FRAME = 3;
@@ -41,6 +43,15 @@ public final class ProtocolProperties {
 		public String toString() {
 			return string;
 		}
+		
+		public static DataType getName(String value) {
+			for(DataType dt : DataType.values()) {
+				if(value.equals(dt.toString())) {
+					return dt;
+				}
+			}
+			return null;
+		}
 	}
 
 	public enum PacketType {
@@ -58,6 +69,16 @@ public final class ProtocolProperties {
 		public String toString() {
 			return string;
 		}
+		
+		public static PacketType getName(String value) {
+			for(PacketType pt : PacketType.values()) {
+				if(value.equals(pt.toString())) {
+					return pt;
+				}
+			}
+			return null;
+		}
+	
 	}
 
 	public enum ActionType {
@@ -75,8 +96,13 @@ public final class ProtocolProperties {
 			return string;
 		}
 		
-		public String getName() {
-			return this.name();
+		public static ActionType getName(String value) {
+			for(ActionType at : ActionType.values()) {
+				if(value.equals(at.toString())) {
+					return at;
+				}
+			}
+			return null;
 		}
 	}
 
@@ -94,6 +120,15 @@ public final class ProtocolProperties {
 		public String toString() {
 			return string;
 		}
+		
+		public static StatusType getName(String value) {
+			for(StatusType st : StatusType.values()) {
+				if(value.equals(st.toString())) {
+					return st;
+				}
+			}
+			return null;
+		}
 	}
 
 	public enum PermissionType {
@@ -109,6 +144,16 @@ public final class ProtocolProperties {
 		public String toString() {
 			return string;
 		}
+		
+		public static PermissionType getName(String value) {
+			for(PermissionType pt : PermissionType.values()) {
+				if(value.equals(pt.toString())) {
+					return pt;
+				}
+			}
+			return null;
+		}
+		
 	}
 
 	public static final String MASTER_ID = "00000000";

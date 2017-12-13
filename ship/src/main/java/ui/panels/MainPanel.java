@@ -38,6 +38,7 @@ import jiconfont.swing.IconFontSwing;
 import jssc.SerialPortException;
 import models.Ship;
 import protocol.ProtocolProperties.ActionType;
+import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
 import serial.Serial;
 import ui.log.LogModel;
@@ -60,6 +61,10 @@ public class MainPanel {
 
 	// System Initialized
 	boolean systemInitialized;
+
+	//Labels for ship info
+	JLabel permissionLabel;
+
 
 	public MainPanel(Serial serial, Ship ship) {
 		this.createJFrame();
@@ -146,21 +151,43 @@ public class MainPanel {
 	private Component createInfoPanel() {
 		JPanel infoPanel = new JPanel(new GridLayout(1,2));
 		infoPanel.setPreferredSize(new Dimension(this.window.getWidth(), this.window.getHeight()/3));
-		JLabel statusLabel = new JLabel("STATUS");
 		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
+
+		infoPanel.add(crateStatusLabel(statusBorder));
+		infoPanel.add(createPermissionsLabel(statusBorder));
+
+		return infoPanel;
+
+	}
+
+	private Component createPermissionsLabel(Border statusBorder) {
+		permissionLabel = new JLabel();
+		checkPermissionsLabel();
+		permissionLabel.setBorder(statusBorder);
+		permissionLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		permissionLabel.setVerticalAlignment(SwingConstants.CENTER);
+		return permissionLabel;
+	}
+
+	private void checkPermissionsLabel() {
+		permissionLabel.setText(PermissionType.getName(ship.getStatus().getPermission()).name());
+		if(ship.getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
+			permissionLabel.setBackground(new Color(74, 237, 49));
+			permissionLabel.setOpaque(true);
+		}else if (ship.getStatus().getPermission().equals(PermissionType.DENY.toString())) {
+			permissionLabel.setBackground(new Color(255, 22, 73));
+			permissionLabel.setOpaque(true);
+		}
+	}
+
+	private Component crateStatusLabel(Border statusBorder) {
+		String statusText = "Your status is: " + StatusType.getName(ship.getStatus().getStatus()).name()+ 
+				"\nYou are asking for: " + ActionType.getName(ship.getStatus().getAction()).name();
+		JLabel statusLabel = new JLabel(statusText);
 		statusLabel.setBorder(statusBorder);
 		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		statusLabel.setVerticalAlignment(SwingConstants.CENTER);
-		infoPanel.add(statusLabel);
-		JLabel permissionLabel = new JLabel("PERMISSION");
-		permissionLabel.setBorder(statusBorder);
-		permissionLabel.setBackground(new Color(255, 22, 73));
-		permissionLabel.setOpaque(true);
-		permissionLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		permissionLabel.setVerticalAlignment(SwingConstants.CENTER);
-		infoPanel.add(permissionLabel);
-		return infoPanel;
-
+		return statusLabel;
 	}
 
 	private Component createLeftPanel() {

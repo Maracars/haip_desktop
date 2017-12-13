@@ -7,8 +7,13 @@ public class Ship {
 	private String id;
 	private Status status;
 	private List<String> actionList;
-
-
+	
+	public Ship(String id, Status status) {
+		this.id = id;
+		this.status = status;
+	}
+	
+	public Ship() {}
 	public String getId() {
 		return id;
 	}
