@@ -72,6 +72,10 @@ public final class ProtocolProperties {
 		public String toString() {
 			return string;
 		}
+		
+		public String getName() {
+			return this.name();
+		}
 	}
 
 	public enum StatusType {
@@ -104,7 +108,6 @@ public final class ProtocolProperties {
 			return string;
 		}
 	}
-
 
 	public static final String MASTER_ID = "00000000";
 
