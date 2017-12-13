@@ -28,11 +28,6 @@ public class Main {
 		}
 		MainPanel panel = new MainPanel(serial, ship);
 
-		try {
-			serial.openConnection();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		ShipLogic watcher = new ShipLogic(serial);
 		serial.addObserver(watcher);
 	}
