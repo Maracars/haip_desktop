@@ -57,6 +57,7 @@ public class MainPanel {
 		this.window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
 		this.window.setLocation(0, 0);
 		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
+		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
 	private void initThings(Serial serial) {
@@ -77,13 +78,12 @@ public class MainPanel {
 		this.window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
 
 		this.window.setVisible(true);
-		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
 	private Component createSplitPane() {
 		JSplitPane splitPane = new JSplitPane();
 
-		splitPane.setDividerLocation(this.window.getWidth() / 6);
+		splitPane.setDividerLocation(this.window.getWidth() / 8);
 		splitPane.setLeftComponent(createLeftPanel());
 		splitPane.setRightComponent(createTabbedPane());
 
@@ -108,7 +108,7 @@ public class MainPanel {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-        logoPanel.scaleImage(this.window.getWidth() / 6, this.window.getWidth() / 6);
+        logoPanel.scaleImage(this.window.getWidth() / 8, this.window.getWidth() / 8);
 
 		return logoPanel;
 	}
