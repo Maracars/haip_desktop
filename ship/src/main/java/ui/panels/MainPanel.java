@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -33,12 +32,15 @@ import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
+import helpers.Helpers;
+import jiconfont.icons.FontAwesome;
+import jiconfont.swing.IconFontSwing;
 import jssc.SerialPortException;
 import models.Ship;
+import protocol.ProtocolProperties.ActionType;
+import protocol.ProtocolProperties.StatusType;
 import serial.Serial;
 import ui.log.LogModel;
-
-import protocol.ProtocolProperties.ActionType;
 
 public class MainPanel {
 	// Window
@@ -47,27 +49,27 @@ public class MainPanel {
 	// Panels
 	JSplitPane splitPane;
 	JTabbedPane tabbedPane;
-    JPanel leftPanel;
+	JPanel leftPanel;
 
 	// Menu Bar Elements
 	JMenuBar menuBar;
 	JMenu menuExit;
 
 	// Actions
-	AbstractAction exitAction, commAction, initAction;
+	AbstractAction exitAction, commAction, initAction, decisionAction;
 
 	// Buttons
-	JButton commButton, initButton;
+	JButton commButton, initButton, actionButton;
 
 	// Serial Communication
 	Serial serial;
-	
+
 	//Ship
 	Ship ship;
 
 	// System Initialized
 	boolean systemInitialized;
-	
+
 	public MainPanel(Serial serial, Ship ship) {
 		window = new JFrame("Haip Ain't an Infor Project");
 		window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
@@ -75,20 +77,20 @@ public class MainPanel {
 		window.setSize(1300, 700);
 		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        this.initActions();
-        this.serial = serial;
-        this.ship = ship;
-        this.systemInitialized = false;
-        
-        this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        this.window.addWindowListener(this.createWindowClosingAdapter());
-        this.window.setJMenuBar(this.createMenuBar());
-        this.window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
-        
+		this.initActions();
+		this.serial = serial;
+		this.ship = ship;
+		this.systemInitialized = false;
+
+		this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		this.window.addWindowListener(this.createWindowClosingAdapter());
+		this.window.setJMenuBar(this.createMenuBar());
+		this.window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
+
 		window.setVisible(true);
 		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
-	
+
 	private Component createSplitPane() {
 		JSplitPane splitPane = new JSplitPane();
 
@@ -98,21 +100,39 @@ public class MainPanel {
 
 		return splitPane;
 	}
-	
+
 	private Component createShipPanel() {
-		JPanel shipPanel = new JPanel(new GridLayout(2,1));
-		shipPanel.add(createInfoPanel());
-		shipPanel.add(createDecisionPanel());
+		JPanel shipPanel = new JPanel(new BorderLayout());
+		shipPanel.add(createInfoPanel(), BorderLayout.NORTH);
+		shipPanel.add(createDecisionInfoPanel(), BorderLayout.CENTER);
+		shipPanel.add(createDecisionActionPanel(), BorderLayout.SOUTH);
 		return shipPanel;
 	}
 
-	private Component createDecisionPanel() {
+	private Component createDecisionActionPanel() {
+		JPanel panel = new JPanel();
+		panel.setBorder(new EmptyBorder(0, 10, 10, 10));
+
+		this.actionButton = new JButton(this.decisionAction);
+		this.actionButton.setPreferredSize(new Dimension(300,100));
+		panel.add(actionButton);
+		return panel;
+	}
+
+	private Component createDecisionInfoPanel() {
 		JPanel decisionPanel = new JPanel(new GridLayout(1,2));
-		JList<ActionType> decisionList = new JList<ActionType>(ActionType.values());
+		JList<String> statusList = new JList<String>(Helpers.getNames(StatusType.class));
+		statusList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		statusList.setLayoutOrientation(JList.VERTICAL);
+		statusList.setSelectedIndex(-1);
+		statusList.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 3, Color.darkGray));
+		JList<String> decisionList = new JList<String>(Helpers.getNames(ActionType.class));
 		decisionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		decisionList.setLayoutOrientation(JList.VERTICAL);
 		decisionList.setSelectedIndex(-1);
+		decisionList.setBorder(BorderFactory.createMatteBorder(0,3,0,0, Color.darkGray));
 		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
+		decisionPanel.add(statusList);
 		decisionPanel.add(decisionList);
 		decisionPanel.setBorder(statusBorder);
 		return decisionPanel;
@@ -120,6 +140,7 @@ public class MainPanel {
 
 	private Component createInfoPanel() {
 		JPanel infoPanel = new JPanel(new GridLayout(1,2));
+		infoPanel.setPreferredSize(new Dimension(this.window.getWidth(), this.window.getHeight()/3));
 		JLabel statusLabel = new JLabel("STATUS");
 		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
 		statusLabel.setBorder(statusBorder);
@@ -134,32 +155,32 @@ public class MainPanel {
 		permissionLabel.setVerticalAlignment(SwingConstants.CENTER);
 		infoPanel.add(permissionLabel);
 		return infoPanel;
-		
+
 	}
 
 	private Component createLeftPanel() {
-        JPanel leftPanel = new JPanel(new BorderLayout(10, 10));
-        leftPanel.add(createLogoPanel(), BorderLayout.NORTH);
-        leftPanel.add(createLogPanel(), BorderLayout.CENTER);
-        leftPanel.add(createButtonsPanel(), BorderLayout.SOUTH);
+		JPanel leftPanel = new JPanel(new BorderLayout(10, 10));
+		leftPanel.add(createLogoPanel(), BorderLayout.NORTH);
+		leftPanel.add(createLogPanel(), BorderLayout.CENTER);
+		leftPanel.add(createButtonsPanel(), BorderLayout.SOUTH);
 		return leftPanel;
 	}
-	
+
 	private Component createLogoPanel() {
-        ImagePanel logoPanel = null;
+		ImagePanel logoPanel = null;
 		try {
-            logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
+			logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-        logoPanel.scaleImage(this.window.getWidth() / 6, this.window.getWidth() / 6);
+		logoPanel.scaleImage(this.window.getWidth() / 6, this.window.getWidth() / 6);
 
 		return logoPanel;
 	}
 
 	private Component createLogPanel() {
-        LogModel logModel = new LogModel();
+		LogModel logModel = new LogModel();
 		return new LogPanel(logModel);
 	}
 
@@ -181,16 +202,18 @@ public class MainPanel {
 
 	private void initActions() {
 		exitAction = new ExitAction("Exit",
-                new ImageIcon("control/src/main/resources/icons/exit.png"),
-                "Exit", KeyEvent.VK_X);
+				new ImageIcon("control/src/main/resources/icons/exit.png"),
+				"Exit", KeyEvent.VK_X);
 		commAction = new CommAction("Connect",
-                new ImageIcon("control/src/main/resources/icons/comm.png"),
+				new ImageIcon("control/src/main/resources/icons/comm.png"),
 				"Connection", KeyEvent.VK_C);
 		initAction = new InitAction("Initialize system",
-                new ImageIcon("control/src/main/resources/icons/start.png"),
-                "Initialize system", KeyEvent.VK_I);
+				new ImageIcon("control/src/main/resources/icons/start.png"),
+				"Initialize system", KeyEvent.VK_I);
+		decisionAction = new DecisionAction("Save Action", IconFontSwing.buildIcon(FontAwesome.CHECK, 16),
+				"Save Action", KeyEvent.VK_ACCEPT);
 	}
-	
+
 	private WindowAdapter createWindowClosingAdapter() {
 		return new WindowAdapter() {
 			@Override
@@ -204,7 +227,7 @@ public class MainPanel {
 					int dialogResult = JOptionPane.showConfirmDialog(window,
 							((systemInitialized) ?
 									"System is initialized.\n" : "Serial connection is established.\n")
-									+ "Do you really want to exit?",
+							+ "Do you really want to exit?",
 							"Warning",
 							JOptionPane.YES_NO_OPTION);
 
@@ -221,15 +244,15 @@ public class MainPanel {
 			}
 		};
 	}
-	
+
 	private JMenuBar createMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
+		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createExitMenu());
 		return menuBar;
 	}
-	
+
 	private JMenu createExitMenu() {
-        JMenu menuExit = new JMenu("Exit");
+		JMenu menuExit = new JMenu("Exit");
 		menuExit.add(exitAction);
 		return menuExit;
 	}
@@ -255,6 +278,28 @@ public class MainPanel {
 				window.dispose();
 			}
 		}
+	}
+
+	public class DecisionAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		public DecisionAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
 	}
 
 	public class CommAction extends AbstractAction {
