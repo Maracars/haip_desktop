@@ -1,29 +1,24 @@
 package ui.panels;
 
+import jssc.SerialPortException;
+import protocol.SerialObserver;
+import serial.Serial;
+import ui.log.LogModel;
+import ui.log.LogPanel;
+import ui.tables.CellRenderer;
+import ui.tables.ColumnModel;
+import ui.tables.TableModel;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-
-import jssc.SerialPortException;
-import models.*;
-import models.Frame;
-import protocol.SerialObserver;
-import serial.Serial;
-import ui.log.LogModel;
-import ui.tables.CellRenderer;
-import ui.tables.ColumnModel;
-import ui.tables.TableData;
-import ui.tables.TableModel;
+import static ui.panels.ActionMessages.*;
 
 public class MainPanel {
 	// Window
@@ -35,6 +30,9 @@ public class MainPanel {
 	// Table Elements
 	JTable table;
 	TableModel tableModel;
+
+	// Log Elements
+	LogModel logModel;
 
 	// Buttons
 	JButton commButton, initButton;
@@ -57,6 +55,7 @@ public class MainPanel {
 		this.window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
 		this.window.setLocation(0, 0);
 		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
+		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
 	private void initThings(Serial serial) {
@@ -77,13 +76,12 @@ public class MainPanel {
 		this.window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
 
 		this.window.setVisible(true);
-		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
 	private Component createSplitPane() {
 		JSplitPane splitPane = new JSplitPane();
 
-		splitPane.setDividerLocation(this.window.getWidth() / 6);
+		splitPane.setDividerLocation(this.window.getWidth() / 7);
 		splitPane.setLeftComponent(createLeftPanel());
 		splitPane.setRightComponent(createTabbedPane());
 
@@ -108,13 +106,13 @@ public class MainPanel {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-        logoPanel.scaleImage(this.window.getWidth() / 6, this.window.getWidth() / 6);
+        logoPanel.scaleImage(this.window.getWidth() / 7, this.window.getWidth() / 7);
 
 		return logoPanel;
 	}
 
 	private Component createLogPanel() {
-        LogModel logModel = new LogModel();
+        this.logModel = new LogModel();
 		return new LogPanel(logModel);
 	}
 
@@ -274,9 +272,10 @@ public class MainPanel {
 					serial.openConnection();
 					commButton.setText("Disconnect");
 					initButton.setEnabled(true);
+					logModel.add(CONNECTION_ESTABLISHED);
 				}
 				catch (Exception e) {
-					e.printStackTrace();
+					logModel.add(e.getMessage());
 				}
 			}
 			else {
@@ -284,9 +283,10 @@ public class MainPanel {
 					serial.closeConnection();
 					commButton.setText("Connect");
 					initButton.setEnabled(false);
+					logModel.add(CONNECTION_CLOSED);
 				}
 				catch (SerialPortException e) {
-					e.printStackTrace();
+					logModel.add(e.getMessage());
 				}
 			}
 		}
@@ -314,6 +314,7 @@ public class MainPanel {
 				initButton.setText("Stop system");
 				initButton.setIcon(new ImageIcon("control/src/main/resources/icons/start.png"));
 				commButton.setEnabled(false);
+				logModel.add(SYSTEM_INITIALIZED);
 			}
 			else {
 				// Stop System
@@ -322,6 +323,7 @@ public class MainPanel {
 				initButton.setText("Initialize system");
 				initButton.setIcon(new ImageIcon("control/src/main/resources/icons/stop.png"));
 				commButton.setEnabled(true);
+				logModel.add(SYSTEM_STOPPED);
 			}
 		}
 	}

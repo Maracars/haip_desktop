@@ -1,4 +1,4 @@
-package ui.panels;
+package ui.log;
 
 import ui.log.LogAdapter;
 import ui.log.LogModel;

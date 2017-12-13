@@ -69,4 +69,11 @@ public class Frame {
 		this.checksum = checksum;
 	}
 
+	@Override
+	public String toString() {
+		return header.toString() + originId + destinationId + length + ((data == null) ? "": data.toString())  + checksum;
+	}
+	
+	
+
 }

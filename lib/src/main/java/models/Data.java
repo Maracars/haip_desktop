@@ -4,6 +4,7 @@ public class Data {
 
 	private String type;
 	private Status status;
+	private String parking;
 
 	public Data() {}
 
@@ -28,9 +29,17 @@ public class Data {
 		this.status = status;
 	}
 
+	public String getParking() {
+		return parking;
+	}
+
+	public void setParking(String parking) {
+		this.parking = parking;
+	}
+
 	@Override
 	public String toString() {
-		return type + status.toString();
+		return type + status.toString() + ((parking) == null ? "" : parking);
 	}
 
 

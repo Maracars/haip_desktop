@@ -46,15 +46,6 @@ public class MainPanel {
 	// Window
 	JFrame window;
 
-	// Panels
-	JSplitPane splitPane;
-	JTabbedPane tabbedPane;
-	JPanel leftPanel;
-
-	// Menu Bar Elements
-	JMenuBar menuBar;
-	JMenu menuExit;
-
 	// Actions
 	AbstractAction exitAction, commAction, initAction, decisionAction;
 
@@ -71,30 +62,44 @@ public class MainPanel {
 	boolean systemInitialized;
 
 	public MainPanel(Serial serial, Ship ship) {
-		window = new JFrame("Haip Ain't an Infor Project");
-		window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
-		window.setLocation(0, 0);
-		window.setSize(1300, 700);
-		window.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		this.createJFrame();
+		this.initThings(serial, ship);
+		this.addContentToJFrame();
+	}
 
+	private void createJFrame() {
+		this.window = new JFrame("Haip Ain't an Infor Project");
+		this.window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
+		this.window.setLocation(0, 0);
+		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
+		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+	}
+
+	private void initThings(Serial serial, Ship ship) {
 		this.initActions();
-		this.serial = serial;
-		this.ship = ship;
-		this.systemInitialized = false;
 
+		this.serial = serial;
+		//this.serialObserver = new SerialObserver(this.serial, this.tableModel);
+		//this.serial.addObserver(this.serialObserver);
+
+		this.ship = ship;
+
+		this.systemInitialized = false;
+	}
+
+	private void addContentToJFrame() {
 		this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.window.addWindowListener(this.createWindowClosingAdapter());
 		this.window.setJMenuBar(this.createMenuBar());
 		this.window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
 
-		window.setVisible(true);
-		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		this.window.setVisible(true);
 	}
 
 	private Component createSplitPane() {
 		JSplitPane splitPane = new JSplitPane();
 
-		splitPane.setDividerLocation(this.window.getWidth() / 6);
+		splitPane.setDividerLocation(this.window.getWidth() / 8);
 		splitPane.setLeftComponent(createLeftPanel());
 		splitPane.setRightComponent(createShipPanel());
 
@@ -102,7 +107,7 @@ public class MainPanel {
 	}
 
 	private Component createShipPanel() {
-		JPanel shipPanel = new JPanel(new BorderLayout());
+		JPanel shipPanel = new JPanel(new BorderLayout(10, 10));
 		shipPanel.add(createInfoPanel(), BorderLayout.NORTH);
 		shipPanel.add(createDecisionInfoPanel(), BorderLayout.CENTER);
 		shipPanel.add(createDecisionActionPanel(), BorderLayout.SOUTH);
@@ -174,7 +179,7 @@ public class MainPanel {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		logoPanel.scaleImage(this.window.getWidth() / 6, this.window.getWidth() / 6);
+		logoPanel.scaleImage(this.window.getWidth() / 8, this.window.getWidth() / 8);
 
 		return logoPanel;
 	}
@@ -210,7 +215,7 @@ public class MainPanel {
 		initAction = new InitAction("Initialize system",
 				new ImageIcon("control/src/main/resources/icons/start.png"),
 				"Initialize system", KeyEvent.VK_I);
-		decisionAction = new DecisionAction("Save Action", IconFontSwing.buildIcon(FontAwesome.CHECK, 16),
+		decisionAction = new DecisionAction("Save Action", IconFontSwing.buildIcon(FontAwesome.CHECK, 32),
 				"Save Action", KeyEvent.VK_ACCEPT);
 	}
 
@@ -257,7 +262,6 @@ public class MainPanel {
 		return menuExit;
 	}
 
-
 	public class ExitAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 		String text;
@@ -281,7 +285,6 @@ public class MainPanel {
 	}
 
 	public class DecisionAction extends AbstractAction {
-
 		private static final long serialVersionUID = 1L;
 		String text;
 		Icon icon;

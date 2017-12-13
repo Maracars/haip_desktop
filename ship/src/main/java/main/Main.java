@@ -10,13 +10,22 @@ import protocol.ShipLogic;
 import serial.Serial;
 import ui.panels.MainPanel;
 
+import javax.swing.*;
+
 public class Main {
 	
 	public static void main(String[] args) throws FontFormatException, IOException {
 		Ship ship = new Ship();
 		Serial serial = new Serial();
 		IconFontSwing.register(FontAwesome.getIconFont());
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
 		MainPanel panel = new MainPanel(serial, ship);
+
 		try {
 			serial.openConnection();
 		} catch (Exception e) {

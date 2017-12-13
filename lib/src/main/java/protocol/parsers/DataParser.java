@@ -8,18 +8,53 @@ import static protocol.ProtocolProperties.STATUS;
 import static protocol.ProtocolProperties.TYPE;
 import static protocol.ProtocolProperties.ACTION;
 import static protocol.ProtocolProperties.PERMISSION;
+import static protocol.ProtocolProperties.PARKING;
 
 import java.util.List;
 
 import models.Data;
 import models.Frame;
 import models.Status;
+import protocol.ProtocolProperties.DataType;
+import protocol.ProtocolProperties.PacketType;
+import protocol.ProtocolProperties.PermissionType;
+import protocol.ProtocolProperties.StatusType;
 
 public class DataParser implements Parser{
 
 	// Type, Status, Action, Permission (2 bits each)
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
+		if(Integer.parseInt(frame.getLength(), 2) > 0) {
+			frame = parseDataFirstByte(frame, byteString);
+			frame = parseDataSecondByte(frame, byteString);
+
+		}else {
+			frame.setData(null);
+		}
+		return frame;
+	}
+
+
+	private Frame parseDataSecondByte(Frame frame, String byteString) {
+		if(frame.getHeader().getPacketType().equals(PacketType.DATA.toString()) &&
+				frame.getData().getType().equals(DataType.RESPONSE.toString()) &&
+				frame.getData().getStatus().getStatus().equals(StatusType.SEA.toString()) &&
+				frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
+			try {
+				frame.getData().setParking(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION + PERMISSION,
+						HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION + PERMISSION + PARKING));
+			}catch (StringIndexOutOfBoundsException e) {
+				frame.getData().setParking(null);
+			}
+		}else {
+			frame.getData().setParking(null);
+		}
+		return frame;
+	}
+
+
+	public Frame parseDataFirstByte(Frame frame, String byteString) {
 		try {
 			String type = byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH,
 					HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE);
