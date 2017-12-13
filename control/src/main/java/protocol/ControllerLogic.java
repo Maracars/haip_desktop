@@ -1,27 +1,26 @@
 package protocol;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
 import helpers.Helpers;
 import models.Frame;
+import models.Status;
 import serial.Serial;
 
+import java.util.*;
+
+import static protocol.ProtocolProperties.ActionType;
+import static protocol.ProtocolProperties.StatusType;
+
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
-public class NodeLogic implements Observer, Runnable {
+public class ControllerLogic implements Observer, Runnable {
 
 	private Serial serial;
-	private List receivedList;
+	private List<Frame> receivedList;
 	private ArrayList<Integer> connectedBoats;
 	private ArrayList<Integer> idleBoats;
 	private HashMap<Integer, Integer> timeouts;
 
 	@SuppressWarnings("unchecked")
-	public NodeLogic(Serial serial) {
+	public ControllerLogic(Serial serial) {
 		this.serial = serial;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new ArrayList<>();
@@ -33,30 +32,56 @@ public class NodeLogic implements Observer, Runnable {
 	public void controllerIokse(String boat) {
 
 		Integer boat_id = Integer.parseInt(boat);
-		// TODO This is going to be called for each boat, here we should have a list of connected boats, those that are idle...
+
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat));
 		Helpers.sendParsedFrame(fr, serial);
 
 		long count = 0;
+		//noinspection StatementWithEmptyBody
 		while (count++ < ProtocolProperties.TIMEOUT && receivedList.isEmpty()) {
 		}
-		if (!receivedList.isEmpty()) {
-			//TODO Here we must send the response to the request.
-			if (idleBoats.contains(boat_id)) addConnectedBoat(boat_id);
-			System.out.println("Ship number " + boat + " sent " + receivedList);
-			checkRequest(receivedList);
-			receivedList.clear();
+		// TODO Here we take the first packet received, dunno if we must ensure we have just one...
+		// Here we check that we have received something or has timed out, and that the boat that has sent is the one we want
+		if (!receivedList.isEmpty() && receivedList.get(0).getOriginId().equals(boat)) {
+			if (receivedList.get(0).getData().getStatus().getAction().equals(ActionType.IDDLE.toString())) {
+				System.out.println("iddle");
+				addTimeout(boat_id);
+			} else {
+				//TODO Here we must send the response to the request.
+				if (idleBoats.contains(boat_id)) addConnectedBoat(boat_id);
+				System.out.println("Ship number " + boat + " sent " + receivedList);
+				checkRequest(receivedList.get(0));
+				receivedList.clear();
+			}
+
 		} else {
 			System.out.println("timeout");
-			timeouts.put(boat_id, timeouts.getOrDefault(boat_id, 0) + 1);
+			addTimeout(boat_id);
 
-			if (timeouts.get(boat_id) >= ProtocolProperties.TIMEOUTED_LOOP_LIMIT) addIdleBoat(boat_id);
 		}
 
 	}
 
+	private void addTimeout(Integer boat_id) {
+		timeouts.put(boat_id, timeouts.getOrDefault(boat_id, 0) + 1);
+
+		if (timeouts.get(boat_id) >= ProtocolProperties.TIMEOUTED_LOOP_LIMIT) addIdleBoat(boat_id);
+	}
+
 	// TODO Check status and give response to the boat
-	public void checkRequest(List receivedList) {
+	public void checkRequest(Frame frame) {
+		Status status = frame.getData().getStatus();
+		String status_str = status.getStatus();
+		String action_str = status.getAction();
+
+		if (status_str.equals(StatusType.PARKING.toString()) && action_str.equals(ActionType.LEAVE.toString())) {
+
+
+		} else if (status_str.equals(StatusType.TRANSIT.toString())) {
+
+		} else if (status_str.equals(StatusType.SEA.toString()) && action_str.equals(ActionType.ENTER.toString())) {
+
+		}
 
 	}
 
@@ -74,7 +99,8 @@ public class NodeLogic implements Observer, Runnable {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		receivedList.add(arg);
+
+		receivedList.add((Frame) arg);
 	}
 
 	@Override
