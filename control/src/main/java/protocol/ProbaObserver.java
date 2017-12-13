@@ -16,7 +16,7 @@ public class ProbaObserver extends Observable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		NodeLogic watcher = new NodeLogic(serial);
+		ControllerLogic watcher = new ControllerLogic(serial);
 		Thread th = new Thread(watcher);
 		serial.addObserver(watcher);
 		th.start();
