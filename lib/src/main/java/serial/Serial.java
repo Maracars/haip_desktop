@@ -12,6 +12,10 @@ import models.Frame;
 import protocol.FrameParser;
 import ui.dialogs.COMPortChooser;
 
+import static serial.SerialExceptionMessages.NO_SERIAL_PORT_CONNECTED;
+import static serial.SerialExceptionMessages.NO_SERIAL_PORT_SELECTED;
+import static serial.SerialExceptionMessages.SERIAL_PORT_NOT_WORKING;
+
 public class Serial extends Observable implements SerialPortEventListener {
 
     private SerialPort serialPort;
@@ -30,7 +34,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 
         // No port connected
         if (portNames.length == 0) {
-            throw new Exception("No port connected");
+            throw new Exception(NO_SERIAL_PORT_CONNECTED);
         }
         // At least one port connected
         else {
@@ -42,17 +46,22 @@ public class Serial extends Observable implements SerialPortEventListener {
             else {
                 COMPortChooser portChooser = new COMPortChooser(null, portNames);
                 if (portChooser.getSelectedIndex() == -1) {
-                    throw new Exception("One port must be chosen");
+                    throw new Exception(NO_SERIAL_PORT_SELECTED);
                 } else {
                     serialPort = new SerialPort(portNames[portChooser.getSelectedIndex()]);
                 }
             }
             //Open the port
-            serialPort.openPort();
-            serialPort.addEventListener(this);
-            serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            try {
+                serialPort.openPort();
+                serialPort.addEventListener(this);
+                serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 
-            isConnected = true;
+                isConnected = true;
+            }
+            catch (SerialPortException e) {
+                throw new Exception(SERIAL_PORT_NOT_WORKING);
+            }
         }
     }
 
@@ -92,7 +101,6 @@ public class Serial extends Observable implements SerialPortEventListener {
         for (String strByte : stringList) {
             writeString(strByte);
         }
-
     }
 
     public void writeString(String string) throws SerialPortException {
