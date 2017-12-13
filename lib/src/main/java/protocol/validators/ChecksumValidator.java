@@ -12,10 +12,6 @@ public class ChecksumValidator implements Validator {
 
 	@Override
 	public boolean validate(Frame frame) {
-		System.out.println(frame.toString());
-		System.out.println(frame.toString().substring(0 ,
-				HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + Integer.parseInt(frame.getLength(),
-						2)*8));
 		if(!CRC8.toCRC8(frame.toString().substring(0 ,
 				HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + Integer.parseInt(frame.getLength(),
 						2)*8)).equals(frame.getChecksum()))
