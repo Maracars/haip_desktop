@@ -42,15 +42,7 @@ public class CRC8 {
 	public static String toCRC8(String string) {
 		reset();
 		update(string.getBytes());
-		return fillWithZeros(Integer.toBinaryString(getValue()));
+		return Helpers.toByteBinString("" + getValue());
 	}
 
-	public static String fillWithZeros(String binaryString) {
-		if (binaryString.length() < 8) {
-			for (int i = binaryString.length(); i < 8; i++) {
-				binaryString = "0" + binaryString;
-			}
-		}
-		return binaryString;
-	}
 }
