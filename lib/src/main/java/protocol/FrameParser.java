@@ -67,7 +67,7 @@ public class FrameParser {
 			int length = Integer.parseInt(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID,
 					HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH), 2);
 
-			return (byteString.length() >= (HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH
+			return (byteString.length() == (HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH
 					+ length + CHECKSUM));
 
 		} catch (StringIndexOutOfBoundsException e) {

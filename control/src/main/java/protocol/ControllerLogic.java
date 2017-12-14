@@ -10,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import static protocol.ProtocolProperties.*;
 
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
-public class ControllerLogic implements Observer, Runnable {
+public class ControllerLogic extends Observable implements Observer, Runnable {
 
 	private Serial serial;
 	private List<Frame> receivedList;
@@ -39,7 +39,6 @@ public class ControllerLogic implements Observer, Runnable {
 			System.out.println("Sent parsed token to boat number " + boat_id);
 		} else {
 			Helpers.sendParsedFrame(fr, serial);
-
 		}
 
 		long count = 0;
@@ -131,6 +130,7 @@ public class ControllerLogic implements Observer, Runnable {
 		}
 		Frame nextFrame = FrameCreator.createResponse(ProtocolProperties.MASTER_ID, ship.getId(), nextStatus, parking);
 		Helpers.sendParsedFrame(nextFrame, serial);
+		setSentRequest(nextFrame);
 
 
 	}
@@ -145,6 +145,11 @@ public class ControllerLogic implements Observer, Runnable {
 		idleBoats.add(boat);
 		System.out.println("Idle boat added: " + boat + " these are the idle boats: " + idleBoats);
 		connectedBoats.remove(boat);
+	}
+
+	private void setSentRequest(Frame frame) {
+		setChanged();
+		notifyObservers(frame);
 	}
 
 	@Override
