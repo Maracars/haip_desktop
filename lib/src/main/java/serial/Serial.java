@@ -82,18 +82,23 @@ public class Serial extends Observable implements SerialPortEventListener {
     public void serialEvent(SerialPortEvent arg0) {
         try {
             String readString = serialPort.readString();
-            //System.out.println(readString);
             packet += readString;
-            //System.out.println(packet);
-
-            int result = FrameParser.parseRx(packet);
-            if (result == FrameParser.BAD_PACKET) {
-                packet = "";
-            } else if (result == FrameParser.FIN_PACKET) {
-                notifyFrame(FrameParser.getFrame());
-            }
-        } catch (SerialPortException e) {
+            sendToParser(packet);
+        }
+        catch (SerialPortException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void sendToParser(String packet) {
+        this.packet = packet;
+        int result = FrameParser.parseRx(packet);
+
+        if (result == FrameParser.BAD_PACKET) {
+            this.packet = "";
+        }
+        else if (result == FrameParser.FIN_PACKET) {
+            notifyFrame(FrameParser.getFrame());
         }
     }
 
