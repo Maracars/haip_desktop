@@ -28,7 +28,7 @@ public class Main {
 		}
 		MainPanel panel = new MainPanel(serial, ship);
 
-		ShipLogic watcher = new ShipLogic(serial);
+		ShipLogic watcher = new ShipLogic(serial, ship);
 		serial.addObserver(watcher);
 	}
 

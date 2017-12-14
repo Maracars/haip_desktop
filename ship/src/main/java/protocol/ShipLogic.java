@@ -17,19 +17,20 @@ public class ShipLogic implements Observer{
 	Serial serial;
 	Ship ship;
 	
-	public ShipLogic(Serial serial) {
+	public ShipLogic(Serial serial, Ship ship) {
 		this.serial = serial;
+		this.ship = ship;
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
 		Frame frame = (Frame) arg;
-		PacketType pt = PacketType.valueOf(frame.getHeader().getPacketType());
+		PacketType pt = PacketType.getName(frame.getHeader().getPacketType());
 		Frame sendFrame = null;
 		switch(pt) {
 		case DISCOVERY:
 			sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
-			replyController(sendFrame);
+			//replyController(sendFrame);
 			System.out.println("Ship number " + ship.getId() + " trying to connect");
 			break;
 		case DATA:
@@ -38,8 +39,8 @@ public class ShipLogic implements Observer{
 			break;
 		case TOKEN:
 			sendFrame = FrameCreator.createRequest(ship.getId(), MASTER_ID, ship.getStatus());
-			replyController(sendFrame);
-			System.out.println("Controller gives permission to talk to ship number " + ship.getId());
+			//replyController(sendFrame);
+			System.out.println("Controller gives permission to talk to ship number " + Integer.parseInt(ship.getId(), 2));
 			break;
 		default:
 			break;
