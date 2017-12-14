@@ -30,6 +30,11 @@ public class FrameCreator {
 	public static Frame createRequest(String origin, String dest, Status status) {
 		return createFrame(status, PacketType.DATA, DataType.REQUEST, origin, dest);
 	}
+	
+	public static Frame createStatus(String origin, String dest, Status status) {
+		return createFrame(status, PacketType.DATA, DataType.STATUS, origin, dest);
+		
+	}
 
 	public static Frame createResponse(String origin, String dest, Status status) {
 		return createFrame(status, PacketType.DATA, DataType.RESPONSE, origin, dest);
