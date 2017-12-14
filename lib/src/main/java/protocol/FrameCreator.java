@@ -28,7 +28,7 @@ public class FrameCreator {
 
 	// TODO These two functions can be set into one, but like this may be more legible
 	public static Frame createRequest(String origin, String dest, Status status) {
-		return createFrameWithoutParking(status, PacketType.DATA, DataType.REQUEST, origin, dest);
+		return createFrame(status, PacketType.DATA, DataType.REQUEST, origin, dest);
 	}
 	
 	public static Frame createStatus(String origin, String dest, Status status) {
@@ -37,7 +37,7 @@ public class FrameCreator {
 	}
 
 	public static Frame createResponse(String origin, String dest, Status status) {
-		return createFrameWithoutParking(status, PacketType.DATA, DataType.RESPONSE, origin, dest);
+		return createFrame(status, PacketType.DATA, DataType.RESPONSE, origin, dest);
 	}
 
 	public static Frame createResponse(String origin, String dest, Status status, String parking) {
@@ -46,10 +46,10 @@ public class FrameCreator {
 
 	public static Frame createFrame(PacketType type, String origin, String dest) {
 
-		return createFrameWithoutParking(new Status("", "", ""), type, DataType.NULL, origin, dest);
+		return createFrame(new Status("", "", ""), type, DataType.NULL, origin, dest);
 	}
 
-	public static Frame createFrameWithoutParking(Status status, PacketType type, DataType dataType, String origin, String dest) {
+	public static Frame createFrame(Status status, PacketType type, DataType dataType, String origin, String dest) {
 
 		return createFrame(status, type, dataType, origin, dest, null);
 	}
