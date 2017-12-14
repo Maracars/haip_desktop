@@ -3,6 +3,7 @@ package ui.panels;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
 import jssc.SerialPortException;
+import protocol.ControllerLogic;
 import protocol.SerialObserver;
 import serial.Serial;
 import ui.log.LogModel;
@@ -43,12 +44,15 @@ public class MainPanel {
 	Serial serial;
 	SerialObserver serialObserver;
 
+	// Controller Logic
+	ControllerLogic controllerLogic;
+
 	// System Initialized
 	boolean systemInitialized;
 
-	public MainPanel(Serial serial) {
+	public MainPanel(Serial serial, ControllerLogic controllerLogic) {
 		this.createJFrame();
-        this.initThings(serial);
+        this.initThings(serial, controllerLogic);
         this.addContentToJFrame();
 	}
 
@@ -60,14 +64,14 @@ public class MainPanel {
 		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
-	private void initThings(Serial serial) {
+	private void initThings(Serial serial, ControllerLogic controllerLogic) {
 		IconFontSwing.register(FontAwesome.getIconFont());
 		this.initActions();
 		this.initTable();
 
 		this.serial = serial;
-		this.serialObserver = new SerialObserver(this.serial, this.tableModel);
-		this.serial.addObserver(this.serialObserver);
+		this.controllerLogic = controllerLogic;
+		this.serialObserver = new SerialObserver(this.serial, this.controllerLogic, this.tableModel);
 
 		this.systemInitialized = false;
 	}
@@ -179,37 +183,6 @@ public class MainPanel {
 		return menuExit;
 	}
 
-	private WindowAdapter createWindowClosingAdapter() {
-		return new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				/* Before closing window, check if communication and system are disabled
-				 * If not, disable and close them before exiting */
-				if (!serial.isConnected() && !systemInitialized) {
-					((JFrame)e.getSource()).dispose();
-				}
-				else {
-					int dialogResult = JOptionPane.showConfirmDialog(window,
-							((systemInitialized) ?
-									"System is initialized.\n" : "Serial connection is established.\n")
-									+ "Do you really want to exit?",
-							"Warning",
-							JOptionPane.YES_NO_OPTION);
-
-					if (dialogResult == JOptionPane.YES_OPTION) {
-						stopSystem();
-						try {
-							serial.closeConnection();
-						} catch (SerialPortException e1) {
-							e1.printStackTrace();
-						}
-						((JFrame)e.getSource()).dispose();
-					}
-				}
-			}
-		};
-	}
-
 	private void initTable() {
         CellRenderer cellRenderer = new CellRenderer();
         ColumnModel columnModel = new ColumnModel(cellRenderer);
@@ -233,6 +206,42 @@ public class MainPanel {
                 "Initialize system", KeyEvent.VK_I);
 	}
 
+	private WindowAdapter createWindowClosingAdapter() {
+		return new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				onWindowClosing();
+			}
+		};
+	}
+
+	private void onWindowClosing() {
+		/* Before closing window, check if communication and system are disabled
+		 * If not, disable and close them before exiting */
+		if (!serial.isConnected() && !systemInitialized) {
+			window.dispose();
+		}
+		else {
+			int dialogResult = JOptionPane.showConfirmDialog(window,
+					((systemInitialized) ?
+							"System is initialized.\n" : "Serial connection is established.\n")
+							+ "Do you really want to exit?",
+					"Warning",
+					JOptionPane.YES_NO_OPTION);
+
+			if (dialogResult == JOptionPane.YES_OPTION) {
+				stopSystem();
+				try {
+					serial.closeConnection();
+				}
+				catch (SerialPortException e) {
+					logModel.add(e.getMessage());
+				}
+				window.dispose();
+			}
+		}
+	}
+
 	public class ExitAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 		String text;
@@ -248,10 +257,7 @@ public class MainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (JOptionPane.showConfirmDialog(window, "Are you sure you want to exit?", "Warning",
-					JOptionPane.YES_NO_OPTION) == 0) {
-				window.dispose();
-			}
+			onWindowClosing();
 		}
 	}
 

@@ -20,14 +20,19 @@ public class CellRenderer extends DefaultTableCellRenderer{
 			label.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
 			label.setText("" + value);
 
-			if ((Boolean) value == false || label.getText().substring(0, 5).equals("ERROR")) {
+			if ((Boolean) value == false) {
 				label.setForeground(Color.RED);
+			}
+			else {
+				label.setForeground(Color.GREEN);
 			}
 			return label;
 		}
 		else {
-			this.setHorizontalAlignment(LEFT);
 			this.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+			/*if (label.getText().substring(0, 5).equals("ERROR")) {
+				label.setForeground(Color.RED);
+			}*/
 		}
 
 		this.setOpaque(true);

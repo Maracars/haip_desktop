@@ -35,7 +35,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		Integer boat_id = Integer.parseInt(boat);
 
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat));
-		if (serial == null) {
+		if (serial == null || !serial.isConnected()) {
 			System.out.println("Sent parsed token to boat number " + boat_id);
 		} else {
 			Helpers.sendParsedFrame(fr, serial);
@@ -43,8 +43,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 		long count = 0;
 		//noinspection StatementWithEmptyBody
-		while (count++ < ProtocolProperties.TIMEOUT && receivedList.isEmpty()) {
-		}
+		while (count++ < ProtocolProperties.TIMEOUT && receivedList.isEmpty());
+
 		// TODO Here we take the first packet received, dunno if we must ensure we have just one...
 		// Here we check that we have received something or has timed out, and that the boat that has sent is the one we want
 		if (!receivedList.isEmpty() && receivedList.get(0).getOriginId().equals(Helpers.toByteBinString(boat))) {
@@ -129,10 +129,13 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			System.out.println("Invalid state");
 		}
 		Frame nextFrame = FrameCreator.createResponse(ProtocolProperties.MASTER_ID, ship.getId(), nextStatus, parking);
-		Helpers.sendParsedFrame(nextFrame, serial);
+
+		if (serial == null || !serial.isConnected()) {
+			System.out.println("Sent frame");
+		} else {
+			Helpers.sendParsedFrame(nextFrame, serial);
+		}
 		setSentRequest(nextFrame);
-
-
 	}
 
 	private void addConnectedBoat(Integer boat) {

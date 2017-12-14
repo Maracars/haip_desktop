@@ -24,10 +24,28 @@ public class TableModel extends AbstractTableModel {
 				index = this.tableDataList.indexOf(t);
 			}
 		}
-		if (index == -1) {
-			this.tableDataList.add(tableData);
+		if (index != -1) {
+			// Update old ship
+			this.tableDataList.set(index, tableData);
 		}
 		else {
+			// Add new ship
+			this.tableDataList.add(tableData);
+		}
+		this.fireTableDataChanged();
+	}
+
+	public void updatePermission(int shipID, boolean permission) {
+		int index = -1;
+
+		for (TableData t : tableDataList) {
+			if (t.getShipID() == shipID) {
+				index = this.tableDataList.indexOf(t);
+			}
+		}
+		if (index != -1) {
+			TableData tableData = tableDataList.get(index);
+			tableData.setPermission(permission);
 			this.tableDataList.set(index, tableData);
 		}
 		this.fireTableDataChanged();

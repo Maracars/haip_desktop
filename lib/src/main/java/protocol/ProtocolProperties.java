@@ -25,6 +25,8 @@ public final class ProtocolProperties {
 	public static final int TIMEOUTED_LOOP_LIMIT = 2;
 	public static final int TRANSIT_ZONE_SHIP_LIMIT = 3;
 
+	public static final String MASTER_ID = "00000000";
+
 
 	public enum DataType {
 		STATUS("00"),
@@ -156,8 +158,6 @@ public final class ProtocolProperties {
 		}
 
 	}
-
-	public static final String MASTER_ID = "00000000";
 
 
 }
