@@ -17,7 +17,19 @@ public class TableModel extends AbstractTableModel {
 	}
 
 	public void add(TableData tableData) {
-		this.tableDataList.add(tableData);
+		int index = -1;
+
+		for (TableData t : tableDataList) {
+			if (t.getShipID() == tableData.getShipID()) {
+				index = this.tableDataList.indexOf(t);
+			}
+		}
+		if (index == -1) {
+			this.tableDataList.add(tableData);
+		}
+		else {
+			this.tableDataList.set(index, tableData);
+		}
 		this.fireTableDataChanged();
 	}
 	

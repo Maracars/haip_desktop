@@ -17,14 +17,10 @@ public class CellRenderer extends DefaultTableCellRenderer{
 		/*switch (column) {}*/
 
 		if (value.getClass().equals(Boolean.class)) {
-			label.setHorizontalAlignment(LEFT);
 			label.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
 			label.setText("" + value);
 
-			if ((Boolean) value == true) {
-				label.setForeground(Color.DARK_GRAY);
-			}
-			else {
+			if ((Boolean) value == false || label.getText().substring(0, 5).equals("ERROR")) {
 				label.setForeground(Color.RED);
 			}
 			return label;

@@ -22,7 +22,7 @@ public class TableData {
 					case 0: return "Docking Bay";
 					case 1: return "Transit Zone";
 					case 2: return "Outside";
-					default: return "Error: Illegal Position";
+					default: return "ERROR: Illegal Position";
 				}
 			}
 			case 2: {
@@ -30,11 +30,43 @@ public class TableData {
 					case 0: return "Get Inside";
 					case 1: return "Get Outside";
 					case 2: return "Stay Idle";
-					default: return "Error: Illegal Action";
+					default: return "ERROR: Illegal Action";
 				}
 			}
 			case 3: return permission;
 			default: return null;
 		}
+	}
+
+	public int getShipID() {
+		return shipID;
+	}
+
+	public void setShipID(int shipID) {
+		this.shipID = shipID;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
+
+	public int getAction() {
+		return action;
+	}
+
+	public void setAction(int action) {
+		this.action = action;
+	}
+
+	public boolean isPermission() {
+		return permission;
+	}
+
+	public void setPermission(boolean permission) {
+		this.permission = permission;
 	}
 }
