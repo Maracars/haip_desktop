@@ -7,8 +7,7 @@ import serial.Serial;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import static protocol.ProtocolProperties.ActionType;
-import static protocol.ProtocolProperties.StatusType;
+import static protocol.ProtocolProperties.*;
 
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
 public class ControllerLogic implements Observer, Runnable {
@@ -74,48 +73,65 @@ public class ControllerLogic implements Observer, Runnable {
 		if (timeouts.get(boat_id) >= ProtocolProperties.TIMEOUTED_LOOP_LIMIT) addIdleBoat(boat_id);
 	}
 
-	// TODO Check status and give response to the boat
 	public void checkRequest(Frame frame) {
 		Status status = frame.getData().getStatus();
+		Status nextStatus;
 		String status_str = status.getStatus();
 		String action_str = status.getAction();
 		Ship ship = new Ship(frame.getOriginId());
+		String parking = null;
 
 		if (status_str.equals(StatusType.PARKING.toString()) && action_str.equals(ActionType.LEAVE.toString())) {
 			boolean okay = port.addToTransitionZone(ship, action_str);
+			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.LEAVE.toString());
+
 			if (okay) {
+				nextStatus.setPermission(PermissionType.ALLOW.toString());
+
 				System.out.println("Ship :" + frame.getOriginId() + " is going to the transit zone, to leave the dock");
+			} else {
+				nextStatus.setPermission(PermissionType.DENY.toString());
+
+
 			}
-			//TODO Taking into account if there's place in the transition zone(okay), send the response to the boat
 
 		} else if (status_str.equals(StatusType.TRANSIT.toString())) {
 
+
 			if (action_str.equals(ActionType.LEAVE.toString())) {
+				nextStatus = new Status(StatusType.SEA.toString(), ActionType.LEAVE.toString(), PermissionType.ALLOW.toString());
+
 				System.out.println("Ship :" + frame.getOriginId() + " is going from the transit zone to the sea. Goodbye!");
 
-			}
-			if (action_str.equals(ActionType.ENTER.toString())) {
+			} else {
+				nextStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString(), PermissionType.ALLOW.toString());
+
 				System.out.println("Ship :" + frame.getOriginId() + " is going from the transit zone to the dock");
 			}
 
-			// TODO Here we should give the permission to leave or enter, taking what's asked.
 
 		} else if (status_str.equals(StatusType.SEA.toString()) && action_str.equals(ActionType.ENTER.toString())) {
 			Mooring freeMooring = port.getFreeMooring(ship);
-			// TODO We have to send the id of this mooring in the data
 			boolean okay = port.addToTransitionZone(ship, action_str);
-			//TODO Taking into account if there's place in the transition zone(okay), send the response to the boat
+
+			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString());
 			if (okay) {
+				nextStatus.setPermission(PermissionType.ALLOW.toString());
 				System.out.println("Ship :" + frame.getOriginId() + " is going to the transit zone, to enter to the dock");
 				System.out.println("The mooring assigned: " + freeMooring.getId());
+				parking = freeMooring.getId();
+			} else {
+				nextStatus.setPermission(PermissionType.DENY.toString());
+
 			}
 
-
 		} else {
-			//TODO Here we must say that the packet is not valid, in order the client to know
-
+			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString(), PermissionType.INVALID.toString());
 			System.out.println("Invalid state");
 		}
+		Frame nextFrame = FrameCreator.createResponse(ProtocolProperties.MASTER_ID, ship.getId(), nextStatus, parking);
+		Helpers.sendParsedFrame(nextFrame, serial);
+
 
 	}
 

@@ -132,7 +132,8 @@ public final class ProtocolProperties {
 	public enum PermissionType {
 		DENY("00"),
 		ALLOW("11"),
-		ASK("10");
+		ASK("10"),
+		INVALID("01");
 
 		private String string;
 

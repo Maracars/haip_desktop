@@ -6,11 +6,18 @@ public class Data {
 	private Status status;
 	private String parking;
 
-	public Data() {}
+	public Data() {
+	}
 
 	public Data(String type, Status status) {
 		this.type = type;
 		this.status = status;
+	}
+
+	public Data(String type, Status status, String parking) {
+		this.type = type;
+		this.status = status;
+		this.parking = parking;
 	}
 
 	public String getType() {
@@ -41,7 +48,6 @@ public class Data {
 	public String toString() {
 		return type + status.toString() + ((parking) == null ? "" : parking);
 	}
-
 
 
 }

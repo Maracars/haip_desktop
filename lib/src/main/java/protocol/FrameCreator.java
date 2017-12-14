@@ -28,23 +28,31 @@ public class FrameCreator {
 
 	// TODO These two functions can be set into one, but like this may be more legible
 	public static Frame createRequest(String origin, String dest, Status status) {
-		return createFrame(status, PacketType.DATA, DataType.REQUEST, origin, dest);
+		return createFrameWithoutParking(status, PacketType.DATA, DataType.REQUEST, origin, dest);
 	}
 
 	public static Frame createResponse(String origin, String dest, Status status) {
-		return createFrame(status, PacketType.DATA, DataType.RESPONSE, origin, dest);
+		return createFrameWithoutParking(status, PacketType.DATA, DataType.RESPONSE, origin, dest);
 	}
 
+	public static Frame createResponse(String origin, String dest, Status status, String parking) {
+		return createFrame(status, PacketType.DATA, DataType.RESPONSE, origin, dest, parking);
+	}
 
 	public static Frame createFrame(PacketType type, String origin, String dest) {
 
-		return createFrame(new Status("", "", ""), type, DataType.NULL, origin, dest);
+		return createFrameWithoutParking(new Status("", "", ""), type, DataType.NULL, origin, dest);
+	}
+
+	public static Frame createFrameWithoutParking(Status status, PacketType type, DataType dataType, String origin, String dest) {
+
+		return createFrame(status, type, dataType, origin, dest, null);
 	}
 
 
-	public static Frame createFrame(Status status, PacketType type, DataType dataType, String origin, String dest) {
+	public static Frame createFrame(Status status, PacketType type, DataType dataType, String origin, String dest, String parking) {
 
-		Data data = new Data(dataType.toString(), status);
+		Data data = new Data(dataType.toString(), status, parking);
 		String dataStr = Helpers.toByteBinString(data.toString());
 
 		// TODO We have think about how the counter work
