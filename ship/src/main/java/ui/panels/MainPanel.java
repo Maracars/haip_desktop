@@ -1,10 +1,49 @@
 package ui.panels;
 
+import static ui.panels.ActionMessages.CONNECTION_CLOSED;
+import static ui.panels.ActionMessages.CONNECTION_ESTABLISHED;
+import static ui.panels.ActionMessages.SYSTEM_INITIALIZED;
+import static ui.panels.ActionMessages.SYSTEM_STOPPED;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import helpers.Helpers;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
 import jssc.SerialPortException;
 import models.Ship;
+import models.Status;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
@@ -12,19 +51,7 @@ import serial.Serial;
 import ui.log.LogModel;
 import ui.log.LogPanel;
 
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-
-import static ui.panels.ActionMessages.*;
-
-public class MainPanel {
+public class MainPanel implements ListSelectionListener{
 	// Window
 	JFrame window;
 
@@ -48,6 +75,9 @@ public class MainPanel {
 
 	//Labels for ship info
 	JLabel permissionLabel;
+	
+	//Lists 
+	JList<String> statusList, decisionList;
 
 
 	public MainPanel(Serial serial, Ship ship) {
@@ -118,12 +148,19 @@ public class MainPanel {
 
 	private Component createDecisionInfoPanel() {
 		JPanel decisionPanel = new JPanel(new GridLayout(1,2));
-		JList<String> statusList = new JList<String>(Helpers.getNames(StatusType.class));
+		statusList = new JList<String>(Helpers.getNames(StatusType.class));
+		statusList.setSelectedValue(StatusType.getName(ship.getStatus().getStatus()).name(), true);
+		statusList.addListSelectionListener(this);
+		StatusListRenderer statusRenderer = new StatusListRenderer();
+		statusList.setCellRenderer(statusRenderer);
 		statusList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		statusList.setLayoutOrientation(JList.VERTICAL);
 		statusList.setSelectedIndex(-1);
 		statusList.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 3, Color.darkGray));
-		JList<String> decisionList = new JList<String>(Helpers.getNames(ActionType.class));
+		decisionList = new JList<String>(Helpers.getNames(ActionType.class));
+		decisionList.addListSelectionListener(this);
+		DecisionListRenderer decisionRenderer = new DecisionListRenderer(statusList);
+		decisionList.setCellRenderer(decisionRenderer);
 		decisionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		decisionList.setLayoutOrientation(JList.VERTICAL);
 		decisionList.setSelectedIndex(-1);
@@ -314,7 +351,10 @@ public class MainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
+			//Save the action
+			Status status = new Status(StatusType.valueOf(statusList.getSelectedValue()).toString(), 
+					ActionType.valueOf(decisionList.getSelectedValue()).toString());
+			ship.setStatus(status);
 
 		}
 
@@ -404,5 +444,11 @@ public class MainPanel {
 	public void rejectCommunications() {
 		// TODO
 		shipDiscovered = false;
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		statusList.repaint();
+		decisionList.repaint();
 	}
 }
