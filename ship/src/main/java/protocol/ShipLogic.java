@@ -92,6 +92,7 @@ public class ShipLogic extends Observable implements Observer{
 			System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " has permission to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name());
 			if(frame.getData().getStatus().getAction().equals(ActionType.ENTER.toString())) {
 				System.out.println("Parking assigned: "+frame.getData().getParking());
+				ship.setParking(frame.getData().getParking());
 			}
 			System.out.println("Ship changes to new status, STATUS: "+StatusType.getName(frame.getData().getStatus().getStatus()) + 
 					", ACTION: "+ActionType.getName(frame.getData().getStatus().getAction()).name() + 
