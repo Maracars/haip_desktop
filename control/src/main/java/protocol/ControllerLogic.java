@@ -22,7 +22,10 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	@SuppressWarnings("unchecked")
 	public ControllerLogic(Serial serial, Port port) {
 		this.serial = serial;
-		this.serial.addObserver(this);
+		if (serial != null) {
+			this.serial.addObserver(this);
+
+		}
 		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new CopyOnWriteArraySet<>();
@@ -198,7 +201,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			}
 			try {
 				//TODO I have no fucking idea how big the delay should be
-				Thread.sleep(1000);
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
