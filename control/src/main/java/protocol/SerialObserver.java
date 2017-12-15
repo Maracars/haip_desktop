@@ -42,7 +42,7 @@ public class SerialObserver implements Observer {
 			this.tableModel.add(tableData);
 		}
 		else {
-			int shipID = Integer.parseInt(this.frame.getOriginId(), 2);
+			int shipID = Integer.parseInt(this.frame.getDestinationId(), 2);
 			boolean permission = this.frame.getData().getStatus().getPermission().equals("11");
 			this.tableModel.updatePermission(shipID, permission);
 		}
