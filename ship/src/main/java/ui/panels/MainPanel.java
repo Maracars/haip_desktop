@@ -149,7 +149,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 		this.actionButton = new JButton(this.decisionAction);
 		this.actionButton.setPreferredSize(new Dimension(this.window.getHeight() / 3,
 				this.window.getHeight() / 10));
-		this.actionButton.setEnabled(true);
+		this.actionButton.setEnabled(false);
 		panel.add(actionButton);
 		return panel;
 	}
