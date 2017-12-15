@@ -43,7 +43,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 		long count = 0;
 		//noinspection StatementWithEmptyBody
-		while (count++ < ProtocolProperties.TIMEOUT && receivedList.isEmpty());
+		while (count++ < ProtocolProperties.TIMEOUT && receivedList.isEmpty()) ;
 
 		// TODO Here we take the first packet received, dunno if we must ensure we have just one...
 		// Here we check that we have received something or has timed out, and that the boat that has sent is the one we want
@@ -163,19 +163,24 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	@Override
 	public void run() {
 		while (true) {
-			for (int i = 0; i < ProtocolProperties.LOOP_IDLE_BOATS; i++) {
+			for (int k = 0; k < 5; k++) {
+				for (int i = 0; i < ProtocolProperties.LOOP_IDLE_BOATS; i++) {
 
-				for (int j = 0; j < ProtocolProperties.LOOP_CONNECTED_BOATS; j++) {
-					for (Integer boat : connectedBoats) {
+					for (int j = 0; j < ProtocolProperties.LOOP_CONNECTED_BOATS; j++) {
+						for (Integer boat : connectedBoats) {
+							controllerIokse(boat.toString());
+						}
+					}
+					for (Integer boat : idleBoats) {
 						controllerIokse(boat.toString());
 					}
-				}
-				for (Integer boat : idleBoats) {
-					controllerIokse(boat.toString());
+
+
 				}
 
 
 			}
+			Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
 		}
 	}
 }

@@ -17,8 +17,8 @@ public class FrameCreator {
 		return createFrame(PacketType.TOKEN, origin, dest);
 	}
 
-	public static Frame createDiscovery(String origin, String dest) {
-		return createFrame(PacketType.DISCOVERY, origin, dest);
+	public static Frame createDiscovery() {
+		return createFrame(PacketType.DISCOVERY, MASTER_ID, BROADCAST);
 	}
 
 	public static Frame createAck(String origin, String dest) {
