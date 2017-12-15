@@ -3,6 +3,9 @@ package main;
 import java.awt.FontFormatException;
 import java.io.IOException;
 
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 import models.Ship;
 import models.Status;
 import protocol.ProtocolProperties.ActionType;
@@ -10,9 +13,6 @@ import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
 import protocol.ShipLogic;
 import serial.Serial;
-import ui.panels.MainPanel;
-
-import javax.swing.*;
 
 public class Main {
 	
@@ -26,7 +26,7 @@ public class Main {
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		MainPanel panel = new MainPanel(serial, ship);
+		//MainPanel panel = new MainPanel(serial, ship, nodeLogic);
 
 		ShipLogic watcher = new ShipLogic(serial, ship);
 		serial.addObserver(watcher);

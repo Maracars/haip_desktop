@@ -49,6 +49,7 @@ import models.Status;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
+import protocol.ShipLogic;
 import serial.Serial;
 import ui.log.LogModel;
 import ui.log.LogPanel;
@@ -80,11 +81,14 @@ public class MainPanel implements ListSelectionListener, Observer{
 	
 	//Lists 
 	JList<String> statusList, decisionList;
+	
+	//ShipLogic
+	ShipLogic shipLogic;
 
 
-	public MainPanel(Serial serial, Ship ship) {
+	public MainPanel(Serial serial, Ship ship, ShipLogic shipLogic) {
 		this.createJFrame();
-		this.initThings(serial, ship);
+		this.initThings(serial, ship, shipLogic);
 		this.addContentToJFrame();
 	}
 
@@ -96,7 +100,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
-	private void initThings(Serial serial, Ship ship) {
+	private void initThings(Serial serial, Ship ship, ShipLogic shipLogic) {
 		IconFontSwing.register(FontAwesome.getIconFont());
 		this.initActions();
 
@@ -105,6 +109,8 @@ public class MainPanel implements ListSelectionListener, Observer{
 		//this.serial.addObserver(this.serialObserver);
 
 		this.ship = ship;
+		
+		this.shipLogic = shipLogic;
 
 		this.shipDiscovered = false;
 	}
@@ -143,7 +149,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 		this.actionButton = new JButton(this.decisionAction);
 		this.actionButton.setPreferredSize(new Dimension(this.window.getHeight() / 3,
 				this.window.getHeight() / 10));
-		this.actionButton.setEnabled(false);
+		this.actionButton.setEnabled(true);
 		panel.add(actionButton);
 		return panel;
 	}
@@ -358,10 +364,8 @@ public class MainPanel implements ListSelectionListener, Observer{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			//Save the action
-			Status status = new Status(StatusType.valueOf(statusList.getSelectedValue()).toString(), 
-					ActionType.valueOf(decisionList.getSelectedValue()).toString());
-			ship.setStatus(status);
-
+			ship.addAction(decisionList.getSelectedValue().toString());
+			actionButton.setEnabled(false);
 		}
 
 	}
@@ -458,8 +462,6 @@ public class MainPanel implements ListSelectionListener, Observer{
 	}
 	
 	public void repaintElements() {
-		System.out.println("repintando elementos");
-		System.out.println(ship.getStatus());
 		decisionList.repaint();
 		statusList.repaint();
 		repaintLabels();
@@ -473,9 +475,13 @@ public class MainPanel implements ListSelectionListener, Observer{
 
 	@Override
 	public void update(Observable o, Object arg) {
-		Ship newShip = (Ship) arg;
-		this.ship = newShip;
+		if(ship.getActionList().size() == 0 ) {
+			actionButton.setEnabled(true);
+		}else {
+			actionButton.setEnabled(false);
+		}
 		repaintElements();
+
 	}
 	
 	

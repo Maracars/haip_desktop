@@ -8,9 +8,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import protocol.ProtocolProperties.ActionType;
-import protocol.ProtocolProperties.StatusType;
-
 public class StatusListRenderer implements ListCellRenderer<String>{
 
 	@Override
@@ -20,7 +17,8 @@ public class StatusListRenderer implements ListCellRenderer<String>{
 		label.setText(value);
 		label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
 		label.setHorizontalAlignment(JLabel.CENTER);
-		if(isSelected && label.isEnabled()) {
+		label.setEnabled(false);
+		if(isSelected) {
 			label.setOpaque(true);
 			label.setBackground(Color.LIGHT_GRAY);
 		}	

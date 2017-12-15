@@ -2,6 +2,8 @@ package protocol;
 
 import static protocol.ProtocolProperties.MASTER_ID;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -19,10 +21,13 @@ public class ShipLogic extends Observable implements Observer{
 	
 	Serial serial;
 	Ship ship;
+	Ship actionShip;
+	List<String> actionList;
 	
 	public ShipLogic(Serial serial, Ship ship) {
 		this.serial = serial;
 		this.ship = ship;
+		actionList = new ArrayList<String>();
 	}
 
 	@Override
@@ -37,7 +42,8 @@ public class ShipLogic extends Observable implements Observer{
 				System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " trying to connect");
 				System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends ACK: " + frame.toString());
 			}else {
-				replyController(sendFrame);
+				if(serial.isConnected())
+					replyController(sendFrame);
 			}
 			break;
 		case DATA:
@@ -61,14 +67,18 @@ public class ShipLogic extends Observable implements Observer{
 	
 	private Frame checkToken(Frame frame) {
 		Frame sendFrame = null;
-		if(ship.getStatus().getAction().equals(ActionType.IDLE.toString())) {
+		if(ship.getActionList().size() > 0) {
+			if(ship.getActionList().get(0).equals(ActionType.IDLE.toString())) {
+				sendFrame = FrameCreator.createStatus(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
+				System.out.println("Ship number " + Integer.parseInt(ship.getId()) + " sends STATUS: " + sendFrame.toString());
+			}else if (ship.getActionList().get(0).equals(ActionType.ENTER.toString()) || ship.getActionList().get(0).equals(ActionType.LEAVE.toString())) {
+				sendFrame = FrameCreator.createRequest(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
+				System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends REQUEST: " + sendFrame.toString());
+			}
+		}else{
 			sendFrame = FrameCreator.createStatus(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
 			System.out.println("Ship number " + Integer.parseInt(ship.getId()) + " sends STATUS: " + sendFrame.toString());
-		}else if (ship.getStatus().getAction().equals(ActionType.ENTER.toString()) || ship.getStatus().getAction().equals(ActionType.LEAVE.toString())) {
-			sendFrame = FrameCreator.createRequest(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
-			System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends REQUEST: " + sendFrame.toString());
 		}
-		
 		return sendFrame;
 		
 	}
@@ -87,7 +97,8 @@ public class ShipLogic extends Observable implements Observer{
 					", ACTION: "+ActionType.getName(frame.getData().getStatus().getAction()).name() + 
 					" PERMISSION: "+PermissionType.getName(frame.getData().getStatus().getPermission()).name());
 			ship.setStatus(frame.getData().getStatus());
-			notifyPanel(ship);
+			ship.setActionList(new ArrayList<String>());
+			
 		}
 		if (frame.getData().getType().equals(DataType.RESPONSE.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.DENY.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " has NOT permission to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name());
@@ -95,16 +106,18 @@ public class ShipLogic extends Observable implements Observer{
 					", ACTION: "+ActionType.getName(frame.getData().getStatus().getAction()).name() + 
 					" PERMISSION: "+PermissionType.getName(frame.getData().getStatus().getPermission()).name());
 			ship.setStatus(frame.getData().getStatus());
-			notifyPanel(ship);
+		
 		}
 		if(frame.getData().getType().equals(DataType.STATUS.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId()) + " has started to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name() + " and controller is asking to change its status");
+			ship.setActionList(new ArrayList<String>());
 		}
+		notifyPanel();
 	}
 
-	private void notifyPanel(Ship ship) {
+	private void notifyPanel() {
 		setChanged();
-		notifyObservers(ship);
+		notifyObservers();
 	}
 
 }
