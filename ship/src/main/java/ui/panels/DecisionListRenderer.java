@@ -28,7 +28,7 @@ public class DecisionListRenderer implements ListCellRenderer<String>{
 		label.setHorizontalAlignment(JLabel.CENTER);
 		if(statusList.getSelectedIndex() != -1)
 			checkAvailableOptions(label, value);
-		if(isSelected) {
+		if(isSelected && label.isEnabled()) {
 			label.setOpaque(true);
 			label.setBackground(Color.LIGHT_GRAY);
 		}

@@ -20,7 +20,7 @@ public class StatusListRenderer implements ListCellRenderer<String>{
 		label.setText(value);
 		label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
 		label.setHorizontalAlignment(JLabel.CENTER);
-		if(isSelected) {
+		if(isSelected && label.isEnabled()) {
 			label.setOpaque(true);
 			label.setBackground(Color.LIGHT_GRAY);
 		}	
