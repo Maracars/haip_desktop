@@ -15,6 +15,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -51,7 +53,7 @@ import serial.Serial;
 import ui.log.LogModel;
 import ui.log.LogPanel;
 
-public class MainPanel implements ListSelectionListener{
+public class MainPanel implements ListSelectionListener, Observer{
 	// Window
 	JFrame window;
 
@@ -74,7 +76,7 @@ public class MainPanel implements ListSelectionListener{
 	boolean shipDiscovered;
 
 	//Labels for ship info
-	JLabel permissionLabel;
+	JLabel permissionLabel, statusLabel;
 	
 	//Lists 
 	JList<String> statusList, decisionList;
@@ -192,6 +194,11 @@ public class MainPanel implements ListSelectionListener{
 		permissionLabel.setVerticalAlignment(SwingConstants.CENTER);
 		return permissionLabel;
 	}
+	
+	private void checkStatusLabel() {
+		statusLabel.setText("Your status is: " + StatusType.getName(ship.getStatus().getStatus()).name()+
+				"\nYou are asking for: " + ActionType.getName(ship.getStatus().getAction()).name());
+	}
 
 	private void checkPermissionsLabel() {
 		permissionLabel.setText(PermissionType.getName(ship.getStatus().getPermission()).name());
@@ -205,9 +212,8 @@ public class MainPanel implements ListSelectionListener{
 	}
 
 	private Component crateStatusLabel(Border statusBorder) {
-		String statusText = "Your status is: " + StatusType.getName(ship.getStatus().getStatus()).name()+
-				"\nYou are asking for: " + ActionType.getName(ship.getStatus().getAction()).name();
-		JLabel statusLabel = new JLabel(statusText);
+		statusLabel = new JLabel();
+		checkStatusLabel();
 		statusLabel.setBorder(statusBorder);
 		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		statusLabel.setVerticalAlignment(SwingConstants.CENTER);
@@ -448,7 +454,29 @@ public class MainPanel implements ListSelectionListener{
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		statusList.repaint();
-		decisionList.repaint();
+		repaintElements();
 	}
+	
+	public void repaintElements() {
+		System.out.println("repintando elementos");
+		System.out.println(ship.getStatus());
+		decisionList.repaint();
+		statusList.repaint();
+		repaintLabels();
+	}
+
+	private void repaintLabels() {
+		checkPermissionsLabel();
+		checkStatusLabel();
+		
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		Ship newShip = (Ship) arg;
+		this.ship = newShip;
+		repaintElements();
+	}
+	
+	
 }

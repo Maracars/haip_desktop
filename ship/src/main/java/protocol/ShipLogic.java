@@ -15,7 +15,7 @@ import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
 import serial.Serial;
 
-public class ShipLogic implements Observer{
+public class ShipLogic extends Observable implements Observer{
 	
 	Serial serial;
 	Ship ship;
@@ -87,6 +87,7 @@ public class ShipLogic implements Observer{
 					", ACTION: "+ActionType.getName(frame.getData().getStatus().getAction()).name() + 
 					" PERMISSION: "+PermissionType.getName(frame.getData().getStatus().getPermission()).name());
 			ship.setStatus(frame.getData().getStatus());
+			notifyPanel(ship);
 		}
 		if (frame.getData().getType().equals(DataType.RESPONSE.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.DENY.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " has NOT permission to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name());
@@ -94,10 +95,16 @@ public class ShipLogic implements Observer{
 					", ACTION: "+ActionType.getName(frame.getData().getStatus().getAction()).name() + 
 					" PERMISSION: "+PermissionType.getName(frame.getData().getStatus().getPermission()).name());
 			ship.setStatus(frame.getData().getStatus());
+			notifyPanel(ship);
 		}
 		if(frame.getData().getType().equals(DataType.STATUS.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId()) + " has started to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name() + " and controller is asking to change its status");
 		}
+	}
+
+	private void notifyPanel(Ship ship) {
+		setChanged();
+		notifyObservers(ship);
 	}
 
 }
