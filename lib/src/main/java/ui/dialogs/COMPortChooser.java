@@ -9,7 +9,7 @@ public class COMPortChooser extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	String[] portStrings;
-	JList<String> portList;
+	JComboBox<String> comboBox;
 	JButton bOk;
 	JFrame window;
 
@@ -19,10 +19,10 @@ public class COMPortChooser extends JDialog implements ActionListener {
 		this.portStrings = portStrings;
 
 		this.setSize((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 6),
-				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2);
+				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 6);
 
-		this.setLocation((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 5),
-				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() - this.getHeight());
+		this.setLocation((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 15),
+				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 2 * this.getHeight());
 
 		this.setContentPane(createWindowPanel());
 
@@ -37,7 +37,7 @@ public class COMPortChooser extends JDialog implements ActionListener {
 
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		panel.add(createText(), BorderLayout.NORTH);
-		panel.add(createListPanel(), BorderLayout.CENTER);
+		panel.add(createComboBox(), BorderLayout.CENTER);
 		panel.add(createButtonPanel(), BorderLayout.SOUTH);
 
 		return panel;
@@ -58,11 +58,10 @@ public class COMPortChooser extends JDialog implements ActionListener {
 		return panel;
 	}
 
-	private Component createListPanel() {
+	private Component createComboBox() {
 		JPanel panel = new JPanel();
-		portList = new JList<>(portStrings);
-		portList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		panel.add(portList);
+		this.comboBox = new JComboBox<>(portStrings);
+		panel.add(comboBox);
 		return panel;
 	}
 
@@ -80,6 +79,6 @@ public class COMPortChooser extends JDialog implements ActionListener {
 	}
 
 	public int getSelectedIndex() {
-		return portList.getSelectedIndex();
+		return comboBox.getSelectedIndex();
 	}
 }
