@@ -22,6 +22,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	@SuppressWarnings("unchecked")
 	public ControllerLogic(Serial serial, Port port) {
 		this.serial = serial;
+		this.serial.addObserver(this);
 		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new CopyOnWriteArraySet<>();
