@@ -25,20 +25,21 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new CopyOnWriteArraySet<>();
-		connectedBoats.add(3);
 		idleBoats = new CopyOnWriteArraySet<>();
 		timeouts = new HashMap<>();
 	}
 
-	public void controllerIokse(String boat) {
+	public void control(String boat) {
 
 		Integer boat_id = Integer.parseInt(boat);
 
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat));
-		if (serial == null || !serial.isConnected()) {
-			System.out.println("Sent parsed token to boat number " + boat_id);
-		} else {
+		if (serial != null && serial.isConnected()) {
 			Helpers.sendParsedFrame(fr, serial);
+
+		} else {
+			System.out.println("Sent parsed token to boat number " + boat_id);
+
 		}
 
 		long count = 0;
@@ -157,7 +158,15 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		receivedList.add((Frame) arg);
+
+		System.out.println("jajaj d puta madre");
+		Frame frame = (Frame) arg;
+		if (PacketType.ACK.equals(PacketType.getName(frame.getHeader().getPacketType()))) {
+			connectedBoats.add(Integer.parseInt(frame.getOriginId(), 2));
+			System.out.println(connectedBoats);
+		} else {
+			receivedList.add(frame);
+		}
 	}
 
 	@Override
@@ -168,19 +177,30 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 					for (int j = 0; j < ProtocolProperties.LOOP_CONNECTED_BOATS; j++) {
 						for (Integer boat : connectedBoats) {
-							controllerIokse(boat.toString());
+							control(boat.toString());
 						}
 					}
 					for (Integer boat : idleBoats) {
-						controllerIokse(boat.toString());
+						control(boat.toString());
 					}
-
 
 				}
 
 
 			}
-			Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
+			if (serial != null && serial.isConnected()) {
+				Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
+
+			} else {
+				System.out.println("Discovery is sent to boats");
+
+			}
+			try {
+				//TODO I have no fucking idea how big the delay should be
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

@@ -35,7 +35,7 @@ public class ProbaObserver extends Observable {
 	public void initMoorings(ArrayList<Mooring> moorings) {
 		for (Integer i = 0; i < 10; i++) {
 			Ship ship = null;
-			if (i == 2 ) {
+			if (i == 2) {
 				ship = new Ship("00000010");
 
 			}
@@ -44,13 +44,14 @@ public class ProbaObserver extends Observable {
 		}
 		Status status = new Status(ProtocolProperties.StatusType.PARKING.toString(), ProtocolProperties.ActionType.IDLE.toString(), ProtocolProperties.PermissionType.ASK.toString());
 
-		System.out.println("jajajjaaiokese" + FrameCreator.createResponse("00000001", "00000000", status));
+		System.out.println("jajajjaaiokese" + FrameCreator.createAck("00000001", "00000000"));
 	}
 
 	public void setWatched(String string) {
 		watched += string;
 
 		int result = FrameParser.parseRx(watched);
+
 		if (result == FrameParser.BAD_PACKET) {
 			watched = "";
 		} else if (result == FrameParser.FIN_PACKET) {
