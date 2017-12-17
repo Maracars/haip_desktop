@@ -1,5 +1,6 @@
 package ui;
 
+import helpers.CRC8;
 import models.*;
 import org.junit.Test;
 import protocol.ControllerLogic;
@@ -15,14 +16,18 @@ import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
+import static protocol.ProtocolProperties.DESTINATION_ID;
+import static protocol.ProtocolProperties.HEADER;
+import static protocol.ProtocolProperties.ORIGIN_ID;
+
 public class InterfaceTest extends Observable {
-	private static String PACKET_1 = "101100000000000100000000000010001010001001010110";
-	private static String PACKET_2 = "101100000000001000000000000010001000011001101111";
-	private static String PACKET_3 = "101100000000000100000000000010001001001001111000";
-	private static String PACKET_4 = "101100000000001000000000000010001001011011011001";
-	private static String PACKET_5 = "101100000000001100000000000010001010101010101100";
-	private static String PACKET_6 = "101100000000000100000000000010001000101010001011";
-	private static String PACKET_7 = "101100000000001000000000000010001010101000110001";
+	private static String PACKET_1 = "0011000000000001000000001010001000110000";
+	private static String PACKET_2 = "0011000000000010000000001000011010001110";
+	private static String PACKET_3 = "0011000000000001000000001001001000011110";
+	private static String PACKET_4 = "0011000000000010000000001001011000111000";
+	private static String PACKET_5 = "0011000000000011000000001010101001001011";
+	private static String PACKET_6 = "0011000000000001000000001000101011101101";
+	private static String PACKET_7 = "0011000000000010000000001010101011010000";
 
 	ArrayList<Mooring> moorings;
 	Dock dock;
@@ -65,18 +70,18 @@ public class InterfaceTest extends Observable {
 	@Test
 	public void receiveFrames() {
 		sendToParserAndWait(PACKET_1);
-		sendToParserAndWait(PACKET_2);
+		/*sendToParserAndWait(PACKET_2);
 		sendToParserAndWait(PACKET_3);
 		sendToParserAndWait(PACKET_4);
 		sendToParserAndWait(PACKET_5);
 		sendToParserAndWait(PACKET_6);
-		sendToParserAndWait(PACKET_7);
+		sendToParserAndWait(PACKET_7);*/
 	}
 
 	@Test
 	public void sendToParserAndWait(String packet) {
 		try {
-			TimeUnit.SECONDS.sleep(5);
+			TimeUnit.SECONDS.sleep(1);
 		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
@@ -92,5 +97,7 @@ public class InterfaceTest extends Observable {
 			e.printStackTrace();
 		}
 		new InterfaceTest().receiveFrames();
+		/*Integer length = (Integer.parseInt(PACKET_1.substring(0, 3)) * 8);
+		System.out.println(CRC8.toCRC8(PACKET_1.toString().substring(0, HEADER + ORIGIN_ID + DESTINATION_ID + length)));*/
 	}
 }

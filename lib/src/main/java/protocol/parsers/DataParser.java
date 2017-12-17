@@ -25,11 +25,11 @@ public class DataParser implements Parser{
 	// Type, Status, Action, Permission (2 bits each)
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
-		if(Integer.parseInt(frame.getLength(), 2) > 0) {
+		if (Integer.parseInt(frame.getHeader().getLength(), 2) > 0) {
 			frame = parseDataFirstByte(frame, byteString);
 			frame = parseDataSecondByte(frame, byteString);
 
-		}else {
+		} else {
 			frame.setData(null);
 		}
 		return frame;
@@ -37,17 +37,17 @@ public class DataParser implements Parser{
 
 
 	private Frame parseDataSecondByte(Frame frame, String byteString) {
-		if(frame.getHeader().getPacketType().equals(PacketType.DATA.toString()) &&
+		if (frame.getHeader().getPacketType().equals(PacketType.DATA.toString()) &&
 				frame.getData().getType().equals(DataType.RESPONSE.toString()) &&
 				frame.getData().getStatus().getStatus().equals(StatusType.SEA.toString()) &&
 				frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
 			try {
-				frame.getData().setParking(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION + PERMISSION,
-						HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION + PERMISSION + PARKING));
-			}catch (StringIndexOutOfBoundsException e) {
+				frame.getData().setParking(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + TYPE + STATUS + ACTION + PERMISSION,
+						HEADER + ORIGIN_ID + DESTINATION_ID + TYPE + STATUS + ACTION + PERMISSION + PARKING));
+			} catch (StringIndexOutOfBoundsException e) {
 				frame.getData().setParking(null);
 			}
-		}else {
+		} else {
 			frame.getData().setParking(null);
 		}
 		return frame;
@@ -56,20 +56,20 @@ public class DataParser implements Parser{
 
 	public Frame parseDataFirstByte(Frame frame, String byteString) {
 		try {
-			String type = byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH,
-					HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE);
+			String type = byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID,
+					HEADER + ORIGIN_ID + DESTINATION_ID + TYPE);
 			Status status = new Status(
-					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE,
-							HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS),
-					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS,
-							HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION),
-					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION,
-							HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + TYPE + STATUS + ACTION + PERMISSION));
+					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + TYPE,
+							HEADER + ORIGIN_ID + DESTINATION_ID + TYPE + STATUS),
+					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + TYPE + STATUS,
+							HEADER + ORIGIN_ID + DESTINATION_ID + TYPE + STATUS + ACTION),
+					byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + TYPE + STATUS + ACTION,
+							HEADER + ORIGIN_ID + DESTINATION_ID + TYPE + STATUS + ACTION + PERMISSION));
 
 			Data data = new Data(type, status);
-
 			frame.setData(data);
-		} catch (StringIndexOutOfBoundsException | NumberFormatException e) {
+		}
+		catch (StringIndexOutOfBoundsException | NumberFormatException e) {
 			frame.setData(null);
 		}
 		return frame;

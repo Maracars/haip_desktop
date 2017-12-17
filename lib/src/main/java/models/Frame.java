@@ -5,24 +5,21 @@ public class Frame {
 	private Header header;
 	private String originId;
 	private String destinationId;
-	private String length;
 	private Data data;
 	private String checksum;
 
-	public Frame(Header header, String originId, String destinationId, String length, Data data, String checksum) {
+	public Frame(Header header, String originId, String destinationId, Data data, String checksum) {
 		this.header = header;
 		this.originId = originId;
 		this.destinationId = destinationId;
-		this.length = length;
 		this.data = data;
 		this.checksum = checksum;
 	}
 
-	public Frame(Header header, String originId, String destinationId, String length, Data data) {
+	public Frame(Header header, String originId, String destinationId, Data data) {
 		this.header = header;
 		this.originId = originId;
 		this.destinationId = destinationId;
-		this.length = length;
 		this.data = data;
 	}
 
@@ -53,14 +50,6 @@ public class Frame {
 		this.destinationId = destinationId;
 	}
 
-	public String getLength() {
-		return length;
-	}
-
-	public void setLength(String length) {
-		this.length = length;
-	}
-
 	public Data getData() {
 		return data;
 	}
@@ -79,7 +68,7 @@ public class Frame {
 
 	@Override
 	public String toString() {
-		return header.toString() + originId + destinationId + length + ((data == null) ? "" : data.toString()) + checksum;
+		return header.toString() + originId + destinationId + ((data == null) ? "" : data.toString()) + checksum;
 	}
 
 

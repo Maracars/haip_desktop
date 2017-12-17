@@ -50,17 +50,15 @@ public class ProbaObserver extends Observable {
 	public void setWatched(String string) {
 		watched += string;
 
-		int result = FrameParser.parseRx(watched);
+		boolean parsed = FrameParser.parseRx(watched);
 
-		if (result == FrameParser.BAD_PACKET) {
-			watched = "";
-		} else if (result == FrameParser.FIN_PACKET) {
+		if (parsed) {
 			setChanged();
 			notifyObservers(FrameParser.getFrame());
 			watched = "";
-
+		} else {
+			watched = "";
 		}
-
 	}
 
 

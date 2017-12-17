@@ -1,13 +1,11 @@
 package protocol.parsers;
 
-import static protocol.ProtocolProperties.COUNTER;
-import static protocol.ProtocolProperties.PACKET_TYPE;
-import static protocol.ProtocolProperties.START_FRAME;
-
 import java.util.List;
 
 import models.Frame;
 import models.Header;
+
+import static protocol.ProtocolProperties.*;
 
 public class HeaderParser implements Parser{
 
@@ -16,9 +14,9 @@ public class HeaderParser implements Parser{
 		Header header = new Header();
 		// TODO Here instead of substrings we should create our own funct. e.g. getFramePart(byteString, START_FRAME)
 		try {
-			header.setStartFrame(byteString.substring(0, START_FRAME));
-			header.setPacketType(byteString.substring(START_FRAME, START_FRAME + PACKET_TYPE));
-			header.setCounter(byteString.substring(START_FRAME + PACKET_TYPE, START_FRAME + PACKET_TYPE + COUNTER));
+			header.setLength(byteString.substring(0, LENGTH));
+			header.setPacketType(byteString.substring(LENGTH, LENGTH + PACKET_TYPE));
+			header.setCounter(byteString.substring(LENGTH + PACKET_TYPE, LENGTH + PACKET_TYPE + COUNTER));
 			frame.setHeader(header);
 		} catch (StringIndexOutOfBoundsException e) {
 			frame.setHeader(null);

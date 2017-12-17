@@ -2,24 +2,25 @@ package protocol;
 
 public final class ProtocolProperties {
 
-	public static final int START_FRAME = 3;
 	public static final int HEADER = 8;
+	public static final int LENGTH = 3;
 	public static final int PACKET_TYPE = 2;
 	public static final int COUNTER = 3;
+
 	public static final int ORIGIN_ID = 8;
 	public static final int DESTINATION_ID = 8;
-	public static final int LENGTH = 8;
-	public static final int INF = 8;
-	public static final int CHECKSUM = 8;
-	// TODO This has to be defined
-	public static final long TIMEOUT = 50000000;
+
 	public static final int TYPE = 2;
 	public static final int STATUS = 2;
 	public static final int ACTION = 2;
 	public static final int PERMISSION = 2;
 	public static final int PARKING = 8;
 
-	public static final String START_FRAME_VALUE = "101";
+	public static final int CHECKSUM = 8;
+
+	// TODO This has to be defined
+	public static final long TIMEOUT = 50000000;
+
 	public static final int LOOP_CONNECTED_BOATS = 3;
 	public static final int LOOP_IDLE_BOATS = 2;
 	public static final int TIMEOUTED_LOOP_LIMIT = 2;

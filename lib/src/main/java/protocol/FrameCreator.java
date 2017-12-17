@@ -61,8 +61,8 @@ public class FrameCreator {
 		String dataStr = Helpers.toByteBinString(data.toString());
 
 		// TODO We have think about how the counter work
-		Header header = new Header(ProtocolProperties.START_FRAME_VALUE, type.toString(), "000");
-		Frame frame = new Frame(header, origin, dest, Helpers.toByteBinString("" + dataStr.length()), data);
+		Header header = new Header(Helpers.toByteBinString("" + dataStr.length()), type.toString(), "000");
+		Frame frame = new Frame(header, origin, dest, data);
 		String packet = frame.toString().substring(0, HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + dataStr.length());
 		String checksum = CRC8.toCRC8(packet);
 		frame.setChecksum(checksum);

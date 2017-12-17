@@ -28,7 +28,7 @@ public class DataValidator implements Validator {
 				put(StatusType.class, status.getStatus());
 				put(PermissionType.class, status.getPermission());
 			}};
-			if (Integer.parseInt(frame.getLength(), 2) != (data.toString().length()))
+			if ((Integer.parseInt(frame.getHeader().getLength(), 2) * 8) != (data.toString().length()))
 				return false;
 
 			for (Map.Entry<Class, String> entry : validator.entrySet()) {

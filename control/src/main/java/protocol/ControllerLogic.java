@@ -29,6 +29,9 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new CopyOnWriteArraySet<>();
+		connectedBoats.add(1);
+		connectedBoats.add(2);
+		connectedBoats.add(3);
 		idleBoats = new CopyOnWriteArraySet<>();
 		timeouts = new HashMap<>();
 	}

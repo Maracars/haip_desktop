@@ -11,9 +11,9 @@ public class ChecksumParser implements Parser {
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
 		try {
-			Integer len = Integer.parseInt(frame.getLength(), 2);
-			String checksum = byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + len,
-					HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + len + CHECKSUM);
+			Integer length = (Integer.parseInt(frame.getHeader().getLength(), 2) * 8);
+			String checksum = byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + length,
+					HEADER + ORIGIN_ID + DESTINATION_ID + length + CHECKSUM);
 
 			frame.setChecksum(checksum);
 		} catch (StringIndexOutOfBoundsException | NumberFormatException e) {

@@ -2,14 +2,14 @@ package models;
 
 public class Header {
 	// 3 bits
-	private String startFrame;
+	private String length;
 	// 2 bits
 	private String packetType;
 	// 3 bits
 	private String counter;
 
-	public Header(String startFrame, String packetType, String counter) {
-		this.startFrame = startFrame;
+	public Header(String length, String packetType, String counter) {
+		this.length = length;
 		this.packetType = packetType;
 		this.counter = counter;
 	}
@@ -17,12 +17,12 @@ public class Header {
 	public Header() {
 	}
 
-	public String getStartFrame() {
-		return startFrame;
+	public String getLength() {
+		return length;
 	}
 
-	public void setStartFrame(String startFrame) {
-		this.startFrame = startFrame;
+	public void setLength(String length) {
+		this.length = length;
 	}
 
 	public String getPacketType() {
@@ -43,7 +43,7 @@ public class Header {
 
 	@Override
 	public String toString() {
-		return startFrame + packetType + counter;
+		return length + packetType + counter;
 	}
 
 }

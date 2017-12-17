@@ -14,16 +14,12 @@ public class TestFrameParserRx {
 
 	@Test
 	public void checkParserTx() {
-		int result = FrameParser.parseRx(PACKET);
-
-		if (result == FrameParser.BAD_PACKET) {
-			System.out.println("Error");
-		}
-		else if (result == FrameParser.FIN_PACKET) {
+		boolean parsed = FrameParser.parseRx(PACKET);
+		if (parsed) {
 			System.out.println("Correct");
 		}
-		else if (result == FrameParser.UNFIN_PACKET) {
-			System.out.println("Unfin");
+		else {
+			System.out.println("Error");
 		}
 	}
 

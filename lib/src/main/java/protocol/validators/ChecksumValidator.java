@@ -9,12 +9,9 @@ public class ChecksumValidator implements Validator {
 
 	@Override
 	public boolean validate(Frame frame) {
-
-		Integer len = Integer.parseInt(frame.getLength(), 2);
-		String expected = CRC8.toCRC8(frame.toString().substring(0, HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + len));
-
+		Integer length = (Integer.parseInt(frame.getHeader().getLength(), 2) * 8);
+		String expected = CRC8.toCRC8(frame.toString().substring(0, HEADER + ORIGIN_ID + DESTINATION_ID + length));
 
 		return expected.equals(frame.getChecksum());
 	}
-
 }
