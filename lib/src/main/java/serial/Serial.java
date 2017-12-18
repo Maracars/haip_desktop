@@ -78,13 +78,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 
 	public void serialEvent(SerialPortEvent arg0) {
 		try {
-            boolean parsed = FrameParser.parseRx(serialPort.readString());
-            if (parsed) {
-                notifyFrame(FrameParser.getFrame());
-            }
-			/*String readString = serialPort.readString();
-			packet += readString;
-			sendToParser(packet);*/
+			sendToParser(serialPort.readString());
 		}
 		catch (SerialPortException e) {
 			e.printStackTrace();
@@ -92,23 +86,11 @@ public class Serial extends Observable implements SerialPortEventListener {
 	}
 
 	public void sendToParser(String string) {
-        boolean parsed = FrameParser.parseRx(string);
-        if (parsed) {
+        boolean validFrame = FrameParser.parseRx(string);
+        if (validFrame) {
             notifyFrame(FrameParser.getFrame());
         }
 	}
-
-	/*public void sendToParser(String packet) {
-		this.packet = packet;
-		int result = FrameParser.parseRx(packet);
-
-		if (result == FrameParser.BAD_PACKET) {
-			this.packet = "";
-		}
-		else if (result == FrameParser.FIN_PACKET) {
-			notifyFrame(FrameParser.getFrame());
-		}
-	}*/
 
 	public void writeStrings(List<String> stringList) throws SerialPortException {
 		for (String strByte : stringList) {

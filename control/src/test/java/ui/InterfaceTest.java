@@ -1,33 +1,34 @@
 package ui;
 
-import helpers.CRC8;
 import models.*;
 import org.junit.Test;
 import protocol.ControllerLogic;
-import protocol.FrameCreator;
 import protocol.ProtocolProperties;
 import serial.Serial;
-import sun.applet.Main;
 import ui.panels.MainPanel;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
-import static protocol.ProtocolProperties.DESTINATION_ID;
-import static protocol.ProtocolProperties.HEADER;
-import static protocol.ProtocolProperties.ORIGIN_ID;
-
 public class InterfaceTest extends Observable {
-	private static String PACKET_1 = "0011000000000001000000001010001000110000";
-	private static String PACKET_2 = "0011000000000010000000001000011010001110";
-	private static String PACKET_3 = "0011000000000001000000001001001000011110";
-	private static String PACKET_4 = "0011000000000010000000001001011000111000";
-	private static String PACKET_5 = "0011000000000011000000001010101001001011";
-	private static String PACKET_6 = "0011000000000001000000001000101011101101";
-	private static String PACKET_7 = "0011000000000010000000001010101011010000";
+	private static String PACKET_1 = "11010000" + "00110000000000010000000010100010" + "00110000";
+
+	private static String PACKET_2_A = "001100000000001";
+	private static String PACKET_2_B = "00000000010000110" + "10001110";
+
+	private static String PACKET_3_A = "11101101" + "001100000000000";
+	private static String PACKET_3_B = "10000000010010010" + "00011110" + "01001011";
+
+	private static String PACKET_4_A = "001100000000001" + "001100000000001";	// 1ª parte basura
+	private static String PACKET_4_B = "00000000010010110" + "00111000" + "0011";	// 3ª parte inicio de P5
+	private static String PACKET_5_A = "00000000001100000000";
+	private static String PACKET_5_B = "10101010" + "01001011" + "001100";	// 3ª parte inicio de P6
+	private static String PACKET_6_A = "0011000000000001000000001000";
+	private static String PACKET_6_B = "1010" + "11101101";
+
+	private static String PACKET_7 = "00110000000000100000000010101010" + "11010000";
 
 	ArrayList<Mooring> moorings;
 	Dock dock;
@@ -69,13 +70,12 @@ public class InterfaceTest extends Observable {
 
 	@Test
 	public void receiveFrames() {
-		sendToParserAndWait(PACKET_1);
-		/*sendToParserAndWait(PACKET_2);
-		sendToParserAndWait(PACKET_3);
-		sendToParserAndWait(PACKET_4);
-		sendToParserAndWait(PACKET_5);
-		sendToParserAndWait(PACKET_6);
-		sendToParserAndWait(PACKET_7);*/
+		sendToParserAndWait(PACKET_4_A);
+		sendToParserAndWait(PACKET_4_B);
+		sendToParserAndWait(PACKET_5_A);
+		sendToParserAndWait(PACKET_5_B);
+		sendToParserAndWait(PACKET_6_A);
+		sendToParserAndWait(PACKET_6_B);
 	}
 
 	@Test

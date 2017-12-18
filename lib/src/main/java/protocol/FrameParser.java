@@ -4,30 +4,21 @@ import models.Frame;
 import protocol.parsers.*;
 import protocol.validators.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Observable;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static protocol.ProtocolProperties.*;
 
 public class FrameParser extends Observable {
-
-	public static final int FIN_PACKET = 1;
-	public static final int BAD_PACKET = -1;
-	public static final int UNFIN_PACKET = 0;
-	private static String packet;
 	private static List<String> potentialPackets;
+	static boolean validFrame;
 	private static Frame frame;
-	private static boolean validPacket;
 	private static List<Validator> validators;
 	private static List<Parser> parsers;
 
 	static {
-		packet = "";
 		potentialPackets = new ArrayList<>();
-		validPacket = false;
+		validFrame = false;
 		validators = new ArrayList<>();
 		parsers = new ArrayList<>();
 		initializeValidators();
@@ -49,69 +40,52 @@ public class FrameParser extends Observable {
 				new DataParser(), new ChecksumParser());
 	}
 
-	/*public static int parseRx(String byteString) {
-
-		//First, we check if the receive bytes can form a packet (Min. 5 bytes)
-		if (!checkPacketSize(byteString))
-			return UNFIN_PACKET;
-
-		//If the packet can be formed, we parse all the bytes
-		parseData(byteString);
-
-		//Then, we validate the Data
-		if (!validateData()) {
-			resetCommunication();
-			return BAD_PACKET;
-		}
-
-		//If the validation is OK, we check that finally, the packet has been form entirely.
-		return checkPacketFinal();
-	}*/
-
 	public static boolean parseRx(String newBits) {
-		packet += newBits;
+		String packet = newBits;
 		potentialPackets = potentialPackets.stream().map(s -> s + newBits).collect(Collectors.toCollection(ArrayList::new));
 
-		while (packet.length() >= 1) {
-			System.out.println(packet);
-			if (packet.length() >= 3) {
-				int dataLength = Integer.parseInt(packet.substring(0, LENGTH), 3);
-				int expectedLength = (HEADER + ORIGIN_ID + DESTINATION_ID + (dataLength * 8) + CHECKSUM);
+		Iterator<String> iterator = potentialPackets.iterator();
+		while (iterator.hasNext()) {
+			String potentialPacket = iterator.next();
 
-				if (expectedLength <= packet.length()) {
-					Frame frame = parseData(packet);
+			if (potentialPacket.length() >= LENGTH) {
+				if (getExpectedPacketLength(potentialPacket) <= potentialPacket.length()) {
 
+					Frame frame = parseData(potentialPacket);
+					iterator.remove();
 					if (validateData(frame)) {
-						if (checkPacketFinal(frame)) {
-							FrameParser.frame = frame;
-							return true;
-						}
+						FrameParser.frame = frame;
+						validFrame = true;
+						break;
 					}
-				}
-				else {
-					potentialPackets.add(packet);
 				}
 			}
-			else potentialPackets.add(packet);
-			packet = packet.substring(1, packet.length());
-
-			/*for (String s : potentialPackets) {
-				int dataLengthPotential = Integer.parseInt(s.substring(0, LENGTH), 3);
-				int expectedLengthPotential = (HEADER + ORIGIN_ID + DESTINATION_ID + (dataLengthPotential * 8) + CHECKSUM);
-
-				if (expectedLengthPotential <= s.length()) {
-					Frame frame = parseData(s);
-
-					if (validateData(frame)) {
-						return checkPacketFinal(frame);
-					}
-					else {
-						potentialPackets.remove(s);
-					}
-				}
-			}*/
 		}
-		return false;
+
+		while (packet.length() > 0) {
+			if (packet.length() >= LENGTH) {
+				if (getExpectedPacketLength(packet) <= packet.length()) {
+
+					Frame frame = parseData(packet);
+					if (validateData(frame)) {
+						FrameParser.frame = frame;
+						validFrame = true;
+						break;
+					}
+				} else {
+					potentialPackets.add(packet);
+				}
+			} else {
+				potentialPackets.add(packet);
+			}
+			packet = packet.substring(1, packet.length());
+		}
+		return validFrame;
+	}
+
+	private static int getExpectedPacketLength(String packet) {
+		int dataLength = (8 * Integer.parseInt(packet.substring(0, LENGTH), 2));
+		return HEADER + ORIGIN_ID + DESTINATION_ID + dataLength + CHECKSUM;
 	}
 
 	private static Frame parseData(String byteString) {
@@ -130,29 +104,6 @@ public class FrameParser extends Observable {
 		}
 		return true;
 	}
-
-	private static boolean checkPacketFinal(Frame frame) {
-		if (frame.getChecksum() != null) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	/*private static boolean checkPacketSize(String byteString) {
-		try {
-			int length = Integer.parseInt(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID,
-					HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH), 2);
-
-			return (byteString.length() == (HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH
-					+ length + CHECKSUM));
-
-		} catch (StringIndexOutOfBoundsException e) {
-			return false;
-		}
-
-	}*/
 
 	public static void resetCommunication() {
 		frame = new Frame();

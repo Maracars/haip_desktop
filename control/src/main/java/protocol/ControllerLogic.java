@@ -29,9 +29,9 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new CopyOnWriteArraySet<>();
-		connectedBoats.add(1);
+		/*connectedBoats.add(1);
 		connectedBoats.add(2);
-		connectedBoats.add(3);
+		connectedBoats.add(3);*/
 		idleBoats = new CopyOnWriteArraySet<>();
 		timeouts = new HashMap<>();
 	}
@@ -45,7 +45,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			Helpers.sendParsedFrame(fr, serial);
 
 		} else {
-			System.out.println("Sent parsed token to boat number " + boat_id);
+			System.out.println("Sent validFrame token to boat number " + boat_id);
 
 		}
 
