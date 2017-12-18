@@ -80,6 +80,7 @@ public class FrameParser extends Observable {
 			}
 			packet = packet.substring(1, packet.length());
 		}
+		if (validFrame) System.out.println("Valid");
 		return validFrame;
 	}
 

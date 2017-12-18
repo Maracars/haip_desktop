@@ -29,9 +29,6 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new CopyOnWriteArraySet<>();
-		/*connectedBoats.add(1);
-		connectedBoats.add(2);
-		connectedBoats.add(3);*/
 		idleBoats = new CopyOnWriteArraySet<>();
 		timeouts = new HashMap<>();
 	}
@@ -165,8 +162,6 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 	@Override
 	public void update(Observable o, Object arg) {
-
-		System.out.println("jajaj d puta madre");
 		Frame frame = (Frame) arg;
 		if (PacketType.ACK.equals(PacketType.getName(frame.getHeader().getPacketType()))) {
 			connectedBoats.add(Integer.parseInt(frame.getOriginId(), 2));

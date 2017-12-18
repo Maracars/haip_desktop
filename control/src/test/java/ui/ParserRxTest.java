@@ -3,7 +3,6 @@ package ui;
 import models.*;
 import org.junit.Test;
 import protocol.ControllerLogic;
-import protocol.ProtocolProperties;
 import serial.Serial;
 import ui.panels.MainPanel;
 
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.concurrent.TimeUnit;
 
-public class InterfaceTest extends Observable {
+public class ParserRxTest extends Observable {
 	private static String PACKET_1 = "11010000" + "00110000000000010000000010100010" + "00110000";
 
 	private static String PACKET_2_A = "001100000000001";
@@ -39,7 +38,7 @@ public class InterfaceTest extends Observable {
 
 	MainPanel mainPanel;
 
-	public InterfaceTest() {
+	public ParserRxTest() {
 		this.moorings = new ArrayList<>();
 		this.initMoorings(moorings);
 
@@ -65,7 +64,6 @@ public class InterfaceTest extends Observable {
 			}
 			moorings.add(new Mooring(i.toString(), ship));
 		}
-		Status status = new Status(ProtocolProperties.StatusType.PARKING.toString(), ProtocolProperties.ActionType.IDLE.toString(), ProtocolProperties.PermissionType.ASK.toString());
 	}
 
 	@Test
@@ -96,8 +94,6 @@ public class InterfaceTest extends Observable {
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		new InterfaceTest().receiveFrames();
-		/*Integer length = (Integer.parseInt(PACKET_1.substring(0, 3)) * 8);
-		System.out.println(CRC8.toCRC8(PACKET_1.toString().substring(0, HEADER + ORIGIN_ID + DESTINATION_ID + length)));*/
+		new ParserRxTest().receiveFrames();
 	}
 }

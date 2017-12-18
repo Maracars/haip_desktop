@@ -19,12 +19,12 @@ public final class ProtocolProperties {
 	public static final int CHECKSUM = 8;
 
 	// TODO This has to be defined
-	public static final long TIMEOUT = 50000000;
+	public static final long TIMEOUT = 3*50000000;
 
 	public static final int LOOP_CONNECTED_BOATS = 3;
 	public static final int LOOP_IDLE_BOATS = 2;
 	public static final int TIMEOUTED_LOOP_LIMIT = 2;
-	public static final int TRANSIT_ZONE_SHIP_LIMIT = 3;
+	public static final int TRANSIT_ZONE_SHIP_LIMIT = 1;
 
 	public static final String MASTER_ID = "00000000";
 	public static final String BROADCAST = "11111111";
