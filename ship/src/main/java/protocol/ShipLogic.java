@@ -47,11 +47,9 @@ public class ShipLogic extends Observable implements Observer{
 			}
 			break;
 		case DATA:
-			// Here we have to check also the response of the controller
 			checkShipMovement(frame);
 			break;
 		case TOKEN:
-			// Here we have to check (with the interface) what wants to do the ship, if it wants to send only status or request an action
 			System.out.println("Controller gives permission to talk to ship number " + Integer.parseInt(ship.getId(), 2));
 			sendFrame = checkToken(frame);
 			if(serial != null) {

@@ -12,6 +12,8 @@ import protocol.ProtocolProperties.StatusType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static protocol.ProtocolProperties.MASTER_ID;
+
 public class DataValidator implements Validator {
 
 	@SuppressWarnings("unchecked")
@@ -36,6 +38,16 @@ public class DataValidator implements Validator {
 				if (!Helpers.isInEnums(entry.getKey(), entry.getValue())) {
 					return false;
 				}
+			}
+			
+			if(frame.getData().getType().equals(DataType.RESPONSE.toString()) && 
+					!frame.getOriginId().equals(MASTER_ID)) {
+				return false;
+			}
+			
+			if(frame.getData().getType().equals(DataType.REQUEST.toString()) && 
+					frame.getOriginId().equals(MASTER_ID)) {
+				return false;
 			}
 		}
 		return true;

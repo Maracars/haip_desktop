@@ -45,7 +45,6 @@ import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
 import jssc.SerialPortException;
 import models.Ship;
-import models.Status;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
@@ -213,6 +212,9 @@ public class MainPanel implements ListSelectionListener, Observer{
 			permissionLabel.setOpaque(true);
 		}else if (ship.getStatus().getPermission().equals(PermissionType.DENY.toString())) {
 			permissionLabel.setBackground(new Color(255, 22, 73));
+			permissionLabel.setOpaque(true);
+		}else{
+			permissionLabel.setBackground(new Color(244, 185, 66));
 			permissionLabel.setOpaque(true);
 		}
 	}
