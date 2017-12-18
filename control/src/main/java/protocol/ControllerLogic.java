@@ -121,24 +121,27 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString());
 			if (okay) {
 				nextStatus.setPermission(PermissionType.ALLOW.toString());
-				System.out.println("Ship :" + frame.getOriginId() + " is going to the transit zone, to enter to the dock");
+				System.out.println("Ship " + frame.getOriginId() + ": is going to the transit zone, to enter to the dock");
 				System.out.println("The mooring assigned: " + freeMooring.getId());
 				parking = freeMooring.getId();
 			} else {
 				nextStatus.setPermission(PermissionType.DENY.toString());
-
+				System.out.println("Ship " + frame.getOriginId() + ": access to transit zone denied, not enough space");
+				System.out.println("The mooring assigned: " + freeMooring.getId());
+				// TODO Don't know if this line is necessary (do we have to tell the ship its mooring if it doesn't have access yet???)
+				parking = freeMooring.getId();
 			}
 
 		} else {
 			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString(), PermissionType.INVALID.toString());
 			System.out.println("Invalid state");
 		}
-		Frame nextFrame = FrameCreator.createResponse(ProtocolProperties.MASTER_ID, ship.getId(), nextStatus, parking);
+		Frame nextFrame = FrameCreator.createResponse(MASTER_ID, ship.getId(), nextStatus, parking);
 
-		if (serial == null || !serial.isConnected()) {
-			System.out.println("Sent frame");
-		} else {
+		if (serial != null && serial.isConnected()) {
 			Helpers.sendParsedFrame(nextFrame, serial);
+		} else {
+			System.out.println("Sent frame");
 		}
 		setSentRequest(nextFrame);
 	}
@@ -163,7 +166,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	@Override
 	public void update(Observable o, Object arg) {
 		Frame frame = (Frame) arg;
-		if (PacketType.ACK.equals(PacketType.getName(frame.getHeader().getPacketType()))) {
+		//if (PacketType.ACK.equals(PacketType.getName(frame.getHeader().getPacketType()))) {
+		if (frame.getHeader().getPacketType().equals(PacketType.ACK.toString())) {
 			connectedBoats.add(Integer.parseInt(frame.getOriginId(), 2));
 			System.out.println(connectedBoats);
 		} else {

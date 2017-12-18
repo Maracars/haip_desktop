@@ -30,6 +30,32 @@ public final class ProtocolProperties {
 	public static final String BROADCAST = "11111111";
 
 
+	public enum PacketType {
+		DISCOVERY("00"),
+		ACK("01"),
+		DATA("10"),
+		TOKEN("11");
+		private String string;
+
+		PacketType(String name) {
+			string = name;
+		}
+
+		@Override
+		public String toString() {
+			return string;
+		}
+
+		public static PacketType getName(String value) {
+			for (PacketType pt : PacketType.values()) {
+				if (value.equals(pt.toString())) {
+					return pt;
+				}
+			}
+			return null;
+		}
+	}
+
 	public enum DataType {
 		STATUS("00"),
 		REQUEST("01"),
@@ -56,14 +82,13 @@ public final class ProtocolProperties {
 		}
 	}
 
-	public enum PacketType {
-		DISCOVERY("00"),
-		ACK("01"),
-		DATA("10"),
-		TOKEN("11");
+	public enum StatusType {
+		PARKING("00"),
+		TRANSIT("01"),
+		SEA("10");
 		private String string;
 
-		PacketType(String name) {
+		StatusType(String name) {
 			string = name;
 		}
 
@@ -72,15 +97,14 @@ public final class ProtocolProperties {
 			return string;
 		}
 
-		public static PacketType getName(String value) {
-			for (PacketType pt : PacketType.values()) {
-				if (value.equals(pt.toString())) {
-					return pt;
+		public static StatusType getName(String value) {
+			for (StatusType st : StatusType.values()) {
+				if (value.equals(st.toString())) {
+					return st;
 				}
 			}
 			return null;
 		}
-
 	}
 
 	public enum ActionType {
@@ -102,31 +126,6 @@ public final class ProtocolProperties {
 			for (ActionType at : ActionType.values()) {
 				if (value.equals(at.toString())) {
 					return at;
-				}
-			}
-			return null;
-		}
-	}
-
-	public enum StatusType {
-		PARKING("00"),
-		TRANSIT("01"),
-		SEA("10");
-		private String string;
-
-		StatusType(String name) {
-			string = name;
-		}
-
-		@Override
-		public String toString() {
-			return string;
-		}
-
-		public static StatusType getName(String value) {
-			for (StatusType st : StatusType.values()) {
-				if (value.equals(st.toString())) {
-					return st;
 				}
 			}
 			return null;

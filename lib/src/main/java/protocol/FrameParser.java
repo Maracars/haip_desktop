@@ -61,7 +61,6 @@ public class FrameParser extends Observable {
 				}
 			}
 		}
-
 		while (packet.length() > 0) {
 			if (packet.length() >= LENGTH) {
 				if (getExpectedPacketLength(packet) <= packet.length()) {
@@ -80,7 +79,6 @@ public class FrameParser extends Observable {
 			}
 			packet = packet.substring(1, packet.length());
 		}
-		if (validFrame) System.out.println("Valid");
 		return validFrame;
 	}
 

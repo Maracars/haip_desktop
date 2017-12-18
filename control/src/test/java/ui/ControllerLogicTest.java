@@ -19,8 +19,12 @@ public class ControllerLogicTest extends Observable {
 	private static String SHIP_1_ACK = "000010000000000100000000";
 	private static String SHIP_2_ACK = "000010000000001000000000";
 
-	private static String PACKET_1 = "00110000000000010000000010100010";
-	private static String PACKET_2 = "00110000000000100000000010100010";
+	private static String PACKET_1_OUT = "001100000000000100000000" + "01100010";
+	private static String PACKET_1_TRANSIT = "001100000000000100000000" + "01010010";
+	private static String PACKET_1_IN = "001100000000000100000000" + "01001010";
+
+	private static String PACKET_2_OUT = "001100000000001000000000" + "01100010";
+	private static String PACKET_2_TRANSIT = "001100000000001000000000" + "01010010";
 
 	ArrayList<Mooring> moorings;
 	Dock dock;
@@ -59,9 +63,17 @@ public class ControllerLogicTest extends Observable {
 		waitAndSendToParser(SHIP_2_ACK + CRC8.toCRC8(SHIP_2_ACK));
 
 		scanner.nextLine();
-		serial.sendToParser(PACKET_1 + CRC8.toCRC8(PACKET_1));
+		serial.sendToParser(PACKET_1_OUT + CRC8.toCRC8(PACKET_1_OUT));
 		scanner.nextLine();
-		serial.sendToParser(PACKET_2 + CRC8.toCRC8(PACKET_2));
+		serial.sendToParser(PACKET_2_OUT + CRC8.toCRC8(PACKET_2_OUT));
+		scanner.nextLine();
+		serial.sendToParser(PACKET_1_TRANSIT + CRC8.toCRC8(PACKET_1_TRANSIT));
+		scanner.nextLine();
+		serial.sendToParser(PACKET_1_IN + CRC8.toCRC8(PACKET_1_IN));
+		scanner.nextLine();
+		serial.sendToParser(PACKET_2_OUT + CRC8.toCRC8(PACKET_2_OUT));
+		scanner.nextLine();
+		serial.sendToParser(PACKET_2_TRANSIT + CRC8.toCRC8(PACKET_2_TRANSIT));
 	}
 
 	@Test
@@ -89,9 +101,9 @@ public class ControllerLogicTest extends Observable {
 	public void initMoorings(ArrayList<Mooring> moorings) {
 		for (Integer i = 0; i < 10; i++) {
 			Ship ship = null;
-			if (i == 2 ) {
+			/*if (i == 2 ) {
 				ship = new Ship("00000010");
-			}
+			}*/
 			moorings.add(new Mooring(i.toString(), ship));
 		}
 	}

@@ -1,16 +1,15 @@
 package protocol;
 
 import models.Frame;
-import models.Ship;
 import serial.Serial;
 import ui.tables.TableData;
 import ui.tables.TableModel;
 
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import static protocol.ProtocolProperties.MASTER_ID;
+import static protocol.ProtocolProperties.PacketType;
 
 public class SerialObserver implements Observer {
 	Serial serial;
@@ -33,7 +32,7 @@ public class SerialObserver implements Observer {
 	public void update(Observable observable, Object object) {
 		this.frame = (Frame) object;
 
-		if (this.frame.getData() != null && this.frame.getData().getType().equals(ProtocolProperties.PacketType.DATA)) {
+		if (this.frame.getData() != null && this.frame.getData().getType().equals(PacketType.DATA.toString())) {
 			if (this.frame.getOriginId() != MASTER_ID) {
 				int shipID = Integer.parseInt(this.frame.getOriginId(), 2);
 				int status = Integer.parseInt(this.frame.getData().getStatus().getStatus(), 2);
