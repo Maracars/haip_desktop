@@ -104,7 +104,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 		} else if (status_str.equals(StatusType.TRANSIT.toString())) {
 
-
+			port.removeFromTransitZone(ship);
 			if (action_str.equals(ActionType.LEAVE.toString())) {
 				nextStatus = new Status(StatusType.SEA.toString(), ActionType.LEAVE.toString(), PermissionType.ALLOW.toString());
 

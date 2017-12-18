@@ -2,9 +2,9 @@ package models;
 
 import protocol.ProtocolProperties;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static protocol.ProtocolProperties.ActionType;
 
@@ -17,7 +17,8 @@ public class Port {
 
 	public Port(Dock dock) {
 		this.dock = dock;
-		this.transitZone = new HashSet<>();
+		this.transitZone = new CopyOnWriteArraySet<>();
+
 		this.transitQueue = new LinkedList<>();
 	}
 
