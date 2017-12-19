@@ -24,7 +24,6 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		this.serial = serial;
 		if (serial != null) {
 			this.serial.addObserver(this);
-
 		}
 		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
@@ -85,59 +84,58 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		Ship ship = new Ship(frame.getOriginId());
 		String parking = null;
 
+		// Dock, leave
 		if (status_str.equals(StatusType.PARKING.toString()) && action_str.equals(ActionType.LEAVE.toString())) {
 			boolean okay = port.addToTransitionZone(ship, action_str);
 			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.LEAVE.toString());
 
 			if (okay) {
 				nextStatus.setPermission(PermissionType.ALLOW.toString());
-
 				System.out.println("Ship :" + frame.getOriginId() + " is going to the transit zone, to leave the dock");
 			} else {
 				nextStatus.setPermission(PermissionType.DENY.toString());
-
-
 			}
-
-		} else if (status_str.equals(StatusType.TRANSIT.toString())) {
-
+		}
+		// Transit, leave or enter
+		else if (status_str.equals(StatusType.TRANSIT.toString())
+				&& (action_str.equals(ActionType.ENTER.toString())) || action_str.equals(ActionType.LEAVE.toString())) {
 			port.removeFromTransitZone(ship);
+
 			if (action_str.equals(ActionType.LEAVE.toString())) {
 				nextStatus = new Status(StatusType.SEA.toString(), ActionType.LEAVE.toString(), PermissionType.ALLOW.toString());
-
-				System.out.println("Ship :" + frame.getOriginId() + " is going from the transit zone to the sea. Goodbye!");
-
+				System.out.println("Ship " + frame.getOriginId() + " is going from the transit zone to the sea. Goodbye!");
 			} else {
 				nextStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString(), PermissionType.ALLOW.toString());
-
-				System.out.println("Ship :" + frame.getOriginId() + " is going from the transit zone to the dock");
+				System.out.println("Ship " + frame.getOriginId() + " is going from the transit zone to the dock");
 			}
-
-
-		} else if (status_str.equals(StatusType.SEA.toString()) && action_str.equals(ActionType.ENTER.toString())) {
+		}
+		// Sea, enter
+		else if (status_str.equals(StatusType.SEA.toString()) && action_str.equals(ActionType.ENTER.toString())) {
 			Mooring freeMooring = port.getFreeMooring(ship);
 			boolean okay = port.addToTransitionZone(ship, action_str);
 
 			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString());
 			if (okay) {
 				nextStatus.setPermission(PermissionType.ALLOW.toString());
-				System.out.println("Ship " + frame.getOriginId() + ": is going to the transit zone, to enter to the dock");
+				System.out.println("Ship " + frame.getOriginId() + " is going to the transit zone, to enter to the dock");
 				System.out.println("The mooring assigned: " + freeMooring.getId());
 				parking = freeMooring.getId();
 			} else {
 				nextStatus.setPermission(PermissionType.DENY.toString());
-				System.out.println("Ship " + frame.getOriginId() + ": access to transit zone denied, not enough space");
+				System.out.println("Ship " + frame.getOriginId() + " access to transit zone denied, not enough space");
 				System.out.println("The mooring assigned: " + freeMooring.getId());
 				// TODO Don't know if this line is necessary (do we have to tell the ship its mooring if it doesn't have access yet???)
 				parking = freeMooring.getId();
 			}
-
-		} else {
+		}
+		// Invalid
+		else {
 			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString(), PermissionType.INVALID.toString());
 			System.out.println("Invalid state");
 		}
 		Frame nextFrame = FrameCreator.createResponse(MASTER_ID, ship.getId(), nextStatus, parking);
 
+		// Send frame
 		if (serial != null && serial.isConnected()) {
 			Helpers.sendParsedFrame(nextFrame, serial);
 		} else {

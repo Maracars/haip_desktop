@@ -19,9 +19,9 @@ public class SerialObserver implements Observer {
 
 	public SerialObserver(Serial serial, ControllerLogic controllerLogic, TableModel tableModel) {
 		this.serial = serial;
-		this.serial.addObserver(this);
-
 		this.controllerLogic = controllerLogic;
+
+		this.serial.addObserver(this);
 		this.controllerLogic.addObserver(this);
 
 		this.frame = null;
@@ -43,7 +43,8 @@ public class SerialObserver implements Observer {
 			}
 			else {
 				int shipID = Integer.parseInt(this.frame.getDestinationId(), 2);
-				boolean permission = this.frame.getData().getStatus().getPermission().equals("11");
+				boolean permission = this.frame.getData().getStatus().getPermission()
+						.equals(ProtocolProperties.PermissionType.ALLOW.toString());
 				this.tableModel.updatePermission(shipID, permission);
 			}
 		}
