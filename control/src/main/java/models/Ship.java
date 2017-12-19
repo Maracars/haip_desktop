@@ -16,5 +16,9 @@ public class Ship {
 		this.id = id;
 	}
 
-
+	@Override
+	public boolean equals(Object obj) {
+		Ship ship = (Ship) obj;
+		return this.id.equals(ship.getId());
+	}
 }

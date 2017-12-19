@@ -50,7 +50,7 @@ public class Port {
 	}
 
 	public void removeFromTransitZone(Ship ship) {
-		transitZone.removeIf(ship1 -> ship1.getId().equals(ship.getId()));
+		transitZone.remove(ship);
 		if (!transitQueue.isEmpty()) {
 			transitZone.add(transitQueue.removeFirst());
 		}
@@ -67,7 +67,7 @@ public class Port {
 	public Mooring getFreeMooring(Ship ship) {
 
 		for (Mooring mooring : dock.getMoorings()) {
-			if (mooring.getShip() != null && ship.getId() == mooring.getShip().getId()) {
+			if (mooring.getShip() != null && ship.equals(mooring.getShip())) {
 				return mooring;
 			}
 		}
