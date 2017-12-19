@@ -12,19 +12,19 @@ import ui.panels.MainPanel;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Observable;
 import java.util.Scanner;
 
-public class ControllerLogicTest extends Observable {
+public class ControllerLogicTest {
 	private static String SHIP_1_ACK = "000010000000000100000000";
 	private static String SHIP_2_ACK = "000010000000001000000000";
 
-	private static String PACKET_1_OUT = "001100000000000100000000" + "01100010";
-	private static String PACKET_1_TRANSIT = "001100000000000100000000" + "01010010";
-	private static String PACKET_1_IN = "001100000000000100000000" + "01001010";
+	private static String PACKET_1_OUT_ENTER = "001100000000000100000000" + "01100010";
+	private static String PACKET_1_TRANSIT_ENTER = "001100000000000100000000" + "01010010";
+	private static String PACKET_1_IN_IDLE = "001100000000000100000000" + "01001010";
 
-	private static String PACKET_2_OUT = "001100000000001000000000" + "01100010";
-	private static String PACKET_2_TRANSIT = "001100000000001000000000" + "01010010";
+	private static String PACKET_2_OUT_ENTER = "001100000000001000000000" + "01100010";
+	private static String PACKET_2_TRANSIT_ENTER = "001100000000001000000000" + "01010010";
+	private static String PACKET_2_IN_IDLE = "001100000000001000000000" + "01001010";
 
 	ArrayList<Mooring> moorings;
 	Dock dock;
@@ -52,7 +52,6 @@ public class ControllerLogicTest extends Observable {
 		this.scanner = new Scanner(System.in);
 
 		Thread thread = new Thread(this.controllerLogic);
-		this.addObserver(this.controllerLogic);
 		thread.start();
 	}
 
@@ -63,17 +62,25 @@ public class ControllerLogicTest extends Observable {
 		waitAndSendToParser(SHIP_2_ACK + CRC8.toCRC8(SHIP_2_ACK));
 
 		scanner.nextLine();
-		serial.sendToParser(PACKET_1_OUT + CRC8.toCRC8(PACKET_1_OUT));
+		serial.sendToParser(PACKET_1_OUT_ENTER + CRC8.toCRC8(PACKET_1_OUT_ENTER));
 		scanner.nextLine();
-		serial.sendToParser(PACKET_2_OUT + CRC8.toCRC8(PACKET_2_OUT));
+		serial.sendToParser(PACKET_2_OUT_ENTER + CRC8.toCRC8(PACKET_2_OUT_ENTER));
 		scanner.nextLine();
-		serial.sendToParser(PACKET_1_TRANSIT + CRC8.toCRC8(PACKET_1_TRANSIT));
+		serial.sendToParser(PACKET_1_TRANSIT_ENTER + CRC8.toCRC8(PACKET_1_TRANSIT_ENTER));
 		scanner.nextLine();
-		serial.sendToParser(PACKET_1_IN + CRC8.toCRC8(PACKET_1_IN));
+		serial.sendToParser(PACKET_2_OUT_ENTER + CRC8.toCRC8(PACKET_2_OUT_ENTER));
 		scanner.nextLine();
-		serial.sendToParser(PACKET_2_OUT + CRC8.toCRC8(PACKET_2_OUT));
+		serial.sendToParser(PACKET_1_IN_IDLE + CRC8.toCRC8(PACKET_1_IN_IDLE));
 		scanner.nextLine();
-		serial.sendToParser(PACKET_2_TRANSIT + CRC8.toCRC8(PACKET_2_TRANSIT));
+		serial.sendToParser(PACKET_2_OUT_ENTER + CRC8.toCRC8(PACKET_2_OUT_ENTER));
+		scanner.nextLine();
+		serial.sendToParser(PACKET_1_IN_IDLE + CRC8.toCRC8(PACKET_1_IN_IDLE));
+		scanner.nextLine();
+		serial.sendToParser(PACKET_2_TRANSIT_ENTER + CRC8.toCRC8(PACKET_2_TRANSIT_ENTER));
+		scanner.nextLine();
+		serial.sendToParser(PACKET_1_IN_IDLE + CRC8.toCRC8(PACKET_1_IN_IDLE));
+		scanner.nextLine();
+		serial.sendToParser(PACKET_2_IN_IDLE + CRC8.toCRC8(PACKET_2_IN_IDLE));
 	}
 
 	@Test
