@@ -106,6 +106,7 @@ public class FrameParser extends Observable {
 
 	public static void resetCommunication() {
 		frame = new Frame();
+		validFrame = false;
 	}
 
 	public static List<String> parseTx(Frame frame) {
