@@ -67,7 +67,7 @@ public class Port {
 	public Mooring getFreeMooring(Ship ship) {
 
 		for (Mooring mooring : dock.getMoorings()) {
-			if (ship.equals(mooring.getShip())) {
+			if (mooring.getShip() != null && ship.getId() == mooring.getShip().getId()) {
 				return mooring;
 			}
 		}
