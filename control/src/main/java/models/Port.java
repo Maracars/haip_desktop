@@ -50,7 +50,7 @@ public class Port {
 	}
 
 	public void removeFromTransitZone(Ship ship) {
-		transitZone.remove(ship);
+		transitZone.removeIf(ship1 -> ship1.getId().equals(ship.getId()));
 		if (!transitQueue.isEmpty()) {
 			transitZone.add(transitQueue.removeFirst());
 		}
