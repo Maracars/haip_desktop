@@ -158,11 +158,10 @@ public class MainPanel implements ListSelectionListener, Observer{
 		statusList = new JList<String>(Helpers.getNames(StatusType.class));
 		statusList.setSelectedValue(StatusType.getName(ship.getStatus().getStatus()).name(), true);
 		statusList.addListSelectionListener(this);
-		StatusListRenderer statusRenderer = new StatusListRenderer();
+		StatusListRenderer statusRenderer = new StatusListRenderer(StatusType.getName(ship.getStatus().getStatus()).name());
 		statusList.setCellRenderer(statusRenderer);
 		statusList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		statusList.setLayoutOrientation(JList.VERTICAL);
-		statusList.setSelectedIndex(-1);
 		statusList.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 3, Color.darkGray));
 		decisionList = new JList<String>(Helpers.getNames(ActionType.class));
 		decisionList.addListSelectionListener(this);
@@ -170,7 +169,6 @@ public class MainPanel implements ListSelectionListener, Observer{
 		decisionList.setCellRenderer(decisionRenderer);
 		decisionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		decisionList.setLayoutOrientation(JList.VERTICAL);
-		decisionList.setSelectedIndex(-1);
 		decisionList.setBorder(BorderFactory.createMatteBorder(0,3,0,0, Color.darkGray));
 		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
 		decisionPanel.add(statusList);
