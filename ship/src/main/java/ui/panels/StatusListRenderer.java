@@ -1,6 +1,5 @@
 package ui.panels;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 
@@ -18,10 +17,9 @@ public class StatusListRenderer implements ListCellRenderer<String>{
 		label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
 		label.setHorizontalAlignment(JLabel.CENTER);
 		label.setEnabled(false);
-		if(isSelected) {
-			label.setOpaque(true);
-			label.setBackground(Color.LIGHT_GRAY);
-		}	
+		if(isSelected){
+			label.setEnabled(true);
+		}
 		return label;
 	}
 
