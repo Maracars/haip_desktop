@@ -1,12 +1,11 @@
 package ui;
 
 import helpers.CRC8;
-import models.Dock;
-import models.Mooring;
-import models.Port;
-import models.Ship;
+import models.*;
 import org.junit.Test;
 import protocol.ControllerLogic;
+import protocol.FrameCreator;
+import protocol.ProtocolProperties;
 import serial.Serial;
 import ui.panels.MainPanel;
 
@@ -14,18 +13,9 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static protocol.ProtocolProperties.*;
+
 public class ControllerLogicTest {
-	private static String SHIP_1_ACK = "000010000000000100000000";
-	private static String SHIP_2_ACK = "000010000000001000000000";
-
-	private static String PACKET_1_OUT_ENTER = "001100000000000100000000" + "01100010";
-	private static String PACKET_1_TRANSIT_ENTER = "001100000000000100000000" + "01010010";
-	private static String PACKET_1_IN_IDLE = "001100000000000100000000" + "01001010";
-
-	private static String PACKET_2_OUT_ENTER = "001100000000001000000000" + "01100010";
-	private static String PACKET_2_TRANSIT_ENTER = "001100000000001000000000" + "01010010";
-	private static String PACKET_2_IN_IDLE = "001100000000001000000000" + "01001010";
-
 	ArrayList<Mooring> moorings;
 	Dock dock;
 	Port port;
@@ -57,30 +47,35 @@ public class ControllerLogicTest {
 
 	@Test
 	public void receiveFrames() {
-		scanner.nextLine();
-		serial.sendToParser(SHIP_1_ACK + CRC8.toCRC8(SHIP_1_ACK));
-		waitAndSendToParser(SHIP_2_ACK + CRC8.toCRC8(SHIP_2_ACK));
+		Status seaEnter = new Status(StatusType.SEA.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
+		Status transitEnter = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
+		Status dockIdle = new Status(StatusType.PARKING.toString(), ActionType.IDLE.toString(), PermissionType.ASK.toString());
 
 		scanner.nextLine();
-		serial.sendToParser(PACKET_1_OUT_ENTER + CRC8.toCRC8(PACKET_1_OUT_ENTER));
+		serial.sendToParser(FrameCreator.createAck("00000001", MASTER_ID).toString());
+		waitAndSendToParser(FrameCreator.createAck("00000010", MASTER_ID).toString());
+
 		scanner.nextLine();
-		serial.sendToParser(PACKET_2_OUT_ENTER + CRC8.toCRC8(PACKET_2_OUT_ENTER));
+		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, seaEnter).toString());
 		scanner.nextLine();
-		serial.sendToParser(PACKET_1_TRANSIT_ENTER + CRC8.toCRC8(PACKET_1_TRANSIT_ENTER));
+		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
 		scanner.nextLine();
-		serial.sendToParser(PACKET_2_OUT_ENTER + CRC8.toCRC8(PACKET_2_OUT_ENTER));
+		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, transitEnter).toString());
 		scanner.nextLine();
-		serial.sendToParser(PACKET_1_IN_IDLE + CRC8.toCRC8(PACKET_1_IN_IDLE));
+		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
+
+		/*scanner.nextLine();
+		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
 		scanner.nextLine();
-		serial.sendToParser(PACKET_2_OUT_ENTER + CRC8.toCRC8(PACKET_2_OUT_ENTER));
+		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
 		scanner.nextLine();
-		serial.sendToParser(PACKET_1_IN_IDLE + CRC8.toCRC8(PACKET_1_IN_IDLE));
+		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
 		scanner.nextLine();
-		serial.sendToParser(PACKET_2_TRANSIT_ENTER + CRC8.toCRC8(PACKET_2_TRANSIT_ENTER));
+		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitEnter).toString());
 		scanner.nextLine();
-		serial.sendToParser(PACKET_1_IN_IDLE + CRC8.toCRC8(PACKET_1_IN_IDLE));
+		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
 		scanner.nextLine();
-		serial.sendToParser(PACKET_2_IN_IDLE + CRC8.toCRC8(PACKET_2_IN_IDLE));
+		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, dockIdle).toString());*/
 	}
 
 	@Test
