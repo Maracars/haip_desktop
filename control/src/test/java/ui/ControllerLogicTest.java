@@ -40,9 +40,6 @@ public class ControllerLogicTest {
 		this.mainPanel = new MainPanel(this.serial, this.controllerLogic);
 
 		this.scanner = new Scanner(System.in);
-
-		Thread thread = new Thread(this.controllerLogic);
-		thread.start();
 	}
 
 	@Test
@@ -64,7 +61,7 @@ public class ControllerLogicTest {
 		scanner.nextLine();
 		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
 
-		/*scanner.nextLine();
+		scanner.nextLine();
 		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
 		scanner.nextLine();
 		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
@@ -75,7 +72,7 @@ public class ControllerLogicTest {
 		scanner.nextLine();
 		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
 		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, dockIdle).toString());*/
+		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, dockIdle).toString());
 	}
 
 	@Test

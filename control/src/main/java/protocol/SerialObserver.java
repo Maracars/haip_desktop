@@ -12,18 +12,10 @@ import static protocol.ProtocolProperties.MASTER_ID;
 import static protocol.ProtocolProperties.PacketType;
 
 public class SerialObserver implements Observer {
-	Serial serial;
-	ControllerLogic controllerLogic;
 	Frame frame;
 	TableModel tableModel;
 
-	public SerialObserver(Serial serial, ControllerLogic controllerLogic, TableModel tableModel) {
-		this.serial = serial;
-		this.controllerLogic = controllerLogic;
-
-		this.serial.addObserver(this);
-		this.controllerLogic.addObserver(this);
-
+	public SerialObserver(TableModel tableModel) {
 		this.frame = null;
 		this.tableModel = tableModel;
 	}

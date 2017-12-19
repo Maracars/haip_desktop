@@ -11,25 +11,53 @@ import static protocol.ProtocolProperties.*;
 
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
 public class ControllerLogic extends Observable implements Observer, Runnable {
-
-	private Serial serial;
+	private Port port;
 	private List<Frame> receivedList;
 	private Set<Integer> connectedBoats;
 	private Set<Integer> idleBoats;
 	private HashMap<Integer, Integer> timeouts;
-	private Port port;
+
+	private Serial serial;
+
+	Thread thread;
+	boolean running;
+	boolean lastCycleEnded;
 
 	@SuppressWarnings("unchecked")
 	public ControllerLogic(Serial serial, Port port) {
-		this.serial = serial;
-		if (serial != null) {
-			this.serial.addObserver(this);
-		}
 		this.port = port;
 		receivedList = Collections.synchronizedList(new ArrayList());
 		connectedBoats = new CopyOnWriteArraySet<>();
 		idleBoats = new CopyOnWriteArraySet<>();
 		timeouts = new HashMap<>();
+
+		this.serial = serial;
+
+		this.thread = new Thread(this);
+	}
+
+	public void startLogic() {
+		if (this.thread.isInterrupted()) {
+			this.running = true;
+			this.lastCycleEnded = false;
+			this.thread.start();
+		}
+		/*this.running = true;
+		this.thread.start();*/
+	}
+
+	public void stopLogic() {
+		if (this.thread.isAlive()) {
+			this.running = false;
+			while (!lastCycleEnded);
+			this.thread.interrupt();
+		}
+		/*this.running = false;
+		this.thread.interrupt();*/
+	}
+
+	public boolean isRunning() {
+		return running;
 	}
 
 	public void control(String boat) {
@@ -91,7 +119,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 			if (okay) {
 				nextStatus.setPermission(PermissionType.ALLOW.toString());
-				System.out.println("Ship :" + frame.getOriginId() + " is going to the transit zone, to leave the dock");
+				System.out.println("Ship :" + frame.getOriginId() + " is going from the dock to the transit zone");
 			} else {
 				nextStatus.setPermission(PermissionType.DENY.toString());
 			}
@@ -117,12 +145,12 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString());
 			if (okay) {
 				nextStatus.setPermission(PermissionType.ALLOW.toString());
-				System.out.println("Ship " + frame.getOriginId() + " is going to the transit zone, to enter to the dock");
+				System.out.println("Ship " + frame.getOriginId() + " is going from the sea to the transit zone");
 				System.out.println("The mooring assigned: " + freeMooring.getId());
 				parking = freeMooring.getId();
 			} else {
 				nextStatus.setPermission(PermissionType.DENY.toString());
-				System.out.println("Ship " + frame.getOriginId() + " access to transit zone denied, not enough space");
+				System.out.println("Ship " + frame.getOriginId() + " access to transit zone denied, not enough space in transit zone");
 				System.out.println("The mooring assigned: " + freeMooring.getId());
 				// TODO Don't know if this line is necessary (do we have to tell the ship its mooring if it doesn't have access yet???)
 				parking = freeMooring.getId();
@@ -175,11 +203,10 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
+		while (running) {
 			for (int k = 0; k < 5; k++) {
-				for (int i = 0; i < ProtocolProperties.LOOP_IDLE_BOATS; i++) {
-
-					for (int j = 0; j < ProtocolProperties.LOOP_CONNECTED_BOATS; j++) {
+				for (int i = 0; i < LOOP_IDLE_BOATS; i++) {
+					for (int j = 0; j < LOOP_CONNECTED_BOATS; j++) {
 						for (Integer boat : connectedBoats) {
 							control(boat.toString());
 						}
@@ -187,17 +214,12 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 					for (Integer boat : idleBoats) {
 						control(boat.toString());
 					}
-
 				}
-
-
 			}
 			if (serial != null && serial.isConnected()) {
 				Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
-
 			} else {
 				System.out.println("Discovery is sent to boats");
-
 			}
 			try {
 				//TODO I have no fucking idea how big the delay should be
@@ -206,5 +228,6 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				e.printStackTrace();
 			}
 		}
+		this.lastCycleEnded = true;
 	}
 }
