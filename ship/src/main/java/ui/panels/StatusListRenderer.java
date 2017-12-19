@@ -8,6 +8,13 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 public class StatusListRenderer implements ListCellRenderer<String>{
+	
+	String statusType;
+	
+	public StatusListRenderer(String statusType) {
+		this.statusType = statusType;
+	}
+	
 
 	@Override
 	public Component getListCellRendererComponent(JList<? extends String> list, String value, int index,
@@ -16,12 +23,15 @@ public class StatusListRenderer implements ListCellRenderer<String>{
 		label.setText(value);
 		label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
 		label.setHorizontalAlignment(JLabel.CENTER);
-		label.setEnabled(false);
-		if(isSelected){
+		if(statusType.equals(value)) {
+			list.setSelectedValue(value, true);
 			label.setEnabled(true);
+			isSelected = true;
+		}else {
+			label.setEnabled(false);
+			isSelected = false;
 		}
 		return label;
 	}
-
 
 }

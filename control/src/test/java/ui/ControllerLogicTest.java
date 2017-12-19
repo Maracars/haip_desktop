@@ -1,11 +1,9 @@
 package ui;
 
-import helpers.CRC8;
 import models.*;
 import org.junit.Test;
 import protocol.ControllerLogic;
 import protocol.FrameCreator;
-import protocol.ProtocolProperties;
 import serial.Serial;
 import ui.panels.MainPanel;
 
@@ -40,6 +38,9 @@ public class ControllerLogicTest {
 		this.mainPanel = new MainPanel(this.serial, this.controllerLogic);
 
 		this.scanner = new Scanner(System.in);
+
+		Thread thread = new Thread(this.controllerLogic);
+		thread.start();
 	}
 
 	@Test
@@ -47,6 +48,8 @@ public class ControllerLogicTest {
 		Status seaEnter = new Status(StatusType.SEA.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
 		Status transitEnter = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
 		Status dockIdle = new Status(StatusType.PARKING.toString(), ActionType.IDLE.toString(), PermissionType.ASK.toString());
+		Status parkingLeave = new Status(StatusType.PARKING.toString(), ActionType.LEAVE.toString(), PermissionType.ASK.toString());
+		Status transitLeave = new Status(StatusType.TRANSIT.toString(), ActionType.LEAVE.toString(), PermissionType.ASK.toString());
 
 		scanner.nextLine();
 		serial.sendToParser(FrameCreator.createAck("00000001", MASTER_ID).toString());
@@ -60,27 +63,32 @@ public class ControllerLogicTest {
 		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, transitEnter).toString());
 		scanner.nextLine();
 		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
-
 		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
+		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, parkingLeave).toString());
 		scanner.nextLine();
 		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitEnter).toString());
 		scanner.nextLine();
+
+		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, parkingLeave).toString());
+		scanner.nextLine();
+
+		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, parkingLeave).toString());
+		scanner.nextLine();
+		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, transitLeave).toString());
+		scanner.nextLine();
+		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, parkingLeave).toString());
+		scanner.nextLine();
 		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
 		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, dockIdle).toString());
+		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitLeave).toString());
+
 	}
 
 	@Test
 	public void waitAndSendToParser(String packet) {
 		try {
 			Thread.sleep(10);
-		}
-		catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		serial.sendToParser(packet);

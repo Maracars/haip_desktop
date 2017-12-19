@@ -69,7 +69,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			Helpers.sendParsedFrame(fr, serial);
 
 		} else {
-			System.out.println("Sent validFrame token to boat number " + boat_id);
+			System.out.println("Sent validFrame token to boat number :" + boat_id);
 
 		}
 
@@ -82,6 +82,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		if (!receivedList.isEmpty() && receivedList.get(0).getOriginId().equals(Helpers.toByteBinString(boat, 8))) {
 			if (receivedList.get(0).getData().getStatus().getAction().equals(ActionType.IDLE.toString())) {
 				addTimeout(boat_id);
+				System.out.println("Asked for iddle, and added timeout" + timeouts);
+
 			} else {
 				//TODO Here we must send the response to the request.
 				if (idleBoats.contains(boat_id)) addConnectedBoat(boat_id);
@@ -90,6 +92,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			}
 
 		} else {
+			System.out.println("Invalid packet " + boat + " " + receivedList.get(0).getOriginId());
 			addTimeout(boat_id);
 
 		}
@@ -121,6 +124,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				nextStatus.setPermission(PermissionType.ALLOW.toString());
 				System.out.println("Ship :" + frame.getOriginId() + " is going from the dock to the transit zone");
 			} else {
+				System.out.println("Ship " + frame.getOriginId() + " access to transit zone denied, not enough space");
+
 				nextStatus.setPermission(PermissionType.DENY.toString());
 			}
 		}

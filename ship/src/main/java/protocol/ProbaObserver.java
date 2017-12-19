@@ -21,7 +21,6 @@ public class ProbaObserver extends Observable {
 		Ship ship = new Ship("00000011", status);
 		ShipLogic watcher = new ShipLogic(null, ship);
 		MainPanel panel = new MainPanel(null, ship, watcher);
-		
 		watcher.addObserver(panel);
 		probaObserver.addObserver(watcher);
 		Scanner scanner = new Scanner(System.in);
