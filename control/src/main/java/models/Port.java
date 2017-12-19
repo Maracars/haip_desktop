@@ -36,7 +36,7 @@ public class Port {
 
 
 	public boolean addToTransitionZone(Ship ship, String action) {
-		if (transitZone.size() < ProtocolProperties.TRANSIT_ZONE_SHIP_LIMIT) {
+		if (transitZone.size() < ProtocolProperties.TRANSIT_ZONE_SHIP_LIMIT || transitZone.contains(ship)) {
 			transitZone.add(ship);
 			if (action.equals(ActionType.LEAVE.toString())) {
 				freeMooring(ship);
