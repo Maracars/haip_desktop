@@ -68,7 +68,7 @@ public class Frame {
 
 	@Override
 	public String toString() {
-		return header.toString() + originId + destinationId + ((data == null) ? "" : data.toString()) + checksum;
+		return header.toString() + originId + destinationId + ((data == null) ? "" : data.toString()) + ((checksum == null) ? "" : checksum);
 	}
 
 

@@ -6,9 +6,11 @@ import models.Data;
 import models.Frame;
 import models.Header;
 import models.Status;
-import protocol.ProtocolProperties.*;
+import protocol.ProtocolProperties.DataType;
+import protocol.ProtocolProperties.PacketType;
 
-import static protocol.ProtocolProperties.*;
+import static protocol.ProtocolProperties.BROADCAST;
+import static protocol.ProtocolProperties.MASTER_ID;
 
 public class FrameCreator {
 
@@ -30,10 +32,10 @@ public class FrameCreator {
 	public static Frame createRequest(String origin, String dest, Status status) {
 		return createFrame(status, PacketType.DATA, DataType.REQUEST, origin, dest);
 	}
-	
+
 	public static Frame createStatus(String origin, String dest, Status status) {
 		return createFrame(status, PacketType.DATA, DataType.STATUS, origin, dest);
-		
+
 	}
 
 	public static Frame createResponse(String origin, String dest, Status status) {
@@ -58,13 +60,12 @@ public class FrameCreator {
 	public static Frame createFrame(Status status, PacketType type, DataType dataType, String origin, String dest, String parking) {
 
 		Data data = new Data(dataType.toString(), status, parking);
-		String dataStr = Helpers.toByteBinString(data.toString());
+		String dataStr = data.toString();
 
 		// TODO We have think about how the counter work
-		Header header = new Header(Helpers.toByteBinString("" + dataStr.length()), type.toString(), "000");
+		Header header = new Header(Helpers.toByteBinString("" + dataStr.length(), 3), type.toString(), "000");
 		Frame frame = new Frame(header, origin, dest, data);
-		String packet = frame.toString().substring(0, HEADER + ORIGIN_ID + DESTINATION_ID + LENGTH + dataStr.length());
-		String checksum = CRC8.toCRC8(packet);
+		String checksum = CRC8.toCRC8(frame.toString());
 		frame.setChecksum(checksum);
 		return frame;
 	}
