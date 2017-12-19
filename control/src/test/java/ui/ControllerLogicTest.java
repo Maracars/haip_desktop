@@ -38,9 +38,6 @@ public class ControllerLogicTest {
 		this.mainPanel = new MainPanel(this.serial, this.controllerLogic);
 
 		this.scanner = new Scanner(System.in);
-
-		Thread thread = new Thread(this.controllerLogic);
-		thread.start();
 	}
 
 	@Test

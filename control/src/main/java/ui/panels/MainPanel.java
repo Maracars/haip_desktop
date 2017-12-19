@@ -35,10 +35,10 @@ public class MainPanel {
 	LogModel logModel;
 
 	// Buttons
-	JButton connectButton, initButton;
+	JButton connectButton, logicButton;
 
 	// Actions
-	AbstractAction exitAction, connectAction, initAction;
+	AbstractAction exitAction, connectAction, logicAction;
 
 	// Serial Communication
 	Serial serial;
@@ -46,9 +46,6 @@ public class MainPanel {
 
 	// Controller Logic
 	ControllerLogic controllerLogic;
-
-	// System Initialized
-	boolean systemInitialized;
 
 	public MainPanel(Serial serial, ControllerLogic controllerLogic) {
 		this.createJFrame();
@@ -71,9 +68,11 @@ public class MainPanel {
 
 		this.serial = serial;
 		this.controllerLogic = controllerLogic;
-		this.serialObserver = new SerialObserver(this.serial, this.controllerLogic, this.tableModel);
+		this.serialObserver = new SerialObserver(this.tableModel);
 
-		this.systemInitialized = false;
+		this.serial.addObserver(this.controllerLogic);
+		this.serial.addObserver(this.serialObserver);
+		this.controllerLogic.addObserver(this.serialObserver);
 	}
 
 	private void addContentToJFrame() {
@@ -131,10 +130,10 @@ public class MainPanel {
 		this.connectButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
 		panel.add(connectButton);
 
-		this.initButton = new JButton(this.initAction);
-		this.initButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
-		this.initButton.setEnabled(false);
-		panel.add(initButton);
+		this.logicButton = new JButton(this.logicAction);
+		this.logicButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
+		//this.logicButton.setEnabled(false);
+		panel.add(logicButton);
 
 		return panel;
 	}
@@ -201,7 +200,7 @@ public class MainPanel {
 		connectAction = new ConnectAction("Connect to board",
 				IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
 				"Connection", KeyEvent.VK_C);
-		initAction = new InitAction("Initialize system",
+		logicAction = new LogicAction("Initialize system",
 				IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32),
                 "Initialize system", KeyEvent.VK_I);
 	}
@@ -218,26 +217,27 @@ public class MainPanel {
 	private void onWindowClosing() {
 		/* Before closing window, check if communication and system are disabled
 		 * If not, disable and close them before exiting */
-		if (!serial.isConnected() && !systemInitialized) {
-			window.dispose();
+		if (!serial.isConnected() && !controllerLogic.isRunning()) {
+			controllerLogic.stopLogic();
+			window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		}
 		else {
 			int dialogResult = JOptionPane.showConfirmDialog(window,
-					((systemInitialized) ?
+					((controllerLogic.isRunning()) ?
 							"System is initialized.\n" : "Serial connection is established.\n")
 							+ "Do you really want to exit?",
 					"Warning",
 					JOptionPane.YES_NO_OPTION);
 
 			if (dialogResult == JOptionPane.YES_OPTION) {
-				stopSystem();
+				controllerLogic.stopLogic();
 				try {
 					serial.closeConnection();
 				}
 				catch (SerialPortException e) {
 					logModel.add(e.getMessage());
 				}
-				window.dispose();
+				window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			}
 		}
 	}
@@ -280,7 +280,7 @@ public class MainPanel {
 				try {
 					serial.openConnection();
 					connectButton.setText("Disconnect from board");
-					initButton.setEnabled(true);
+					//logicButton.setEnabled(true);
 					logModel.add(CONNECTION_ESTABLISHED);
 				}
 				catch (Exception e) {
@@ -291,7 +291,7 @@ public class MainPanel {
 				try {
 					serial.closeConnection();
 					connectButton.setText("Connect to board");
-					initButton.setEnabled(false);
+					//logicButton.setEnabled(false);
 					logModel.add(CONNECTION_CLOSED);
 				}
 				catch (SerialPortException e) {
@@ -301,12 +301,12 @@ public class MainPanel {
 		}
 	}
 
-	public class InitAction extends AbstractAction {
+	public class LogicAction extends AbstractAction {
 		private static final long serialVersionUID = 1L;
 		String text;
 		Icon icon;
 
-		public InitAction(String text, Icon icon, String description, Integer mnemonic) {
+		public LogicAction(String text, Icon icon, String description, Integer mnemonic) {
 			super(text, icon);
 			this.text = text;
 			this.icon = icon;
@@ -316,34 +316,21 @@ public class MainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (!systemInitialized) {
-				// Init System
-				initSystem();
+			if (!controllerLogic.isRunning()) {
+				controllerLogic.startLogic();
 
-				initButton.setText("Stop system");
-				initButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
-				connectButton.setEnabled(false);
+				logicButton.setText("Stop system");
+				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
+				//connectButton.setEnabled(false);
 				logModel.add(SYSTEM_INITIALIZED);
-			}
-			else {
-				// Stop System
-				stopSystem();
+			} else {
+				controllerLogic.stopLogic();
 
-				initButton.setText("Initialize system");
-				initButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
-				connectButton.setEnabled(true);
+				logicButton.setText("Initialize system");
+				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
+				//connectButton.setEnabled(true);
 				logModel.add(SYSTEM_STOPPED);
 			}
 		}
-	}
-
-	public void initSystem() {
-		// TODO Init System
-		systemInitialized = true;
-	}
-
-	public void stopSystem() {
-		// TODO Stop System
-		systemInitialized = false;
 	}
 }

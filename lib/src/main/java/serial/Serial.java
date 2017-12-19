@@ -17,7 +17,6 @@ import static serial.SerialExceptionMessages.NO_SERIAL_PORT_SELECTED;
 import static serial.SerialExceptionMessages.SERIAL_PORT_NOT_WORKING;
 
 public class Serial extends Observable implements SerialPortEventListener {
-
 	private SerialPort serialPort;
 	private boolean isConnected;
 
@@ -76,6 +75,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 		return isConnected;
 	}
 
+	@Override
 	public void serialEvent(SerialPortEvent arg0) {
 		try {
 			sendToParser(serialPort.readString());
