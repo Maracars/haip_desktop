@@ -1,23 +1,28 @@
 package ui.panels;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
 
-public class TextPanel extends JPanel {
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+public class TextFieldPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	JTextField textField;
 
-	public TextPanel(String text) {
+	public TextFieldPanel(String text) {
 		this.setLayout(new BorderLayout(10, 10));
 		
 		textField = new JTextField("");
 
-		textField.setEditable(false);
+		textField.setEditable(true);
 		textField.setBackground(Color.WHITE);
 
 		this.add(textField);
 		this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), text));
+
 	}
 	
 	public void setText(String text) {

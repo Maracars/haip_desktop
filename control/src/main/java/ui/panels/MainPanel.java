@@ -6,6 +6,7 @@ import jssc.SerialPortException;
 import protocol.ControllerLogic;
 import protocol.SerialObserver;
 import serial.Serial;
+import ui.dialogs.SettingsDialog;
 import ui.log.LogModel;
 import ui.log.LogPanel;
 import ui.tables.CellRenderer;
@@ -14,6 +15,8 @@ import ui.tables.TableModel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -24,21 +27,13 @@ import java.io.IOException;
 import static ui.panels.ActionMessages.*;
 
 public class MainPanel {
-	// Window
+	// Swing Elements
 	private JFrame window;
-
-	// Table Elements
 	private JTable table;
 	private TableModel tableModel;
-
-	// Log Elements
 	private LogModel logModel;
-
-	// Buttons
 	private JButton connectButton, logicButton;
-
-	// Actions
-	private AbstractAction exitAction, connectAction, logicAction;
+	private AbstractAction connectAction, logicAction;
 
 	// Serial Communication
 	private Serial serial;
@@ -59,6 +54,7 @@ public class MainPanel {
 		this.window.setLocation(0, 0);
 		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
 		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	}
 
 	private void initThings(Serial serial, ControllerLogic controllerLogic) {
@@ -76,7 +72,6 @@ public class MainPanel {
 	}
 
 	private void addContentToJFrame() {
-		this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.window.addWindowListener(this.createWindowClosingAdapter());
 		this.window.setJMenuBar(this.createMenuBar());
 		this.window.getContentPane().add(this.createSplitPane(), BorderLayout.CENTER);
@@ -148,7 +143,7 @@ public class MainPanel {
 
 		JComponent panel2 = (JComponent) createTab2();
 		tabbedPane.addTab("Ship Data Table", icon, panel2, "Shows ship data in a table");
-		tabbedPane.setMnemonicAt(0, KeyEvent.VK_2);
+		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
 		return tabbedPane;
 	}
@@ -158,7 +153,7 @@ public class MainPanel {
 		try {
 			imagePanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
 		} catch (IOException e) {
-			e.printStackTrace();
+			this.logModel.add(ERROR_READING_LOGO);
 		}
 		return imagePanel;
 	}
@@ -172,37 +167,46 @@ public class MainPanel {
 
 	private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
+		menuBar.add(createSettingsMenu());
 		menuBar.add(createExitMenu());
 		return menuBar;
 	}
 
+	private JMenu createSettingsMenu() {
+		JMenu settingsMenu = new JMenu("Settings");
+
+		settingsMenu.addMenuListener(new MenuListener() {
+			@Override
+			public void menuSelected(MenuEvent e) {
+				try {
+					new SettingsDialog(window);
+				} catch (IOException e1) {
+					logModel.add(ERROR_READING_SETTINGS);
+				}
+				settingsMenu.setSelected(false);
+			}
+			@Override
+			public void menuDeselected(MenuEvent e) {}
+			@Override
+			public void menuCanceled(MenuEvent e) {}
+		});
+		return settingsMenu;
+	}
+
 	private JMenu createExitMenu() {
-        JMenu menuExit = new JMenu("Exit");
-		menuExit.add(exitAction);
-		return menuExit;
-	}
+        JMenu exitMenu = new JMenu("Exit");
 
-	private void initTable() {
-        CellRenderer cellRenderer = new CellRenderer();
-        ColumnModel columnModel = new ColumnModel(cellRenderer);
-        this.tableModel = new TableModel(columnModel);
-
-		this.table = new JTable(tableModel, columnModel);
-		this.table.setRowHeight(this.window.getHeight() / 20);
-		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		this.table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
-	}
-
-	private void initActions() {
-		exitAction = new ExitAction("Exit",
-				IconFontSwing.buildIcon(FontAwesome.WINDOW_CLOSE, 32),
-                "Exit", KeyEvent.VK_X);
-		connectAction = new ConnectAction("Connect to board",
-				IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
-				"Connection", KeyEvent.VK_C);
-		logicAction = new LogicAction("Initialize system",
-				IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32),
-                "Initialize system", KeyEvent.VK_I);
+		exitMenu.addMenuListener(new MenuListener() {
+			@Override
+			public void menuSelected(MenuEvent e) {
+				onWindowClosing();
+			}
+			@Override
+			public void menuDeselected(MenuEvent e) {}
+			@Override
+			public void menuCanceled(MenuEvent e) {}
+		});
+		return exitMenu;
 	}
 
 	private WindowAdapter createWindowClosingAdapter() {
@@ -217,48 +221,49 @@ public class MainPanel {
 	private void onWindowClosing() {
 		/* Before closing window, check if communication and system are disabled
 		 * If not, disable and close them before exiting */
-		if (!serial.isConnected() && !controllerLogic.isRunning()) {
-			controllerLogic.stopLogic();
-			window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		}
-		else {
-			int dialogResult = JOptionPane.showConfirmDialog(window,
-					((controllerLogic.isRunning()) ?
+		if (!this.serial.isConnected() && !this.controllerLogic.isRunning()) {
+			this.exitProgram();
+		} else {
+			int dialogResult = JOptionPane.showConfirmDialog(this.window, ((this.controllerLogic.isRunning()) ?
 							"System is initialized.\n" : "Serial connection is established.\n")
 							+ "Do you really want to exit?",
-					"Warning",
-					JOptionPane.YES_NO_OPTION);
+					"Warning", JOptionPane.YES_NO_OPTION);
 
 			if (dialogResult == JOptionPane.YES_OPTION) {
-				controllerLogic.stopLogic();
+				this.controllerLogic.stopLogic();
 				try {
-					serial.closeConnection();
+					this.serial.closeConnection();
+				} catch (SerialPortException e) {
+					this.logModel.add(e.getMessage());
 				}
-				catch (SerialPortException e) {
-					logModel.add(e.getMessage());
-				}
-				window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				this.exitProgram();
 			}
 		}
 	}
 
-	public class ExitAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
+	private void initTable() {
+        CellRenderer cellRenderer = new CellRenderer();
+        ColumnModel columnModel = new ColumnModel(cellRenderer);
+        this.tableModel = new TableModel(columnModel);
 
-		public ExitAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
+		this.table = new JTable(tableModel, columnModel);
+		this.table.setRowHeight(this.window.getHeight() / 20);
+		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
+	}
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			onWindowClosing();
-		}
+	private void initActions() {
+		connectAction = new ConnectAction("Connect to board",
+				IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
+				"Connection", KeyEvent.VK_C);
+		logicAction = new LogicAction("Initialize system",
+				IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32),
+                "Initialize system", KeyEvent.VK_I);
+	}
+
+	private void exitProgram() {
+		this.window.dispose();
+		System.exit(0);
 	}
 
 	public class ConnectAction extends AbstractAction {

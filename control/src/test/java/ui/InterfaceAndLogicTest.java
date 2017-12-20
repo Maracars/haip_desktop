@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 import static protocol.ProtocolProperties.*;
 
-public class ControllerLogicTest {
+public class InterfaceAndLogicTest {
 	ArrayList<Mooring> moorings;
 	Dock dock;
 	Port port;
@@ -25,7 +25,7 @@ public class ControllerLogicTest {
 
 	Scanner scanner;
 
-	public ControllerLogicTest() {
+	public InterfaceAndLogicTest() {
 		this.moorings = new ArrayList<>();
 		this.initMoorings(moorings);
 
@@ -98,7 +98,7 @@ public class ControllerLogicTest {
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		new ControllerLogicTest().receiveFrames();
+		new InterfaceAndLogicTest().receiveFrames();
 	}
 
 	@Test
