@@ -19,9 +19,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 	private Serial serial;
 
-	Thread thread;
-	boolean running;
-	boolean lastCycleEnded;
+	private Thread thread;
+	private volatile boolean running;
 
 	@SuppressWarnings("unchecked")
 	public ControllerLogic(Serial serial, Port port) {
@@ -37,31 +36,52 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	}
 
 	public void startLogic() {
-		if (this.thread.isInterrupted()) {
+		if (!this.thread.isAlive()) {
 			this.running = true;
-			this.lastCycleEnded = false;
 			this.thread.start();
 		}
-		/*this.running = true;
-		this.thread.start();*/
 	}
 
 	public void stopLogic() {
 		if (this.thread.isAlive()) {
 			this.running = false;
-			while (!lastCycleEnded);
-			this.thread.interrupt();
 		}
-		/*this.running = false;
-		this.thread.interrupt();*/
 	}
 
 	public boolean isRunning() {
 		return running;
 	}
 
-	public void control(String boat) {
+	@Override
+	public void run() {
+		while (running) {
+			for (int k = 0; k < 5; k++) {
+				for (int i = 0; i < LOOP_IDLE_BOATS; i++) {
+					for (int j = 0; j < LOOP_CONNECTED_BOATS; j++) {
+						for (Integer boat : connectedBoats) {
+							control(boat.toString());
+						}
+					}
+					for (Integer boat : idleBoats) {
+						control(boat.toString());
+					}
+				}
+			}
+			if (serial != null && serial.isConnected()) {
+				Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
+			} else {
+				System.out.println("Discovery is sent to boats");
+			}
+			try {
+				//TODO I have no fucking idea how big the delay should be
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
+	public void control(String boat) {
 		Integer boat_id = Integer.parseInt(boat);
 
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat, 8));
@@ -204,35 +224,5 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		} else {
 			receivedList.add(frame);
 		}
-	}
-
-	@Override
-	public void run() {
-		while (running) {
-			for (int k = 0; k < 5; k++) {
-				for (int i = 0; i < LOOP_IDLE_BOATS; i++) {
-					for (int j = 0; j < LOOP_CONNECTED_BOATS; j++) {
-						for (Integer boat : connectedBoats) {
-							control(boat.toString());
-						}
-					}
-					for (Integer boat : idleBoats) {
-						control(boat.toString());
-					}
-				}
-			}
-			if (serial != null && serial.isConnected()) {
-				Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
-			} else {
-				System.out.println("Discovery is sent to boats");
-			}
-			try {
-				//TODO I have no fucking idea how big the delay should be
-				Thread.sleep(2000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		this.lastCycleEnded = true;
 	}
 }

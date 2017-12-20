@@ -25,27 +25,27 @@ import static ui.panels.ActionMessages.*;
 
 public class MainPanel {
 	// Window
-	JFrame window;
+	private JFrame window;
 
 	// Table Elements
-	JTable table;
-	TableModel tableModel;
+	private JTable table;
+	private TableModel tableModel;
 
 	// Log Elements
-	LogModel logModel;
+	private LogModel logModel;
 
 	// Buttons
-	JButton connectButton, logicButton;
+	private JButton connectButton, logicButton;
 
 	// Actions
-	AbstractAction exitAction, connectAction, logicAction;
+	private AbstractAction exitAction, connectAction, logicAction;
 
 	// Serial Communication
-	Serial serial;
-	SerialObserver serialObserver;
+	private Serial serial;
+	private SerialObserver serialObserver;
 
 	// Controller Logic
-	ControllerLogic controllerLogic;
+	private ControllerLogic controllerLogic;
 
 	public MainPanel(Serial serial, ControllerLogic controllerLogic) {
 		this.createJFrame();
@@ -201,7 +201,7 @@ public class MainPanel {
 				IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
 				"Connection", KeyEvent.VK_C);
 		logicAction = new LogicAction("Initialize system",
-				IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32),
+				IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32),
                 "Initialize system", KeyEvent.VK_I);
 	}
 
@@ -320,14 +320,14 @@ public class MainPanel {
 				controllerLogic.startLogic();
 
 				logicButton.setText("Stop system");
-				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
+				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
 				//connectButton.setEnabled(false);
 				logModel.add(SYSTEM_INITIALIZED);
 			} else {
 				controllerLogic.stopLogic();
 
 				logicButton.setText("Initialize system");
-				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
+				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
 				//connectButton.setEnabled(true);
 				logModel.add(SYSTEM_STOPPED);
 			}
