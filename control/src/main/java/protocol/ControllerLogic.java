@@ -112,7 +112,10 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			}
 
 		} else {
-			System.out.println("Invalid packet " + boat + " " + receivedList.get(0).getOriginId());
+			if (!receivedList.isEmpty()) {
+				System.out.println("Invalid packet " + boat + " " + receivedList.get(0).getOriginId());
+
+			}
 			addTimeout(boat_id);
 
 		}
