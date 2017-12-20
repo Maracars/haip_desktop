@@ -20,9 +20,11 @@ public class ProbaObserver extends Observable {
 		Status status = new Status(StatusType.PARKING.toString(), ActionType.LEAVE.toString(), PermissionType.ASK.toString());
 		Ship ship = new Ship("00000011", status);
 		ShipLogic watcher = new ShipLogic(null, ship);
-		MainPanel panel = new MainPanel(null, ship, watcher);
+		SimulationShipLogic simulationShipLogic = new SimulationShipLogic(watcher);
+		MainPanel panel = new MainPanel(null, ship, watcher, simulationShipLogic);
 		watcher.addObserver(panel);
 		probaObserver.addObserver(watcher);
+		probaObserver.addObserver(simulationShipLogic);
 		Scanner scanner = new Scanner(System.in);
 		while (true) {
 			String line = scanner.nextLine();
