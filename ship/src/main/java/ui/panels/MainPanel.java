@@ -49,7 +49,9 @@ import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
 import protocol.ShipLogic;
+import protocol.SimulationShipLogic;
 import serial.Serial;
+import ui.dialogs.SimulationDialog;
 import ui.log.LogModel;
 import ui.log.LogPanel;
 
@@ -64,7 +66,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 	JButton connectButton, waitForDiscoveryAction, actionButton;
 
 	// Actions
-	AbstractAction exitAction, connectAction, initAction, decisionAction;
+	AbstractAction exitAction, connectAction, initAction, decisionAction, simulationAction;
 
 	// Serial Communication
 	Serial serial;
@@ -83,11 +85,13 @@ public class MainPanel implements ListSelectionListener, Observer{
 	
 	//ShipLogic
 	ShipLogic shipLogic;
+	
+	//SimulationShipLogic
+	SimulationShipLogic simulationShipLogic;
 
-
-	public MainPanel(Serial serial, Ship ship, ShipLogic shipLogic) {
+	public MainPanel(Serial serial, Ship ship, ShipLogic shipLogic, SimulationShipLogic simulationShipLogic) {
 		this.createJFrame();
-		this.initThings(serial, ship, shipLogic);
+		this.initThings(serial, ship, shipLogic, simulationShipLogic);
 		this.addContentToJFrame();
 	}
 
@@ -99,7 +103,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 	}
 
-	private void initThings(Serial serial, Ship ship, ShipLogic shipLogic) {
+	private void initThings(Serial serial, Ship ship, ShipLogic shipLogic, SimulationShipLogic simulationShipLogic) {
 		IconFontSwing.register(FontAwesome.getIconFont());
 		this.initActions();
 
@@ -110,6 +114,8 @@ public class MainPanel implements ListSelectionListener, Observer{
 		this.ship = ship;
 		
 		this.shipLogic = shipLogic;
+		
+		this.simulationShipLogic = simulationShipLogic;
 
 		this.shipDiscovered = false;
 	}
@@ -281,6 +287,8 @@ public class MainPanel implements ListSelectionListener, Observer{
 		decisionAction = new DecisionAction("Save Action",
 				IconFontSwing.buildIcon(FontAwesome.CHECK, 32),
 				"Save Action", KeyEvent.VK_ACCEPT);
+		simulationAction = new SimulationAction("Init Simulation", 
+				IconFontSwing.buildIcon(FontAwesome.ROCKET, 32), "Init Simulation", null);
 	}
 
 	private WindowAdapter createWindowClosingAdapter() {
@@ -317,7 +325,14 @@ public class MainPanel implements ListSelectionListener, Observer{
 	private JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createExitMenu());
+		menuBar.add(createSimulationMenu());
 		return menuBar;
+	}
+
+	private JMenu createSimulationMenu() {
+		JMenu menuSimulation = new JMenu("Simulation");
+		menuSimulation.add(simulationAction);
+		return menuSimulation;
 	}
 
 	private JMenu createExitMenu() {
@@ -368,6 +383,28 @@ public class MainPanel implements ListSelectionListener, Observer{
 			actionButton.setEnabled(false);
 		}
 
+	}
+	
+	public class SimulationAction extends AbstractAction {
+		
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		public SimulationAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			SimulationDialog simulationDialog = new SimulationDialog(window, simulationShipLogic);
+			
+		}
+		
 	}
 
 	public class ConnectAction extends AbstractAction {

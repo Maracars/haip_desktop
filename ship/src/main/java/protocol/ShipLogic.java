@@ -21,13 +21,16 @@ public class ShipLogic extends Observable implements Observer{
 	
 	Serial serial;
 	Ship ship;
-	Ship actionShip;
+	boolean simulation;
+	ArrayList<Ship> simulationShips;
 	List<String> actionList;
 	
 	public ShipLogic(Serial serial, Ship ship) {
 		this.serial = serial;
 		this.ship = ship;
+		simulation = false;
 		actionList = new ArrayList<String>();
+		simulationShips = new ArrayList<>();
 	}
 
 	@Override
@@ -47,11 +50,12 @@ public class ShipLogic extends Observable implements Observer{
 			}
 			break;
 		case DATA:
-			checkShipMovement(frame);
+			checkShipMovement(frame, ship);
+			notifyPanel();
 			break;
 		case TOKEN:
 			System.out.println("Controller gives permission to talk to ship number " + Integer.parseInt(ship.getId(), 2));
-			sendFrame = checkToken(frame);
+			sendFrame = checkToken(frame, ship);
 			if(serial != null) {
 				replyController(sendFrame);
 			}
@@ -63,7 +67,7 @@ public class ShipLogic extends Observable implements Observer{
 		
 	}
 	
-	private Frame checkToken(Frame frame) {
+	public Frame checkToken(Frame frame, Ship ship) {
 		Frame sendFrame = null;
 		if(ship.getActionList().size() > 0) {
 			if(ship.getActionList().get(0).equals(ActionType.IDLE.toString())) {
@@ -85,7 +89,7 @@ public class ShipLogic extends Observable implements Observer{
 		Helpers.sendParsedFrame(frame, serial);
 	}
 	
-	public void checkShipMovement(Frame frame) {
+	public void checkShipMovement(Frame frame, Ship ship) {
 		if(frame.getData().getType().equals(DataType.RESPONSE.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " has permission to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name());
 			if(frame.getData().getStatus().getAction().equals(ActionType.ENTER.toString())) {
@@ -111,7 +115,6 @@ public class ShipLogic extends Observable implements Observer{
 			System.out.println("Ship number " + Integer.parseInt(ship.getId()) + " has started to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name() + " and controller is asking to change its status");
 			ship.setActionList(new ArrayList<String>());
 		}
-		notifyPanel();
 	}
 
 	private void notifyPanel() {
