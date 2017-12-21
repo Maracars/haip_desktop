@@ -179,13 +179,9 @@ public class MainPanel {
 	}
 
 	private Component createTab1() {
-		ImagePanel imagePanel = null;
-		try {
-			imagePanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
-		} catch (IOException e) {
-			this.logModel.add(ERROR_READING_LOGO);
-		}
-		return imagePanel;
+		MapPanel mapPanel = new MapPanel(controllerLogic.getPort());
+		controllerLogic.addObserver(mapPanel);
+		return mapPanel;
 	}
 
 	private Component createTab2() {
