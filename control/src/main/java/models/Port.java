@@ -1,5 +1,6 @@
 package models;
 
+import helpers.SettingProperties;
 import protocol.ProtocolProperties;
 
 import java.util.LinkedList;
@@ -36,11 +37,10 @@ public class Port {
 
 
 	public boolean addToTransitionZone(Ship ship, String action) {
-		if (transitZone.size() < ProtocolProperties.TRANSIT_ZONE_SHIP_LIMIT || transitZone.contains(ship)) {
+		if (transitZone.size() < SettingProperties.getTransitZoneShipLimit() || transitZone.contains(ship)) {
 			transitZone.add(ship);
 			if (action.equals(ActionType.LEAVE.toString())) {
 				freeMooring(ship);
-
 			}
 			return true;
 		} else {

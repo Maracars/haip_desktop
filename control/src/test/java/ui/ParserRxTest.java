@@ -48,7 +48,7 @@ public class ParserRxTest extends Observable {
 		this.serial = new Serial();
 		this.controllerLogic = new ControllerLogic(this.serial, this.port);
 
-		this.mainPanel = new MainPanel(this.serial, this.controllerLogic);
+		this.mainPanel = new MainPanel(this.serial, this.port);
 
 		Thread thread = new Thread(this.controllerLogic);
 		this.addObserver(this.controllerLogic);

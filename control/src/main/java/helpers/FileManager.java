@@ -10,18 +10,12 @@ public class FileManager {
 	private File file;
 	private boolean fileCreated;
 
-	List<Setting> settingList;
-	/* 0 -> Dock Size
-	1 -> Transit Size */
-
 	public FileManager() throws IOException {
 		this.file = new File(FILE_NAME);
 		fileCreated = this.file.createNewFile();
-
-		this.settingList = new ArrayList<>();
 	}
 
-	public List<Setting> readFile() throws IOException {
+	public void readFile() throws IOException {
 		String line;
 		String[] values;
 
@@ -29,18 +23,17 @@ public class FileManager {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(FILE_NAME));
 			while ((line = bufferedReader.readLine()) != null) {
 				values = line.split("[$]");
-				settingList.add(new Setting(DOCK_SIZE, Integer.valueOf(values[0])));
-				settingList.add(new Setting(TRANSIT_SIZE, Integer.valueOf(values[1])));
+
+				List<Integer> settingList = new ArrayList<>();
+				for (String str : values) {
+					settingList.add(Integer.parseInt(str));
+				}
+				SettingProperties.setProperties(settingList);
 			}
 		}
-		if (fileCreated || settingList.size() != NUM_OF_SETTINGS) {
-			settingList.add(new Setting(DOCK_SIZE, DEFAULT_DOCK_SIZE));
-			settingList.add(new Setting(TRANSIT_SIZE, DEFAULT_TRANSIT_SIZE));
-		}
-		return settingList;
 	}
 
-	public void writeFile(List<Setting> settingList) {
+	public void writeFile() {
 		File file = new File(FILE_NAME);
 		BufferedWriter bufferedWriter;
 
@@ -49,8 +42,9 @@ public class FileManager {
 			raf.setLength(0);
 
 			bufferedWriter = new BufferedWriter(new FileWriter(file, true));
-			for (Setting setting : settingList) {
-				bufferedWriter.write(String.valueOf(setting.getValue()));
+
+			for (Integer integer : SettingProperties.getProperties()) {
+				bufferedWriter.write(String.valueOf(integer));
 				bufferedWriter.write("$");
 			}
 			bufferedWriter.close();

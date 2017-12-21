@@ -1,7 +1,7 @@
 package ui.dialogs;
 
 import helpers.FileManager;
-import helpers.Setting;
+import helpers.SettingProperties;
 import ui.panels.TextFieldPanel;
 
 import javax.swing.*;
@@ -12,28 +12,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static helpers.SettingProperties.*;
+
 public class SettingsDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	private FileManager fileManager;
-	private List<Setting> settingList;
 	private List<TextFieldPanel> fieldList;
 
-	public SettingsDialog(JFrame window) throws IOException {
-		super(window, "Settings Menu", true);
+	public SettingsDialog(FileManager fileManager) throws IOException {
+		super(new JFrame(), "Settings Menu", true);
 		this.setLocation(340, 100);
 		this.setSize(600, 600);
 		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-		this.readSettingsFromFile();
+		this.fileManager = fileManager;
+		this.fileManager.readFile();
 
 		this.setContentPane(createMainPanel());
 		this.setVisible(true);
-	}
-
-	private void readSettingsFromFile() throws IOException {
-		this.fileManager = new FileManager();
-		this.settingList = this.fileManager.readFile();
 	}
 
 	private JPanel createMainPanel() {
@@ -50,17 +47,17 @@ public class SettingsDialog extends JDialog implements ActionListener {
 		JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
 		this.fieldList = new ArrayList<>();
 
-		for (Setting setting : settingList) {
-			TextFieldPanel textFieldPanel = createTextFieldPanel(setting.getName());
-			textFieldPanel.setText(String.valueOf(setting.getValue()));
-			fieldList.add(textFieldPanel);
+		for (int i = 0; i < NUM_OF_SETTINGS; i++) {
+			TextFieldPanel textFieldPanel = createTextFieldPanel(SettingProperties.getPropertyNames().get(i),
+					SettingProperties.getProperties().get(i));
+			this.fieldList.add(textFieldPanel);
 			panel.add(textFieldPanel);
 		}
 		return panel;
 	}
 
-	private TextFieldPanel createTextFieldPanel(String settingName) {
-		return new TextFieldPanel(settingName);
+	private TextFieldPanel createTextFieldPanel(String settingName, int settingValue) {
+		return new TextFieldPanel(settingName, String.valueOf(settingValue));
 	}
 
 	private Component createButtonsPanel() {
@@ -88,11 +85,13 @@ public class SettingsDialog extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Accept")) {
 			if (checkFields()) {
-				for (int i = 0; i < fieldList.size(); i++) {
-					settingList.set(i, new Setting(settingList.get(i).getName(),
-							Integer.parseInt(fieldList.get(i).getText())));
+				List<Integer> settingList = new ArrayList<>();
+				for (TextFieldPanel textField : fieldList) {
+					settingList.add(Integer.parseInt(textField.getText()));
 				}
-				this.fileManager.writeFile(settingList);
+				SettingProperties.setProperties(settingList);
+
+				this.fileManager.writeFile(/*settingList*/);
 				this.dispose();
 			}
 		} else if (e.getActionCommand().equals("Cancel")) {
@@ -103,12 +102,12 @@ public class SettingsDialog extends JDialog implements ActionListener {
 	private boolean checkFields() {
 		for (int i = 0; i < fieldList.size(); i++) {
 			if (fieldList.get(i).getText().trim().isEmpty()) {
-				JOptionPane.showMessageDialog(this, "Some of the fields is empty",
+				JOptionPane.showMessageDialog(this, "Some of the fields are empty",
 						"Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 			if (isInteger(fieldList.get(i).getText()) == false) {
-				JOptionPane.showMessageDialog(this, "Some of the fields is not a number",
+				JOptionPane.showMessageDialog(this, "Some of the fields are not a number",
 						"Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}

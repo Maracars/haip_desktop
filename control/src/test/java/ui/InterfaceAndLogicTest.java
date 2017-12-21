@@ -1,5 +1,6 @@
 package ui;
 
+import helpers.SettingProperties;
 import models.*;
 import org.junit.Test;
 import protocol.ControllerLogic;
@@ -19,7 +20,6 @@ public class InterfaceAndLogicTest {
 	Port port;
 
 	Serial serial;
-	ControllerLogic controllerLogic;
 
 	MainPanel mainPanel;
 
@@ -31,11 +31,8 @@ public class InterfaceAndLogicTest {
 
 		this.dock = new Dock("Albert Dock", moorings);
 		this.port = new Port(this.dock);
-
 		this.serial = new Serial();
-		this.controllerLogic = new ControllerLogic(this.serial, this.port);
-
-		this.mainPanel = new MainPanel(this.serial, this.controllerLogic);
+		this.mainPanel = new MainPanel(this.serial, this.port);
 
 		this.scanner = new Scanner(System.in);
 	}
@@ -103,7 +100,7 @@ public class InterfaceAndLogicTest {
 
 	@Test
 	public void initMoorings(ArrayList<Mooring> moorings) {
-		for (Integer i = 0; i < 10; i++) {
+		for (Integer i = 0; i < SettingProperties.getDockingBayShipLimit(); i++) {
 			Ship ship = null;
 			/*if (i == 2 ) {
 				ship = new Ship("00000010");

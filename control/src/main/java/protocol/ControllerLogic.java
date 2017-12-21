@@ -1,6 +1,7 @@
 package protocol;
 
 import helpers.Helpers;
+import helpers.Setting;
 import models.*;
 import serial.Serial;
 
@@ -11,6 +12,8 @@ import static protocol.ProtocolProperties.*;
 
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
 public class ControllerLogic extends Observable implements Observer, Runnable {
+	//private List<Setting> settingList;
+
 	private Port port;
 	private List<Frame> receivedList;
 	private Set<Integer> connectedBoats;
@@ -25,14 +28,15 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	@SuppressWarnings("unchecked")
 	public ControllerLogic(Serial serial, Port port) {
 		this.port = port;
-		receivedList = Collections.synchronizedList(new ArrayList());
-		connectedBoats = new CopyOnWriteArraySet<>();
-		idleBoats = new CopyOnWriteArraySet<>();
-		timeouts = new HashMap<>();
+		this.receivedList = Collections.synchronizedList(new ArrayList());
+		this.connectedBoats = new CopyOnWriteArraySet<>();
+		this.idleBoats = new CopyOnWriteArraySet<>();
+		this.timeouts = new HashMap<>();
 
 		this.serial = serial;
 
 		this.thread = new Thread(this);
+		this.running = false;
 	}
 
 	public void startLogic() {

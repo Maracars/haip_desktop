@@ -9,19 +9,16 @@ import javax.swing.JTextField;
 
 public class TextFieldPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
+	private JTextField textField;
 
-	JTextField textField;
-
-	public TextFieldPanel(String text) {
+	public TextFieldPanel(String title, String text) {
 		this.setLayout(new BorderLayout(10, 10));
-		
-		textField = new JTextField("");
 
-		textField.setEditable(true);
-		textField.setBackground(Color.WHITE);
+		this.textField = new JTextField(text);
+		this.textField.setBackground(Color.WHITE);
 
 		this.add(textField);
-		this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), text));
+		this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), title));
 
 	}
 	
@@ -31,5 +28,9 @@ public class TextFieldPanel extends JPanel {
 	
 	public String getText() {
 		return this.textField.getText();
+	}
+
+	public void setEditable(boolean editable) {
+		this.textField.setEditable(editable);
 	}
 }

@@ -1,8 +1,11 @@
 package ui.panels;
 
+import helpers.FileManager;
+import helpers.SettingProperties;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
 import jssc.SerialPortException;
+import models.Port;
 import protocol.ControllerLogic;
 import protocol.SerialObserver;
 import serial.Serial;
@@ -15,15 +18,16 @@ import ui.tables.TableModel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import static helpers.SettingProperties.NUM_OF_SETTINGS;
 import static ui.panels.ActionMessages.*;
 
 public class MainPanel {
@@ -33,7 +37,11 @@ public class MainPanel {
 	private TableModel tableModel;
 	private LogModel logModel;
 	private JButton connectButton, logicButton;
-	private AbstractAction connectAction, logicAction;
+	private AbstractAction connectAction, logicAction, settingsAction, exitAction;
+
+	// Settings List
+	private FileManager fileManager;
+	private List<TextFieldPanel> fieldList;
 
 	// Serial Communication
 	private Serial serial;
@@ -42,9 +50,9 @@ public class MainPanel {
 	// Controller Logic
 	private ControllerLogic controllerLogic;
 
-	public MainPanel(Serial serial, ControllerLogic controllerLogic) {
+	public MainPanel(Serial serial, Port port) {
 		this.createJFrame();
-        this.initThings(serial, controllerLogic);
+        this.initThings(serial, port);
         this.addContentToJFrame();
 	}
 
@@ -57,13 +65,20 @@ public class MainPanel {
 		this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 	}
 
-	private void initThings(Serial serial, ControllerLogic controllerLogic) {
+	private void initThings(Serial serial, Port port) {
 		IconFontSwing.register(FontAwesome.getIconFont());
 		this.initActions();
 		this.initTable();
 
+		try {
+			this.fileManager = new FileManager();
+			this.fileManager.readFile();
+		} catch (IOException e) {
+			this.logModel.add(ERROR_READING_SETTINGS);
+		}
+
 		this.serial = serial;
-		this.controllerLogic = controllerLogic;
+		this.controllerLogic = new ControllerLogic(this.serial, port/*, this.settingList*/);
 		this.serialObserver = new SerialObserver(this.tableModel);
 
 		this.serial.addObserver(this.controllerLogic);
@@ -103,8 +118,7 @@ public class MainPanel {
         ImagePanel logoPanel = null;
 		try {
             logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
         logoPanel.scaleImage(this.window.getWidth() / 7, this.window.getWidth() / 7);
@@ -118,31 +132,47 @@ public class MainPanel {
 	}
 
 	private Component createButtonsPanel() {
-		JPanel panel = new JPanel(new GridLayout(2, 1, 10, 10));
+		JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
 		panel.setBorder(new EmptyBorder(0, 10, 10, 10));
 
 		this.connectButton = new JButton(this.connectAction);
 		this.connectButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
-		panel.add(connectButton);
 
 		this.logicButton = new JButton(this.logicAction);
 		this.logicButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
 		//this.logicButton.setEnabled(false);
+
+		panel.add(createSizesPanel());
+		panel.add(connectButton);
 		panel.add(logicButton);
+
+		return panel;
+	}
+
+	private Component createSizesPanel() {
+		JPanel panel = new JPanel(new GridLayout(1, 2, 10, 10));
+		this.fieldList = new ArrayList<>();
+
+		for (int i = 0; i < NUM_OF_SETTINGS; i++) {
+			TextFieldPanel textFieldPanel = new TextFieldPanel(SettingProperties.getPropertyNames().get(i),
+					String.valueOf(SettingProperties.getProperties().get(i)));
+			textFieldPanel.setEditable(false);
+			this.fieldList.add(textFieldPanel);
+			panel.add(textFieldPanel);
+		}
 
 		return panel;
 	}
 
 	private Component createTabbedPane() {
         JTabbedPane tabbedPane = new JTabbedPane();
-		Icon icon = null;
 
 		JComponent panel1 = (JComponent) createTab1();
-		tabbedPane.addTab("Port Map", icon, panel1, "Shows port map");
+		tabbedPane.addTab("Port Map", null, panel1, "Shows port map");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
 		JComponent panel2 = (JComponent) createTab2();
-		tabbedPane.addTab("Ship Data Table", icon, panel2, "Shows ship data in a table");
+		tabbedPane.addTab("Ship Data Table", null, panel2, "Shows ship data in a table");
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
 		return tabbedPane;
@@ -167,46 +197,166 @@ public class MainPanel {
 
 	private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-		menuBar.add(createSettingsMenu());
-		menuBar.add(createExitMenu());
+		menuBar.add(createFileMenu());
 		return menuBar;
 	}
 
-	private JMenu createSettingsMenu() {
-		JMenu settingsMenu = new JMenu("Settings");
-
-		settingsMenu.addMenuListener(new MenuListener() {
-			@Override
-			public void menuSelected(MenuEvent e) {
-				try {
-					new SettingsDialog(window);
-				} catch (IOException e1) {
-					logModel.add(ERROR_READING_SETTINGS);
-				}
-				settingsMenu.setSelected(false);
-			}
-			@Override
-			public void menuDeselected(MenuEvent e) {}
-			@Override
-			public void menuCanceled(MenuEvent e) {}
-		});
-		return settingsMenu;
+	private JMenu createFileMenu() {
+		JMenu fileMenu = new JMenu("File");
+		fileMenu.setMnemonic(KeyEvent.VK_F);
+		fileMenu.add(settingsAction);
+		fileMenu.add(exitAction);
+		return fileMenu;
 	}
 
-	private JMenu createExitMenu() {
-        JMenu exitMenu = new JMenu("Exit");
+	private void initTable() {
+        CellRenderer cellRenderer = new CellRenderer();
+        ColumnModel columnModel = new ColumnModel(cellRenderer);
+        this.tableModel = new TableModel(columnModel);
 
-		exitMenu.addMenuListener(new MenuListener() {
-			@Override
-			public void menuSelected(MenuEvent e) {
-				onWindowClosing();
+		this.table = new JTable(tableModel, columnModel);
+		this.table.setRowHeight(this.window.getHeight() / 20);
+		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
+	}
+
+	private void initActions() {
+		connectAction = new ConnectAction("Connect to board", IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
+				"Connection", KeyEvent.VK_C);
+		connectAction.setEnabled(true);
+
+		logicAction = new LogicAction("Initialize system", IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32),
+                "Initialize system", KeyEvent.VK_L);
+		logicAction.setEnabled(false);
+
+		settingsAction = new SettingsAction("Settings", IconFontSwing.buildIcon(FontAwesome.SLIDERS, 32),
+				"Change port settings", KeyEvent.VK_S);
+		settingsAction.setEnabled(true);
+
+		exitAction = new ExitAction("Exit", IconFontSwing.buildIcon(FontAwesome.WINDOW_CLOSE, 32),
+				"Close program", KeyEvent.VK_X);
+		exitAction.setEnabled(true);
+	}
+
+	public class ConnectAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		public ConnectAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+			public void actionPerformed(ActionEvent arg0) {
+			if (!serial.isConnected()) {
+				try {
+					serial.openConnection();
+					connectButton.setText("Disconnect from board");
+					logicAction.setEnabled(true);
+					logModel.add(CONNECTION_ESTABLISHED);
+				}
+				catch (Exception e) {
+					logModel.add(e.getMessage());
+				}
 			}
-			@Override
-			public void menuDeselected(MenuEvent e) {}
-			@Override
-			public void menuCanceled(MenuEvent e) {}
-		});
-		return exitMenu;
+			else {
+				try {
+					serial.closeConnection();
+					connectButton.setText("Connect to board");
+					logicAction.setEnabled(false);
+					logModel.add(CONNECTION_CLOSED);
+				}
+				catch (SerialPortException e) {
+					logModel.add(e.getMessage());
+				}
+			}
+		}
+	}
+
+	public class LogicAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		public LogicAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if (!controllerLogic.isRunning()) {
+				controllerLogic.startLogic();
+
+				logicButton.setText("Stop system");
+				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
+				connectAction.setEnabled(false);
+				settingsAction.setEnabled(false);
+				logModel.add(SYSTEM_INITIALIZED);
+			} else {
+				controllerLogic.stopLogic();
+
+				logicButton.setText("Initialize system");
+				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
+				connectAction.setEnabled(true);
+				settingsAction.setEnabled(true);
+				logModel.add(SYSTEM_STOPPED);
+			}
+		}
+	}
+
+	private class SettingsAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		public SettingsAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent actionEvent) {
+			try {
+				new SettingsDialog(fileManager);
+
+				for (int i = 0; i < fieldList.size(); i++) {
+					fieldList.get(i).setText(String.valueOf(SettingProperties.getProperties().get(i)));
+				}
+			} catch (IOException e1) {
+				logModel.add(ERROR_READING_SETTINGS);
+			}
+		}
+	}
+
+	private class ExitAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		public ExitAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent actionEvent) {
+			onWindowClosing();
+		}
 	}
 
 	private WindowAdapter createWindowClosingAdapter() {
@@ -241,101 +391,8 @@ public class MainPanel {
 		}
 	}
 
-	private void initTable() {
-        CellRenderer cellRenderer = new CellRenderer();
-        ColumnModel columnModel = new ColumnModel(cellRenderer);
-        this.tableModel = new TableModel(columnModel);
-
-		this.table = new JTable(tableModel, columnModel);
-		this.table.setRowHeight(this.window.getHeight() / 20);
-		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		this.table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
-	}
-
-	private void initActions() {
-		connectAction = new ConnectAction("Connect to board",
-				IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
-				"Connection", KeyEvent.VK_C);
-		logicAction = new LogicAction("Initialize system",
-				IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32),
-                "Initialize system", KeyEvent.VK_I);
-	}
-
 	private void exitProgram() {
 		this.window.dispose();
 		System.exit(0);
-	}
-
-	public class ConnectAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public ConnectAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-			public void actionPerformed(ActionEvent arg0) {
-			if (!serial.isConnected()) {
-				try {
-					serial.openConnection();
-					connectButton.setText("Disconnect from board");
-					//logicButton.setEnabled(true);
-					logModel.add(CONNECTION_ESTABLISHED);
-				}
-				catch (Exception e) {
-					logModel.add(e.getMessage());
-				}
-			}
-			else {
-				try {
-					serial.closeConnection();
-					connectButton.setText("Connect to board");
-					//logicButton.setEnabled(false);
-					logModel.add(CONNECTION_CLOSED);
-				}
-				catch (SerialPortException e) {
-					logModel.add(e.getMessage());
-				}
-			}
-		}
-	}
-
-	public class LogicAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public LogicAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			if (!controllerLogic.isRunning()) {
-				controllerLogic.startLogic();
-
-				logicButton.setText("Stop system");
-				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
-				//connectButton.setEnabled(false);
-				logModel.add(SYSTEM_INITIALIZED);
-			} else {
-				controllerLogic.stopLogic();
-
-				logicButton.setText("Initialize system");
-				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
-				//connectButton.setEnabled(true);
-				logModel.add(SYSTEM_STOPPED);
-			}
-		}
 	}
 }
