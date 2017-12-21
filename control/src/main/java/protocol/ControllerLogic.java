@@ -215,8 +215,16 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			System.out.println("Sent frame");
 		}
 		setSentRequest(nextFrame);
-		ship.setStatus(nextStatus);
+		
+		if(nextStatus.getPermission().equals(PermissionType.ALLOW.toString())) {
+			ship.setStatus(nextStatus);
+		}else{
+			status.setPermission(PermissionType.DENY.toString());
+			ship.setStatus(status);
+		}
+		
 		updateMap(ship);
+		
 	}
 
 	private void addConnectedBoat(Integer boat) {
