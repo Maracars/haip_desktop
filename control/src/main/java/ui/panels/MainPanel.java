@@ -149,7 +149,8 @@ public class MainPanel {
 	}
 
 	private Component createTab1() {
-		MapPanel mapPanel = new MapPanel();
+		MapPanel mapPanel = new MapPanel(controllerLogic.getPort());
+		controllerLogic.addObserver(mapPanel);
 		return mapPanel;
 	}
 

@@ -1,13 +1,29 @@
 package protocol;
 
-import helpers.Helpers;
-import models.*;
-import serial.Serial;
+import static protocol.ProtocolProperties.LOOP_CONNECTED_BOATS;
+import static protocol.ProtocolProperties.LOOP_IDLE_BOATS;
+import static protocol.ProtocolProperties.MASTER_ID;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import static protocol.ProtocolProperties.*;
+import helpers.Helpers;
+import models.Frame;
+import models.Mooring;
+import models.Port;
+import models.Ship;
+import models.Status;
+import protocol.ProtocolProperties.ActionType;
+import protocol.ProtocolProperties.PacketType;
+import protocol.ProtocolProperties.PermissionType;
+import protocol.ProtocolProperties.StatusType;
+import serial.Serial;
 
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
 public class ControllerLogic extends Observable implements Observer, Runnable {
@@ -29,7 +45,6 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		connectedBoats = new CopyOnWriteArraySet<>();
 		idleBoats = new CopyOnWriteArraySet<>();
 		timeouts = new HashMap<>();
-
 		this.serial = serial;
 
 		this.thread = new Thread(this);
@@ -164,6 +179,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				nextStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString(), PermissionType.ALLOW.toString());
 				System.out.println("Ship " + frame.getOriginId() + " is going from the transit zone to the dock");
 			}
+			
 		}
 		// Sea, enter
 		else if (status_str.equals(StatusType.SEA.toString()) && action_str.equals(ActionType.ENTER.toString())) {
@@ -176,6 +192,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				System.out.println("Ship " + frame.getOriginId() + " is going from the sea to the transit zone");
 				System.out.println("The mooring assigned: " + freeMooring.getId());
 				parking = freeMooring.getId();
+				System.out.println("PARKING ASSIGNEEEED "+parking);
 			} else {
 				nextStatus.setPermission(PermissionType.DENY.toString());
 				System.out.println("Ship " + frame.getOriginId() + " access to transit zone denied, not enough space in transit zone");
@@ -198,6 +215,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			System.out.println("Sent frame");
 		}
 		setSentRequest(nextFrame);
+		ship.setStatus(nextStatus);
+		updateMap(ship);
 	}
 
 	private void addConnectedBoat(Integer boat) {
@@ -224,8 +243,19 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		if (frame.getHeader().getPacketType().equals(PacketType.ACK.toString())) {
 			connectedBoats.add(Integer.parseInt(frame.getOriginId(), 2));
 			System.out.println(connectedBoats);
+			Ship ship = new Ship(frame.getOriginId());
+			updateMap(ship);
 		} else {
 			receivedList.add(frame);
 		}
+	}
+	
+	private void updateMap(Ship ship) {
+		setChanged();
+		notifyObservers(ship);
+	}
+
+	public Port getPort() {
+		return port;
 	}
 }

@@ -22,23 +22,28 @@ public class SerialObserver implements Observer {
 
 	@Override
 	public void update(Observable observable, Object object) {
-		this.frame = (Frame) object;
+		try {
+			this.frame = (Frame) object;
 
-		if (this.frame.getData() != null && this.frame.getData().getType().equals(PacketType.DATA.toString())) {
-			if (this.frame.getOriginId() != MASTER_ID) {
-				int shipID = Integer.parseInt(this.frame.getOriginId(), 2);
-				int status = Integer.parseInt(this.frame.getData().getStatus().getStatus(), 2);
-				int action = Integer.parseInt(this.frame.getData().getStatus().getAction(), 2);
+			if (this.frame.getData() != null && this.frame.getData().getType().equals(PacketType.DATA.toString())) {
+				if (this.frame.getOriginId() != MASTER_ID) {
+					int shipID = Integer.parseInt(this.frame.getOriginId(), 2);
+					int status = Integer.parseInt(this.frame.getData().getStatus().getStatus(), 2);
+					int action = Integer.parseInt(this.frame.getData().getStatus().getAction(), 2);
 
-				TableData tableData = new TableData(shipID, status, action, false);
-				this.tableModel.add(tableData);
+					TableData tableData = new TableData(shipID, status, action, false);
+					this.tableModel.add(tableData);
+				}
+				else {
+					int shipID = Integer.parseInt(this.frame.getDestinationId(), 2);
+					boolean permission = this.frame.getData().getStatus().getPermission()
+							.equals(ProtocolProperties.PermissionType.ALLOW.toString());
+					this.tableModel.updatePermission(shipID, permission);
+				}
 			}
-			else {
-				int shipID = Integer.parseInt(this.frame.getDestinationId(), 2);
-				boolean permission = this.frame.getData().getStatus().getPermission()
-						.equals(ProtocolProperties.PermissionType.ALLOW.toString());
-				this.tableModel.updatePermission(shipID, permission);
-			}
+		}catch(NullPointerException | ClassCastException e) {
+			return;
 		}
+
 	}
 }

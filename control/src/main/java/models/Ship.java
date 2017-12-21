@@ -3,9 +3,23 @@ package models;
 public class Ship {
 
 	private String id;
+	private Status status;
 
 	public Ship(String id) {
 		this.id = id;
+	}
+	
+	public Ship(String id, Status status) {
+		this.id = id;
+		this.status = status;
+	}
+	
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
 	}
 
 	public String getId() {
