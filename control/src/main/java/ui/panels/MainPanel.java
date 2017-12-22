@@ -1,7 +1,6 @@
 package ui.panels;
 
-import helpers.FileManager;
-import helpers.SettingProperties;
+import settings.Settings;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
 import jssc.SerialPortException;
@@ -23,11 +22,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-import static helpers.SettingProperties.NUM_OF_SETTINGS;
+import static settings.Settings.*;
 import static ui.panels.ActionMessages.*;
 
 public class MainPanel {
@@ -40,7 +43,7 @@ public class MainPanel {
 	private AbstractAction connectAction, logicAction, settingsAction, exitAction;
 
 	// Settings List
-	private FileManager fileManager;
+	private Properties properties;
 	private List<TextFieldPanel> fieldList;
 
 	// Serial Communication
@@ -52,8 +55,50 @@ public class MainPanel {
 
 	public MainPanel(Serial serial, Port port) {
 		this.createJFrame();
-        this.initThings(serial, port);
-        this.addContentToJFrame();
+		this.initThings(serial, port);
+		this.addContentToJFrame();
+	}
+
+	private void initThings(Serial serial, Port port) {
+		IconFontSwing.register(FontAwesome.getIconFont());
+		this.initActions();
+		this.initTable();
+
+		try {
+			this.readSettings();
+		} catch (IOException e) {
+			//this.logModel.add(ERROR_READING_SETTINGS);
+		}
+
+		this.serial = serial;
+		this.controllerLogic = new ControllerLogic(this.serial, port);
+		this.serialObserver = new SerialObserver(this.tableModel);
+
+		this.serial.addObserver(this.controllerLogic);
+		this.serial.addObserver(this.serialObserver);
+		this.controllerLogic.addObserver(this.serialObserver);
+	}
+
+	private void readSettings() throws IOException {
+		this.properties = new Properties();
+		this.properties.load(new FileReader(FILE_NAME));
+
+		List<String> settings = new ArrayList<>();
+		for (int i = 0; i < NUM_OF_SETTINGS; i++) {
+			settings.add(properties.getProperty(PROPERTY_NAMES[i], String.valueOf(SHIP_LIMITS[i])));
+		}
+		Settings.setProperties(settings);
+	}
+
+	private void initTable() {
+		CellRenderer cellRenderer = new CellRenderer();
+		ColumnModel columnModel = new ColumnModel(cellRenderer);
+		this.tableModel = new TableModel(columnModel);
+
+		this.table = new JTable(tableModel, columnModel);
+		this.table.setRowHeight(this.window.getHeight() / 20);
+		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
 	}
 
 	private void createJFrame() {
@@ -63,27 +108,6 @@ public class MainPanel {
 		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
 		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-	}
-
-	private void initThings(Serial serial, Port port) {
-		IconFontSwing.register(FontAwesome.getIconFont());
-		this.initActions();
-		this.initTable();
-
-		try {
-			this.fileManager = new FileManager();
-			this.fileManager.readFile();
-		} catch (IOException e) {
-			this.logModel.add(ERROR_READING_SETTINGS);
-		}
-
-		this.serial = serial;
-		this.controllerLogic = new ControllerLogic(this.serial, port/*, this.settingList*/);
-		this.serialObserver = new SerialObserver(this.tableModel);
-
-		this.serial.addObserver(this.controllerLogic);
-		this.serial.addObserver(this.serialObserver);
-		this.controllerLogic.addObserver(this.serialObserver);
 	}
 
 	private void addContentToJFrame() {
@@ -119,7 +143,7 @@ public class MainPanel {
 		try {
             logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
 		} catch (IOException e) {
-			e.printStackTrace();
+			this.logModel.add(ERROR_READING_LOGO);
 		}
         logoPanel.scaleImage(this.window.getWidth() / 7, this.window.getWidth() / 7);
 
@@ -154,8 +178,8 @@ public class MainPanel {
 		this.fieldList = new ArrayList<>();
 
 		for (int i = 0; i < NUM_OF_SETTINGS; i++) {
-			TextFieldPanel textFieldPanel = new TextFieldPanel(SettingProperties.getPropertyNames().get(i),
-					String.valueOf(SettingProperties.getProperties().get(i)));
+			TextFieldPanel textFieldPanel = new TextFieldPanel(PROPERTY_FIELD_TITLES[i],
+					String.valueOf(Settings.getProperties().get(i)));
 			textFieldPanel.setEditable(false);
 			this.fieldList.add(textFieldPanel);
 			panel.add(textFieldPanel);
@@ -205,17 +229,6 @@ public class MainPanel {
 		return fileMenu;
 	}
 
-	private void initTable() {
-        CellRenderer cellRenderer = new CellRenderer();
-        ColumnModel columnModel = new ColumnModel(cellRenderer);
-        this.tableModel = new TableModel(columnModel);
-
-		this.table = new JTable(tableModel, columnModel);
-		this.table.setRowHeight(this.window.getHeight() / 20);
-		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		this.table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
-	}
-
 	private void initActions() {
 		connectAction = new ConnectAction("Connect to board", IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
 				"Connection", KeyEvent.VK_C);
@@ -226,7 +239,7 @@ public class MainPanel {
 		logicAction.setEnabled(false);
 
 		settingsAction = new SettingsAction("Settings", IconFontSwing.buildIcon(FontAwesome.SLIDERS, 32),
-				"Change port settings", KeyEvent.VK_S);
+				"Change port properties", KeyEvent.VK_S);
 		settingsAction.setEnabled(true);
 
 		exitAction = new ExitAction("Exit", IconFontSwing.buildIcon(FontAwesome.WINDOW_CLOSE, 32),
@@ -324,14 +337,18 @@ public class MainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
-			try {
-				new SettingsDialog(fileManager);
+			SettingsDialog settingsDialog = new SettingsDialog();
+			List<String> settings = settingsDialog.getSettings();
+			Settings.setProperties(settings);
 
-				for (int i = 0; i < fieldList.size(); i++) {
-					fieldList.get(i).setText(String.valueOf(SettingProperties.getProperties().get(i)));
+			for (int i = 0; i < settings.size(); i++) {
+				properties.setProperty(PROPERTY_NAMES[i], settings.get(i));
+				try {
+					properties.store(new FileWriter(FILE_NAME), null);
+				} catch (IOException e) {
+					logModel.add(ERROR_WRITING_SETTINGS);
 				}
-			} catch (IOException e1) {
-				logModel.add(ERROR_READING_SETTINGS);
+				fieldList.get(i).setText(settings.get(i));
 			}
 		}
 	}

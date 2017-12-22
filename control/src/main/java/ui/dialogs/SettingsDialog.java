@@ -1,33 +1,33 @@
 package ui.dialogs;
 
-import helpers.FileManager;
-import helpers.SettingProperties;
+import settings.Settings;
 import ui.panels.TextFieldPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static helpers.SettingProperties.*;
+import static settings.Settings.NUM_OF_SETTINGS;
+import static settings.Settings.PROPERTY_FIELD_TITLES;
 
 public class SettingsDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
-	private FileManager fileManager;
 	private List<TextFieldPanel> fieldList;
 
-	public SettingsDialog(FileManager fileManager) throws IOException {
+	public SettingsDialog() {
 		super(new JFrame(), "Settings Menu", true);
-		this.setLocation(340, 100);
-		this.setSize(600, 600);
-		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-		this.fileManager = fileManager;
-		this.fileManager.readFile();
+		this.setSize((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 6),
+				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 4);
+
+		this.setLocation((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 12),
+				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 8);
+
+		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
 		this.setContentPane(createMainPanel());
 		this.setVisible(true);
@@ -48,8 +48,8 @@ public class SettingsDialog extends JDialog implements ActionListener {
 		this.fieldList = new ArrayList<>();
 
 		for (int i = 0; i < NUM_OF_SETTINGS; i++) {
-			TextFieldPanel textFieldPanel = createTextFieldPanel(SettingProperties.getPropertyNames().get(i),
-					SettingProperties.getProperties().get(i));
+			TextFieldPanel textFieldPanel = createTextFieldPanel(PROPERTY_FIELD_TITLES[i],
+					Settings.getProperties().get(i));
 			this.fieldList.add(textFieldPanel);
 			panel.add(textFieldPanel);
 		}
@@ -68,12 +68,12 @@ public class SettingsDialog extends JDialog implements ActionListener {
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.setActionCommand("Cancel");
 		cancelButton.addActionListener(this);
-		cancelButton.setPreferredSize(new Dimension(100, 50));
+		cancelButton.setPreferredSize(new Dimension(this.getWidth() / 3, this.getHeight() / 6));
 
 		JButton acceptButton = new JButton("Accept");
 		acceptButton.setActionCommand("Accept");
 		acceptButton.addActionListener(this);
-		acceptButton.setPreferredSize(new Dimension(100, 50));
+		acceptButton.setPreferredSize(new Dimension(this.getWidth() / 3, this.getHeight() / 6));
 
 		panel.add(cancelButton);
 		panel.add(acceptButton);
@@ -85,13 +85,6 @@ public class SettingsDialog extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Accept")) {
 			if (checkFields()) {
-				List<Integer> settingList = new ArrayList<>();
-				for (TextFieldPanel textField : fieldList) {
-					settingList.add(Integer.parseInt(textField.getText()));
-				}
-				SettingProperties.setProperties(settingList);
-
-				this.fileManager.writeFile(/*settingList*/);
 				this.dispose();
 			}
 		} else if (e.getActionCommand().equals("Cancel")) {
@@ -99,15 +92,23 @@ public class SettingsDialog extends JDialog implements ActionListener {
 		}
 	}
 
+	public List<String> getSettings() {
+		List<String> settings = new ArrayList<>();
+		for (TextFieldPanel textFieldPanel : fieldList) {
+			settings.add(textFieldPanel.getText());
+		}
+		return settings;
+	}
+
 	private boolean checkFields() {
 		for (int i = 0; i < fieldList.size(); i++) {
 			if (fieldList.get(i).getText().trim().isEmpty()) {
-				JOptionPane.showMessageDialog(this, "Some of the fields are empty",
+				JOptionPane.showMessageDialog(this, "Some of the fields are empty.",
 						"Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
 			if (isInteger(fieldList.get(i).getText()) == false) {
-				JOptionPane.showMessageDialog(this, "Some of the fields are not a number",
+				JOptionPane.showMessageDialog(this, "Some of the fields are not a number.",
 						"Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}

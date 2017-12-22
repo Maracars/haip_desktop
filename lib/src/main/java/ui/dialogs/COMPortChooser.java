@@ -19,7 +19,7 @@ public class COMPortChooser extends JDialog implements ActionListener {
 		this.portStrings = portStrings;
 
 		this.setSize((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 6),
-				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 6);
+				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 5);
 
 		this.setLocation((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 15),
 				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 2 * this.getHeight());
@@ -50,9 +50,7 @@ public class COMPortChooser extends JDialog implements ActionListener {
 
 		bOk = new JButton("Ok");
 		bOk.addActionListener(this);
-		bOk.setPreferredSize(new Dimension(100, 20));
-		bOk.setMinimumSize(new Dimension(100, 20));
-		bOk.setMaximumSize(new Dimension(100, 20));
+		bOk.setPreferredSize(new Dimension(this.getWidth() / 3, this.getHeight() / 6));
 
 		panel.add(bOk);
 		return panel;

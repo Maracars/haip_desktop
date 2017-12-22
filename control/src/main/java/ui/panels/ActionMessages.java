@@ -8,5 +8,7 @@ public final class ActionMessages {
 	public static final String SYSTEM_STOPPED = "Port system has been stopped\n";
 
 	public static final String ERROR_READING_LOGO = "ERROR: Couldn't read logo\n";
-	public static final String ERROR_READING_SETTINGS = "ERROR: Couldn't read settings file\n";
+	public static final String ERROR_READING_SETTINGS = "ERROR: Couldn't read settings file\n"
+			+ "Default settings will be used\n";
+	public static final String ERROR_WRITING_SETTINGS = "ERROR: Couldn't write settings file\n";
 }

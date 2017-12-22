@@ -1,9 +1,8 @@
 package ui;
 
-import helpers.SettingProperties;
+import settings.Settings;
 import models.*;
 import org.junit.Test;
-import protocol.ControllerLogic;
 import protocol.FrameCreator;
 import serial.Serial;
 import ui.panels.MainPanel;
@@ -100,7 +99,7 @@ public class InterfaceAndLogicTest {
 
 	@Test
 	public void initMoorings(ArrayList<Mooring> moorings) {
-		for (Integer i = 0; i < SettingProperties.getDockingBayShipLimit(); i++) {
+		for (Integer i = 0; i < Settings.getProperties().get(0); i++) {
 			Ship ship = null;
 			/*if (i == 2 ) {
 				ship = new Ship("00000010");
