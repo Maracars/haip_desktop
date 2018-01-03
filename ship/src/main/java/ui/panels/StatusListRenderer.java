@@ -34,4 +34,16 @@ public class StatusListRenderer implements ListCellRenderer<String>{
 		return label;
 	}
 
+
+	public String getStatusType() {
+		return statusType;
+	}
+
+
+	public void setStatusType(String statusType) {
+		this.statusType = statusType;
+	}
+	
+	
+
 }

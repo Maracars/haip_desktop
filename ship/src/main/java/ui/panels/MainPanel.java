@@ -82,6 +82,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 	
 	//Lists 
 	JList<String> statusList, decisionList;
+	StatusListRenderer statusRenderer;
 	
 	//ShipLogic
 	ShipLogic shipLogic;
@@ -156,7 +157,16 @@ public class MainPanel implements ListSelectionListener, Observer{
 				this.window.getHeight() / 10));
 		this.actionButton.setEnabled(false);
 		panel.add(actionButton);
+		checkActionButton();
 		return panel;
+	}
+
+	private void checkActionButton() {
+		if(ship.getActionList().size() == 0 ) {
+			actionButton.setEnabled(true);
+		}else {
+			actionButton.setEnabled(false);
+		}
 	}
 
 	private Component createDecisionInfoPanel() {
@@ -164,7 +174,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 		statusList = new JList<String>(Helpers.getNames(StatusType.class));
 		statusList.setSelectedValue(StatusType.getName(ship.getStatus().getStatus()).name(), true);
 		statusList.addListSelectionListener(this);
-		StatusListRenderer statusRenderer = new StatusListRenderer(StatusType.getName(ship.getStatus().getStatus()).name());
+		statusRenderer = new StatusListRenderer(StatusType.getName(ship.getStatus().getStatus()).name());
 		statusList.setCellRenderer(statusRenderer);
 		statusList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		statusList.setLayoutOrientation(JList.VERTICAL);
@@ -501,6 +511,8 @@ public class MainPanel implements ListSelectionListener, Observer{
 	
 	public void repaintElements() {
 		decisionList.repaint();
+		statusRenderer.setStatusType(StatusType.getName(ship.getStatus().getStatus()).name());
+		statusList.setSelectedValue(StatusType.getName(ship.getStatus().getStatus()).name(), true);
 		statusList.repaint();
 		repaintLabels();
 	}
@@ -508,18 +520,12 @@ public class MainPanel implements ListSelectionListener, Observer{
 	private void repaintLabels() {
 		checkPermissionsLabel();
 		checkStatusLabel();
-		
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		if(ship.getActionList().size() == 0 ) {
-			actionButton.setEnabled(true);
-		}else {
-			actionButton.setEnabled(false);
-		}
+		checkActionButton();
 		repaintElements();
-
 	}
 	
 	
