@@ -4,7 +4,9 @@ import settings.Settings;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
 import jssc.SerialPortException;
+import models.Mooring;
 import models.Port;
+import models.Ship;
 import protocol.ControllerLogic;
 import protocol.SerialObserver;
 import serial.Serial;
@@ -17,6 +19,9 @@ import ui.tables.TableModel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import helpers.Helpers;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -69,6 +74,7 @@ public class MainPanel {
 		} catch (IOException e) {
 			this.logModel.add(ERROR_READING_SETTINGS);
 		}
+		initMoorings(port);
 
 		this.serial = serial;
 		this.controllerLogic = new ControllerLogic(this.serial, port);
@@ -77,6 +83,15 @@ public class MainPanel {
 		this.serial.addObserver(this.controllerLogic);
 		this.serial.addObserver(this.serialObserver);
 		this.controllerLogic.addObserver(this.serialObserver);
+	}
+	
+	public void initMoorings(Port port) {
+		ArrayList<Mooring> moorings = new ArrayList<Mooring>();
+		for (Integer i = 0; i < Settings.getProperties().get(0); i++) {
+			Ship ship = null;
+			moorings.add(new Mooring(Helpers.toByteBinString(i.toString(), 8), ship));
+		}
+		port.getDock().setMoorings(moorings);
 	}
 
 	private void readSettings() throws IOException {

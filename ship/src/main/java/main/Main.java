@@ -9,7 +9,9 @@ import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
 import protocol.ShipLogic;
+import protocol.SimulationShipLogic;
 import serial.Serial;
+import ui.panels.MainPanel;
 
 public class Main {
 	
@@ -23,14 +25,13 @@ public class Main {
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		//MainPanel panel = new MainPanel(serial, ship, nodeLogic);
 
 		ShipLogic watcher = new ShipLogic(serial, ship);
 		serial.addObserver(watcher);
 		serial.openConnection();
-		/*SimulationShipLogic simulationShipLogic = new SimulationShipLogic(watcher);
+		SimulationShipLogic simulationShipLogic = new SimulationShipLogic(watcher);
 		MainPanel panel = new MainPanel(serial, ship, watcher, simulationShipLogic);
-		watcher.addObserver(panel);*/
+		watcher.addObserver(panel);
 	}
 
 }
