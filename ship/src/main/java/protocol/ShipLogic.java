@@ -18,13 +18,13 @@ import protocol.ProtocolProperties.StatusType;
 import serial.Serial;
 
 public class ShipLogic extends Observable implements Observer{
-	
+
 	Serial serial;
 	Ship ship;
 	boolean simulation;
 	ArrayList<Ship> simulationShips;
 	List<String> actionList;
-	
+
 	public ShipLogic(Serial serial, Ship ship) {
 		this.serial = serial;
 		this.ship = ship;
@@ -38,6 +38,7 @@ public class ShipLogic extends Observable implements Observer{
 		Frame frame = (Frame) arg;
 		PacketType pt = PacketType.getName(frame.getHeader().getPacketType());
 		Frame sendFrame = null;
+		System.out.println("Received frame "+frame.toString());
 		switch(pt) {
 		case DISCOVERY:
 			sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
@@ -45,6 +46,7 @@ public class ShipLogic extends Observable implements Observer{
 				System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " trying to connect");
 				System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends ACK: " + frame.toString());
 			}else {
+				System.out.println("Ship number " + Integer.parseInt(ship.getId(),2) + " connected");
 				if(serial.isConnected())
 					replyController(sendFrame);
 			}
@@ -58,15 +60,16 @@ public class ShipLogic extends Observable implements Observer{
 			sendFrame = checkToken(frame, ship);
 			if(serial != null) {
 				replyController(sendFrame);
+
 			}
 			break;
 		default:
 			break;
 		}
-		
-		
+
+
 	}
-	
+
 	public Frame checkToken(Frame frame, Ship ship) {
 		Frame sendFrame = null;
 		if(ship.getActionList().size() > 0) {
@@ -82,13 +85,13 @@ public class ShipLogic extends Observable implements Observer{
 			System.out.println("Ship number " + Integer.parseInt(ship.getId()) + " sends STATUS: " + sendFrame.toString());
 		}
 		return sendFrame;
-		
+
 	}
 
 	public void replyController(Frame frame) {
 		Helpers.sendParsedFrame(frame, serial);
 	}
-	
+
 	public void checkShipMovement(Frame frame, Ship ship) {
 		if(frame.getData().getType().equals(DataType.RESPONSE.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " has permission to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name());
@@ -101,7 +104,7 @@ public class ShipLogic extends Observable implements Observer{
 					" PERMISSION: "+PermissionType.getName(frame.getData().getStatus().getPermission()).name());
 			ship.setStatus(frame.getData().getStatus());
 			ship.setActionList(new ArrayList<String>());
-			
+
 		}
 		if (frame.getData().getType().equals(DataType.RESPONSE.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.DENY.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " has NOT permission to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name());
@@ -109,7 +112,7 @@ public class ShipLogic extends Observable implements Observer{
 					", ACTION: "+ActionType.getName(frame.getData().getStatus().getAction()).name() + 
 					" PERMISSION: "+PermissionType.getName(frame.getData().getStatus().getPermission()).name());
 			ship.setStatus(frame.getData().getStatus());
-		
+
 		}
 		if(frame.getData().getType().equals(DataType.STATUS.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId()) + " has started to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name() + " and controller is asking to change its status");

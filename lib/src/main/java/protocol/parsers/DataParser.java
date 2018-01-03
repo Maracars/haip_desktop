@@ -37,10 +37,7 @@ public class DataParser implements Parser{
 
 
 	private Frame parseDataSecondByte(Frame frame, String byteString) {
-		if (frame.getHeader().getPacketType().equals(PacketType.DATA.toString()) &&
-				frame.getData().getType().equals(DataType.RESPONSE.toString()) &&
-				frame.getData().getStatus().getStatus().equals(StatusType.SEA.toString()) &&
-				frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
+		if (Integer.parseInt(frame.getHeader().getLength(),2) >= 2) {
 			try {
 				frame.getData().setParking(byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID + TYPE + STATUS + ACTION + PERMISSION,
 						HEADER + ORIGIN_ID + DESTINATION_ID + TYPE + STATUS + ACTION + PERMISSION + PARKING));

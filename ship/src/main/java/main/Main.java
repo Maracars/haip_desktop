@@ -1,8 +1,5 @@
 package main;
 
-import java.awt.FontFormatException;
-import java.io.IOException;
-
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -16,11 +13,11 @@ import serial.Serial;
 
 public class Main {
 	
-	public static void main(String[] args) throws FontFormatException, IOException {
-		Status status = new Status(StatusType.SEA.toString(), ActionType.ENTER.toString(), PermissionType.ALLOW.toString());
+	public static void main(String[] args) throws Exception {
+		Status status = new Status(StatusType.SEA.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
 		Ship ship = new Ship("00000001", status);
+		ship.addAction(ActionType.ENTER.toString());
 		Serial serial = new Serial();
-
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
@@ -30,6 +27,10 @@ public class Main {
 
 		ShipLogic watcher = new ShipLogic(serial, ship);
 		serial.addObserver(watcher);
+		serial.openConnection();
+		/*SimulationShipLogic simulationShipLogic = new SimulationShipLogic(watcher);
+		MainPanel panel = new MainPanel(serial, ship, watcher, simulationShipLogic);
+		watcher.addObserver(panel);*/
 	}
 
 }

@@ -402,6 +402,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			SimulationDialog simulationDialog = new SimulationDialog(window, simulationShipLogic);
+			serial.addObserver(simulationShipLogic);
 			
 		}
 		
