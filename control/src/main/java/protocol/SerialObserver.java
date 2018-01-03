@@ -22,7 +22,7 @@ public class SerialObserver implements Observer {
 
 	@Override
 	public void update(Observable observable, Object object) {
-		try {
+		if (object instanceof Frame) {
 			this.frame = (Frame) object;
 
 			if (this.frame.getData() != null && this.frame.getData().getType().equals(PacketType.DATA.toString())) {
@@ -41,9 +41,6 @@ public class SerialObserver implements Observer {
 					this.tableModel.updatePermission(shipID, permission);
 				}
 			}
-		}catch(NullPointerException | ClassCastException e) {
-			return;
 		}
-
 	}
 }

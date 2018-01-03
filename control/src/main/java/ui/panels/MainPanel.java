@@ -67,7 +67,7 @@ public class MainPanel {
 		try {
 			this.readSettings();
 		} catch (IOException e) {
-			//this.logModel.add(ERROR_READING_SETTINGS);
+			this.logModel.add(ERROR_READING_SETTINGS);
 		}
 
 		this.serial = serial;
@@ -407,5 +407,9 @@ public class MainPanel {
 	private void exitProgram() {
 		this.window.dispose();
 		System.exit(0);
+	}
+
+	public void startLogic() {
+		controllerLogic.startLogic();
 	}
 }

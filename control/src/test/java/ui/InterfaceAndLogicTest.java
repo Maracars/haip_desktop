@@ -1,5 +1,6 @@
 package ui;
 
+import helpers.Helpers;
 import settings.Settings;
 import models.*;
 import org.junit.Test;
@@ -9,6 +10,8 @@ import ui.panels.MainPanel;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 import static protocol.ProtocolProperties.*;
@@ -38,42 +41,44 @@ public class InterfaceAndLogicTest {
 
 	@Test
 	public void receiveFrames() {
+		mainPanel.startLogic();
+
 		Status seaEnter = new Status(StatusType.SEA.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
 		Status transitEnter = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
 		Status dockIdle = new Status(StatusType.PARKING.toString(), ActionType.IDLE.toString(), PermissionType.ASK.toString());
 		Status parkingLeave = new Status(StatusType.PARKING.toString(), ActionType.LEAVE.toString(), PermissionType.ASK.toString());
 		Status transitLeave = new Status(StatusType.TRANSIT.toString(), ActionType.LEAVE.toString(), PermissionType.ASK.toString());
 
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createAck("00000001", MASTER_ID).toString());
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createAck("00000001", MASTER_ID).toString());
 		waitAndSendToParser(FrameCreator.createAck("00000010", MASTER_ID).toString());
 
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, seaEnter).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, transitEnter).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, parkingLeave).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitEnter).toString());
-		scanner.nextLine();
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000001", MASTER_ID, seaEnter).toString());
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000001", MASTER_ID, transitEnter).toString());
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, seaEnter).toString());
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000001", MASTER_ID, parkingLeave).toString());
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitEnter).toString());
+		//scanner.nextLine();
 
-		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, parkingLeave).toString());
-		scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000001", MASTER_ID, parkingLeave).toString());
+		//scanner.nextLine();
 
-		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, parkingLeave).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, transitLeave).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, parkingLeave).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
-		scanner.nextLine();
-		serial.sendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitLeave).toString());
+		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, parkingLeave).toString());
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000001", MASTER_ID, transitLeave).toString());
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, parkingLeave).toString());
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
+		//scanner.nextLine();
+		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitLeave).toString());
 
 	}
 
@@ -94,7 +99,25 @@ public class InterfaceAndLogicTest {
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		new InterfaceAndLogicTest().receiveFrames();
+		InterfaceAndLogicTest interfaceAndLogicTest = new InterfaceAndLogicTest();
+
+		/*try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		interfaceAndLogicTest.receiveFrames();*/
+		//new InterfaceAndLogicTest();
+		/*Serial serial = new Serial();
+		List<String> stringList = Arrays.asList("00110000"+"00000001"+"00000000"+"01100010"+"11100111");
+		try {
+			serial.openConnection();
+			serial.writeStrings(stringList);
+			serial.closeConnection();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}*/
 	}
 
 	@Test
@@ -104,7 +127,7 @@ public class InterfaceAndLogicTest {
 			/*if (i == 2 ) {
 				ship = new Ship("00000010");
 			}*/
-			moorings.add(new Mooring(i.toString(), ship));
+			moorings.add(new Mooring(Helpers.toByteBinString(i.toString(), 8), ship));
 		}
 	}
 }

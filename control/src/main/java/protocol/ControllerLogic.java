@@ -192,7 +192,6 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				System.out.println("Ship " + frame.getOriginId() + " is going from the sea to the transit zone");
 				System.out.println("The mooring assigned: " + freeMooring.getId());
 				parking = freeMooring.getId();
-				System.out.println("PARKING ASSIGNEEEED "+parking);
 			} else {
 				nextStatus.setPermission(PermissionType.DENY.toString());
 				System.out.println("Ship " + frame.getOriginId() + " access to transit zone denied, not enough space in transit zone");
@@ -207,10 +206,16 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			System.out.println("Invalid state");
 		}
 		Frame nextFrame = FrameCreator.createResponse(MASTER_ID, ship.getId(), nextStatus, parking);
+		System.out.println("next frame to send: "+nextFrame.toString());
 
 		// Send frame
 		if (serial != null && serial.isConnected()) {
 			Helpers.sendParsedFrame(nextFrame, serial);
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		} else {
 			System.out.println("Sent frame");
 		}

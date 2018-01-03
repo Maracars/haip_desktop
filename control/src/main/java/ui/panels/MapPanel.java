@@ -234,7 +234,6 @@ public class MapPanel extends JPanel implements ComponentListener, Observer{
 		try {
 			Ship ship = (Ship) arg;
 			addShipToTheList(ship);
-			System.out.println("barku berri bat");
 			repaintAllElements();
 		}catch(ClassCastException e) {
 			return;

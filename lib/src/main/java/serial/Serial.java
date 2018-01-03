@@ -78,7 +78,8 @@ public class Serial extends Observable implements SerialPortEventListener {
 	@Override
 	public void serialEvent(SerialPortEvent arg0) {
 		try {
-			sendToParser(serialPort.readString());
+			String bits = serialPort.readString();
+			if (bits != null) sendToParser(bits);
 		}
 		catch (SerialPortException e) {
 			e.printStackTrace();
@@ -99,12 +100,14 @@ public class Serial extends Observable implements SerialPortEventListener {
 	}
 
 	public void writeString(String string) throws SerialPortException {
+		System.out.println(string);
 		serialPort.writeString(string);
 	}
 
 	private void notifyFrame(Frame value) {
 		setChanged();
 		notifyObservers(value);
+		FrameParser.resetCommunication();
 	}
 
 }
