@@ -27,9 +27,27 @@ public class InterfaceAndLogicTest {
 
 	Scanner scanner;
 
+	@Test
+	public static void main(String[] args) {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+		new InterfaceAndLogicTest();
+
+		/*try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		interfaceAndLogicTest.receiveFrames();*/
+		//new InterfaceAndLogicTest();
+	}
+
 	public InterfaceAndLogicTest() {
 		this.moorings = new ArrayList<>();
-		this.initMoorings(moorings);
 
 		this.dock = new Dock("Albert Dock", moorings);
 		this.port = new Port(this.dock);
@@ -90,44 +108,5 @@ public class InterfaceAndLogicTest {
 			e.printStackTrace();
 		}
 		serial.sendToParser(packet);
-	}
-
-	@Test
-	public static void main(String[] args) {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}
-		InterfaceAndLogicTest interfaceAndLogicTest = new InterfaceAndLogicTest();
-
-		/*try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		interfaceAndLogicTest.receiveFrames();*/
-		//new InterfaceAndLogicTest();
-		/*Serial serial = new Serial();
-		List<String> stringList = Arrays.asList("00110000"+"00000001"+"00000000"+"01100010"+"11100111");
-		try {
-			serial.openConnection();
-			serial.writeStrings(stringList);
-			serial.closeConnection();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
-	}
-
-	@Test
-	public void initMoorings(ArrayList<Mooring> moorings) {
-		for (Integer i = 0; i < Settings.getProperties().get(0); i++) {
-			Ship ship = null;
-			/*if (i == 2 ) {
-				ship = new Ship("00000010");
-			}*/
-			moorings.add(new Mooring(Helpers.toByteBinString(i.toString(), 8), ship));
-		}
 	}
 }
