@@ -1,20 +1,14 @@
 package serial;
 
-import java.util.List;
-import java.util.Observable;
-
-import jssc.SerialPort;
-import jssc.SerialPortEvent;
-import jssc.SerialPortEventListener;
-import jssc.SerialPortException;
-import jssc.SerialPortList;
+import jssc.*;
 import models.Frame;
 import protocol.FrameParser;
 import ui.dialogs.COMPortChooser;
 
-import static serial.SerialExceptionMessages.NO_SERIAL_PORT_CONNECTED;
-import static serial.SerialExceptionMessages.NO_SERIAL_PORT_SELECTED;
-import static serial.SerialExceptionMessages.SERIAL_PORT_NOT_WORKING;
+import java.util.List;
+import java.util.Observable;
+
+import static serial.SerialExceptionMessages.*;
 
 public class Serial extends Observable implements SerialPortEventListener {
 	private SerialPort serialPort;
@@ -63,11 +57,14 @@ public class Serial extends Observable implements SerialPortEventListener {
 	}
 
 	// Closes serial connection if open
-	public void closeConnection() throws SerialPortException {
+	public void closeConnection() throws Exception {
 		if (serialPort != null) {
-			serialPort.closePort();
-			serialPort = null;
-			isConnected = false;
+			boolean portClosed = serialPort.closePort();
+			if (portClosed) {
+				serialPort = null;
+				isConnected = false;
+			}
+			else throw new Exception("Port could not be closed");
 		}
 	}
 
@@ -76,13 +73,16 @@ public class Serial extends Observable implements SerialPortEventListener {
 	}
 
 	@Override
-	public void serialEvent(SerialPortEvent arg0) {
-		try {
-			String bits = serialPort.readString();
-			if (bits != null) sendToParser(bits);
-		}
-		catch (SerialPortException e) {
-			e.printStackTrace();
+	public void serialEvent(SerialPortEvent event) {
+		if (event.isRXCHAR() && event.getEventValue() > 0) { // If data is available && there are more than 0 bytes
+			try {
+				int bytesCount = event.getEventValue();
+				String bits = serialPort.readString(bytesCount);
+				if (bits != null) sendToParser(bits);
+			}
+			catch (SerialPortException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

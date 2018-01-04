@@ -1,29 +1,14 @@
 package protocol;
 
-import static protocol.ProtocolProperties.LOOP_CONNECTED_BOATS;
-import static protocol.ProtocolProperties.LOOP_IDLE_BOATS;
-import static protocol.ProtocolProperties.MASTER_ID;
+import helpers.Helpers;
+import models.*;
+import protocol.ProtocolProperties.*;
+import serial.Serial;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import helpers.Helpers;
-import models.Frame;
-import models.Mooring;
-import models.Port;
-import models.Ship;
-import models.Status;
-import protocol.ProtocolProperties.ActionType;
-import protocol.ProtocolProperties.PacketType;
-import protocol.ProtocolProperties.PermissionType;
-import protocol.ProtocolProperties.StatusType;
-import serial.Serial;
+import static protocol.ProtocolProperties.*;
 
 // TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
 public class ControllerLogic extends Observable implements Observer, Runnable {
@@ -173,13 +158,12 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			port.removeFromTransitZone(ship);
 
 			if (action_str.equals(ActionType.LEAVE.toString())) {
-				nextStatus = new Status(StatusType.SEA.toString(), ActionType.LEAVE.toString(), PermissionType.ALLOW.toString());
+				nextStatus = new Status(StatusType.SEA.toString(), ActionType.LEAVE.toString(), PermissionType.ASK.toString());
 				System.out.println("Ship " + frame.getOriginId() + " is going from the transit zone to the sea. Goodbye!");
 			} else {
-				nextStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString(), PermissionType.ALLOW.toString());
+				nextStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
 				System.out.println("Ship " + frame.getOriginId() + " is going from the transit zone to the dock");
 			}
-			
 		}
 		// Sea, enter
 		else if (status_str.equals(StatusType.SEA.toString()) && action_str.equals(ActionType.ENTER.toString())) {

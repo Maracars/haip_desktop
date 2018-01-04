@@ -1,15 +1,15 @@
 package ui.panels;
 
-import settings.Settings;
+import helpers.Helpers;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
-import jssc.SerialPortException;
 import models.Mooring;
 import models.Port;
 import models.Ship;
 import protocol.ControllerLogic;
 import protocol.SerialObserver;
 import serial.Serial;
+import settings.Settings;
 import ui.dialogs.SettingsDialog;
 import ui.log.LogModel;
 import ui.log.LogPanel;
@@ -19,15 +19,11 @@ import ui.tables.TableModel;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
-import helpers.Helpers;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -136,7 +132,7 @@ public class MainPanel {
 	private Component createSplitPane() {
 		JSplitPane splitPane = new JSplitPane();
 
-		splitPane.setDividerLocation(this.window.getWidth() / 7);
+		splitPane.setDividerLocation(this.window.getWidth() / 6);
 		splitPane.setLeftComponent(createLeftPanel());
 		splitPane.setRightComponent(createTabbedPane());
 
@@ -295,7 +291,7 @@ public class MainPanel {
 					logicAction.setEnabled(false);
 					logModel.add(CONNECTION_CLOSED);
 				}
-				catch (SerialPortException e) {
+				catch (Exception e) {
 					logModel.add(e.getMessage());
 				}
 			}
@@ -411,7 +407,7 @@ public class MainPanel {
 				this.controllerLogic.stopLogic();
 				try {
 					this.serial.closeConnection();
-				} catch (SerialPortException e) {
+				} catch (Exception e) {
 					this.logModel.add(e.getMessage());
 				}
 				this.exitProgram();

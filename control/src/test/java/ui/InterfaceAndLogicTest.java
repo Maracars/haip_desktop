@@ -1,8 +1,9 @@
 package ui;
 
-import helpers.Helpers;
-import settings.Settings;
-import models.*;
+import models.Dock;
+import models.Mooring;
+import models.Port;
+import models.Status;
 import org.junit.Test;
 import protocol.FrameCreator;
 import serial.Serial;
@@ -10,22 +11,20 @@ import ui.panels.MainPanel;
 
 import javax.swing.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 import static protocol.ProtocolProperties.*;
 
 public class InterfaceAndLogicTest {
-	ArrayList<Mooring> moorings;
-	Dock dock;
-	Port port;
+	private ArrayList<Mooring> moorings;
+	private Dock dock;
+	private Port port;
 
-	Serial serial;
+	private Serial serial;
 
-	MainPanel mainPanel;
+	private MainPanel mainPanel;
 
-	Scanner scanner;
+	private Scanner scanner;
 
 	@Test
 	public static void main(String[] args) {
@@ -42,8 +41,7 @@ public class InterfaceAndLogicTest {
 			e.printStackTrace();
 		}
 
-		interfaceAndLogicTest.receiveFrames();*/
-		//new InterfaceAndLogicTest();
+		new InterfaceAndLogicTest().receiveFrames();*/
 	}
 
 	public InterfaceAndLogicTest() {
@@ -84,10 +82,8 @@ public class InterfaceAndLogicTest {
 		//scanner.nextLine();
 		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitEnter).toString());
 		//scanner.nextLine();
-
 		waitAndSendToParser(FrameCreator.createRequest("00000001", MASTER_ID, parkingLeave).toString());
 		//scanner.nextLine();
-
 		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, parkingLeave).toString());
 		//scanner.nextLine();
 		waitAndSendToParser(FrameCreator.createRequest("00000001", MASTER_ID, transitLeave).toString());
@@ -97,7 +93,6 @@ public class InterfaceAndLogicTest {
 		waitAndSendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
 		//scanner.nextLine();
 		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitLeave).toString());
-
 	}
 
 	@Test

@@ -12,8 +12,8 @@ import static protocol.ProtocolProperties.MASTER_ID;
 import static protocol.ProtocolProperties.PacketType;
 
 public class SerialObserver implements Observer {
-	Frame frame;
-	TableModel tableModel;
+	private Frame frame;
+	private TableModel tableModel;
 
 	public SerialObserver(TableModel tableModel) {
 		this.frame = null;

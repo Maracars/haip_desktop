@@ -57,38 +57,38 @@ import ui.log.LogPanel;
 
 public class MainPanel implements ListSelectionListener, Observer{
 	// Window
-	JFrame window;
+	private JFrame window;
 
 	// Log Elements
-	LogModel logModel;
+	private LogModel logModel;
 
 	// Buttons
-	JButton connectButton, waitForDiscoveryAction, actionButton;
+	private JButton connectButton, waitForDiscoveryAction, actionButton;
 
 	// Actions
-	AbstractAction exitAction, connectAction, initAction, decisionAction, simulationAction;
+	private AbstractAction exitAction, connectAction, initAction, decisionAction, simulationAction;
 
 	// Serial Communication
-	Serial serial;
+	private Serial serial;
 
 	//Ship
-	Ship ship;
+	private Ship ship;
 
 	// System Initialized
-	boolean shipDiscovered;
+	private boolean shipDiscovered;
 
 	//Labels for ship info
-	JLabel permissionLabel, statusLabel;
+	private JLabel permissionLabel, statusLabel;
 	
 	//Lists 
-	JList<String> statusList, decisionList;
-	StatusListRenderer statusRenderer;
+	private JList<String> statusList, decisionList;
+	private StatusListRenderer statusRenderer;
 	
 	//ShipLogic
-	ShipLogic shipLogic;
+	private ShipLogic shipLogic;
 	
 	//SimulationShipLogic
-	SimulationShipLogic simulationShipLogic;
+	private SimulationShipLogic simulationShipLogic;
 
 	public MainPanel(Serial serial, Ship ship, ShipLogic shipLogic, SimulationShipLogic simulationShipLogic) {
 		this.createJFrame();
@@ -133,7 +133,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 	private Component createSplitPane() {
 		JSplitPane splitPane = new JSplitPane();
 
-		splitPane.setDividerLocation(this.window.getWidth() / 7);
+		splitPane.setDividerLocation(this.window.getWidth() / 6);
 		splitPane.setLeftComponent(createLeftPanel());
 		splitPane.setRightComponent(createShipPanel());
 
@@ -322,7 +322,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 						rejectCommunications();
 						try {
 							serial.closeConnection();
-						} catch (SerialPortException e1) {
+						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
 						((JFrame)e.getSource()).dispose();
@@ -451,7 +451,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 					waitForDiscoveryAction.setEnabled(false);
 					logModel.add(CONNECTION_CLOSED);
 				}
-				catch (SerialPortException e) {
+				catch (Exception e) {
 					logModel.add(e.getMessage());
 				}
 			}
