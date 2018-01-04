@@ -40,7 +40,6 @@ public class InterfaceAndLogicTest {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
 		new InterfaceAndLogicTest().receiveFrames();*/
 	}
 

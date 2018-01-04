@@ -12,11 +12,9 @@ import static serial.SerialExceptionMessages.*;
 
 public class Serial extends Observable implements SerialPortEventListener {
 	private SerialPort serialPort;
-	private boolean isConnected;
 
 	public Serial() {
 		serialPort = null;
-		isConnected = false;
 	}
 
 	// Opens serial connection
@@ -44,11 +42,10 @@ public class Serial extends Observable implements SerialPortEventListener {
 			}
 			//Open the port
 			try {
-				serialPort.openPort();
-				serialPort.addEventListener(this);
-				serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-
-				isConnected = true;
+				if (serialPort.openPort()) {
+					serialPort.addEventListener(this);
+					serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+				}
 			}
 			catch (SerialPortException e) {
 				throw new Exception(SERIAL_PORT_NOT_WORKING);
@@ -58,27 +55,25 @@ public class Serial extends Observable implements SerialPortEventListener {
 
 	// Closes serial connection if open
 	public void closeConnection() throws Exception {
-		if (serialPort != null) {
-			boolean portClosed = serialPort.closePort();
-			if (portClosed) {
+		if (serialPort != null && serialPort.isOpened()) {
+			if (serialPort.closePort()) {
 				serialPort = null;
-				isConnected = false;
 			}
 			else throw new Exception("Port could not be closed");
 		}
 	}
 
 	public boolean isConnected() {
-		return isConnected;
+		return (serialPort != null && serialPort.isOpened());
 	}
 
 	@Override
 	public void serialEvent(SerialPortEvent event) {
 		if (event.isRXCHAR() && event.getEventValue() > 0) { // If data is available && there are more than 0 bytes
 			try {
-				int bytesCount = event.getEventValue();
-				String bits = serialPort.readString(bytesCount);
-				if (bits != null) sendToParser(bits);
+				int byteCount = event.getEventValue();
+				String byteStr = serialPort.readString(byteCount);
+				if (byteStr != null) sendToParser(byteStr);
 			}
 			catch (SerialPortException e) {
 				e.printStackTrace();
@@ -109,5 +104,4 @@ public class Serial extends Observable implements SerialPortEventListener {
 		notifyObservers(value);
 		FrameParser.resetCommunication();
 	}
-
 }

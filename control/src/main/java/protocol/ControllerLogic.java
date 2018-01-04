@@ -81,7 +81,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		}
 	}
 
-	public void control(String boat) {
+	private void control(String boat) {
 		Integer boat_id = Integer.parseInt(boat);
 
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat, 8));
@@ -130,7 +130,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		if (timeouts.get(boat_id) >= ProtocolProperties.TIMEOUTED_LOOP_LIMIT) addIdleBoat(boat_id);
 	}
 
-	public void checkRequest(Frame frame) {
+	private void checkRequest(Frame frame) {
 		Status status = frame.getData().getStatus();
 		Status nextStatus;
 		String status_str = status.getStatus();
@@ -153,15 +153,15 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			}
 		}
 		// Transit, leave or enter
-		else if (status_str.equals(StatusType.TRANSIT.toString())
-				&& (action_str.equals(ActionType.ENTER.toString())) || action_str.equals(ActionType.LEAVE.toString())) {
+		else if (status_str.equals(StatusType.TRANSIT.toString()) &&
+				(action_str.equals(ActionType.ENTER.toString())) || action_str.equals(ActionType.LEAVE.toString())) {
 			port.removeFromTransitZone(ship);
 
 			if (action_str.equals(ActionType.LEAVE.toString())) {
-				nextStatus = new Status(StatusType.SEA.toString(), ActionType.LEAVE.toString(), PermissionType.ASK.toString());
+				nextStatus = new Status(StatusType.SEA.toString(), ActionType.LEAVE.toString(), PermissionType.ALLOW.toString());
 				System.out.println("Ship " + frame.getOriginId() + " is going from the transit zone to the sea. Goodbye!");
 			} else {
-				nextStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
+				nextStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString(), PermissionType.ALLOW.toString());
 				System.out.println("Ship " + frame.getOriginId() + " is going from the transit zone to the dock");
 			}
 		}
