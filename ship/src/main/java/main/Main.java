@@ -27,12 +27,10 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		ShipLogic watcher = new ShipLogic(serial, ship);
-		serial.addObserver(watcher);
-		serial.openConnection();
-		SimulationShipLogic simulationShipLogic = new SimulationShipLogic(watcher);
-		MainPanel panel = new MainPanel(serial, ship, watcher, simulationShipLogic);
-		watcher.addObserver(panel);
+		ShipLogic shipLogic = new ShipLogic(serial, ship);
+		SimulationShipLogic simulationShipLogic = new SimulationShipLogic(shipLogic);
+		MainPanel panel = new MainPanel(serial, ship, shipLogic, simulationShipLogic);
+		shipLogic.addObserver(panel);
 	}
 
 }

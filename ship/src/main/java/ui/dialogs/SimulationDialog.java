@@ -3,6 +3,7 @@ package ui.dialogs;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -17,32 +18,34 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import helpers.Helpers;
 import models.Ship;
 import models.Status;
+import protocol.DecisionMaker;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
 import protocol.SimulationShipLogic;
 
 public class SimulationDialog extends JDialog implements ActionListener{
-	private static final int MAX_BOATS_SIMULATION = 6;
 
 	private static final long serialVersionUID = 1L;
 
 	JFrame window;
-	JComboBox<String> boatNumbers;
-	List<JPanel> boatStates;
 	JButton bStart;
 	JButton bStop;
-	SimulationShipLogic shipLogic;
+	SimulationShipLogic simShipLogic;
+	JTextField boatNumbers;
 
-	public SimulationDialog(JFrame window, SimulationShipLogic shipLogic) {
+	public SimulationDialog(JFrame window, SimulationShipLogic simShipLogic) {
 		super(window, "Haip Simulation", true);
 		this.window = window;
-		this.shipLogic = shipLogic;
-		boatStates = new ArrayList<JPanel>();
+		this.simShipLogic = simShipLogic;
+		simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic.getShipLogic());
+		simShipLogic.getShipLogic().setSimulationStarted();
+		simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic);
 
 		this.setSize((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() - 500),
 				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 150);
@@ -62,7 +65,7 @@ public class SimulationDialog extends JDialog implements ActionListener{
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		panel.add(createText(), BorderLayout.NORTH);
-		panel.add(createComboBox(), BorderLayout.CENTER);
+		panel.add(createNotePanel(), BorderLayout.CENTER);
 		panel.add(createButtonPanel(), BorderLayout.SOUTH);
 
 		return panel;
@@ -84,105 +87,50 @@ public class SimulationDialog extends JDialog implements ActionListener{
 		return panel;
 	}
 
-	private Component createComboBox() {
-		JPanel panel = new JPanel(new GridLayout(3, 2));
-		for(int i = 0; i < MAX_BOATS_SIMULATION; i++) {
-			panel.add(createBoatStatePanel(i));
-		}
-		repaintPanels();
-		return panel;
-	}
-
-	private Component createBoatStatePanel(int boatNumber) {
+	private Component createNotePanel() {
 		JPanel panel = new JPanel();
-		JLabel label = new JLabel();
-		label.setText("Select boat number "+ (boatNumber + 1)+ " initial state");
-		label.setEnabled(false);
-		JComboBox<String> boatState = new JComboBox<String>(Helpers.getNames(StatusType.class));
-		boatState.setEnabled(false);
-		panel.add(label);
-		panel.add(boatState);
-		boatStates.add(panel);
+		String text = "Note: Make sure of start the simulation without boats in the port. "
+				+ "All the boats simulated would start from SEA state";
+		JLabel noteLabel = new JLabel(text);
+		panel.add(noteLabel);
 		return panel;
-
 	}
 
 	private Component createText() {
 		JPanel panel = new JPanel();
 		JLabel label = new JLabel();
+		boatNumbers = new JTextField();
+		boatNumbers.setMinimumSize(new Dimension(50, 20));
 		label.setText("Choose a number of boats:");
-		createBoatsList();
 		panel.add(label);
-		panel.add(this.boatNumbers);
+		panel.add(boatNumbers);
 		return panel;
-	}
-
-	private void createBoatsList() {
-		String[] boatNumbers = {"1","2","3","4","5", "6"};
-		this.boatNumbers = new JComboBox<String>(boatNumbers);
-		this.boatNumbers.addActionListener(this);
-
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(bStart)) {
-			initializeBoats();
+			int numBoats = Integer.parseInt(boatNumbers.getText());
+			initializeBoats(numBoats);
 			bStop.setEnabled(true);
 			bStart.setEnabled(false);
 		}else if(e.getSource().equals(bStop)){
 			bStart.setEnabled(true);
 			bStop.setEnabled(false);
-		}else{
-			repaintPanels();
 		}
 		
 	}
 
-	private void initializeBoats() {
-		for(int i = 0; i <= boatNumbers.getSelectedIndex(); i++) {
-			JComboBox<String> boatState = (JComboBox<String>) boatStates.get(i).getComponent(1);
-			Ship ship = checkShipStatus(boatState, i+1);
-			shipLogic.addShipToSimulation(ship);
+	private void initializeBoats(int numBoats) {
+		System.out.println("Num boats "+numBoats);
+		for(int i = 0; i < numBoats; i++) {
+			Status newStatus = DecisionMaker.getRandomAction(StatusType.SEA);
+			Status status = new Status(StatusType.SEA.toString(), newStatus.getAction(), PermissionType.ASK.toString());
+			Ship ship = new Ship(Helpers.toByteBinString(String.valueOf(i+1), 8), status);
+			ship.addAction(newStatus);
+			simShipLogic.addShipToSimulation(ship);
 		}
 
 	}
-
-	private Ship checkShipStatus(JComboBox<String> boatState, int boatId) {
-		StatusType statusType = StatusType.valueOf((String) boatState.getSelectedItem());
-		Status status = null;
-		switch(statusType) {
-		case PARKING:
-			status = new Status(statusType.toString(), ActionType.LEAVE.toString(), PermissionType.ASK.toString());
-			break;
-		case TRANSIT:
-			//Hemen ez dakit zer jarri
-			break;
-		case SEA:
-			status = new Status(statusType.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
-			break;
-		default:
-			break;
-		}
-
-		Ship ship = new Ship(Integer.toBinaryString(boatId), status);
-		return ship;
-	}
-
-	public void repaintPanels() {
-		for(int i = 0; i < boatStates.size(); i++) {
-			for(Component component: boatStates.get(i).getComponents()) {
-				if(i <= boatNumbers.getSelectedIndex()) {
-					component.setEnabled(true);
-				}else {
-					component.setEnabled(false);
-				}
-			}
-		}
-	}
-
-
-
-
 
 }

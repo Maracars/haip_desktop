@@ -102,8 +102,16 @@ public class ShipLogic extends Observable implements Observer{
 			if(frame.getData().getStatus().getStatus().equals(ship.getActionList().get(0).getStatus())) {
 				System.out.println("Operation finish for ship number " + Integer.parseInt(ship.getId(), 2) + " status: " + StatusType.getName(ship.getStatus().getStatus()).name());
 				System.out.println("Setting ship status to IDLE and now can ask for a new action");
-				ship.setStatus(new Status(frame.getData().getStatus().getStatus(), ActionType.IDLE.toString(), PermissionType.ASK.toString()));
-				ship.setActionList(new ArrayList<Status>());
+				if(simulation) {
+					Status newStatus = DecisionMaker.getRandomAction(StatusType.getName(frame.getData().getStatus().getStatus()));
+					ship.setStatus(new Status(frame.getData().getStatus().getStatus(),newStatus.getAction(), PermissionType.ASK.toString()));
+					ship.setActionList(new ArrayList<>());
+					ship.addAction(newStatus);
+				}else{
+					ship.setStatus(new Status(frame.getData().getStatus().getStatus(), ActionType.IDLE.toString(), PermissionType.ASK.toString()));
+					ship.setActionList(new ArrayList<Status>());
+				}
+
 			}else if (frame.getData().getStatus().getStatus().equals(StatusType.TRANSIT.toString())) {
 				System.out.println("Performing the operation for ship number "+Integer.parseInt(ship.getId(), 2));
 				ship.setStatus(frame.getData().getStatus());
@@ -131,6 +139,15 @@ public class ShipLogic extends Observable implements Observer{
 	private void notifyPanel() {
 		setChanged();
 		notifyObservers();
+	}
+
+	public Serial getSerial() {
+		return serial;
+	}
+
+	public void setSimulationStarted() {
+		simulation = true;
+		
 	}
 
 }

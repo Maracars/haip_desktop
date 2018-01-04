@@ -154,7 +154,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 
 		this.logicButton = new JButton(this.logicAction);
 		this.logicButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
-		//this.logicButton.setEnabled(false);
+		this.logicButton.setEnabled(false);
 
 		panel.add(connectButton);
 		panel.add(logicButton);
@@ -360,6 +360,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 			if (!shipDiscovered) {
 				// Wait for discovery
 				waitForDiscovery();
+				
 
 				logicButton.setText("Reject communications");
 				connectButton.setEnabled(false);
@@ -379,13 +380,13 @@ public class MainPanel implements ListSelectionListener, Observer{
 	}
 
 	public void waitForDiscovery() {
-		// TODO
 		shipDiscovered = true;
+		serial.addObserver(shipLogic);
 	}
 
 	public void rejectCommunications() {
-		// TODO
 		shipDiscovered = false;
+		serial.deleteObserver(shipLogic);
 	}
 
 	public class DecisionAction extends AbstractAction {
@@ -446,7 +447,6 @@ public class MainPanel implements ListSelectionListener, Observer{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			new SimulationDialog(window, simulationShipLogic);
-			serial.addObserver(simulationShipLogic);
 		}
 	}
 
