@@ -19,7 +19,7 @@ public final class ProtocolProperties {
 	public static final int CHECKSUM = 8;
 
 	// TODO This has to be defined
-	public static final long TIMEOUT = 100*50000000;
+	public static final long TIMEOUT = 50000000;
 
 	public static final int LOOP_CONNECTED_BOATS = 3;
 	public static final int LOOP_IDLE_BOATS = 2;

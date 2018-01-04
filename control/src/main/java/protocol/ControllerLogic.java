@@ -69,6 +69,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			}
 			if (serial != null && serial.isConnected()) {
 				Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
+				System.out.println("Discovery is sent to boats");
 			} else {
 				System.out.println("Discovery is sent to boats");
 			}
@@ -87,6 +88,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat, 8));
 		if (serial != null && serial.isConnected()) {
 			Helpers.sendParsedFrame(fr, serial);
+			System.out.println("Sent validFrame token to boat number :" + boat_id);
 
 		} else {
 			System.out.println("Sent validFrame token to boat number :" + boat_id);
@@ -102,26 +104,21 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		if (!receivedList.isEmpty() && receivedList.get(0).getOriginId().equals(Helpers.toByteBinString(boat, 8))) {
 			if (receivedList.get(0).getData().getStatus().getAction().equals(ActionType.IDLE.toString())) {
 				addTimeout(boat_id);
-				System.out.println("Asked for iddle, and added timeout" + timeouts);
-
+				updateMap(new Ship(receivedList.get(0).getOriginId(), receivedList.get(0).getData().getStatus()));
+				System.out.println("Asked for idle, and added timeout" + timeouts);
 			} else {
 				//TODO Here we must send the response to the request.
 				if (idleBoats.contains(boat_id)) addConnectedBoat(boat_id);
 				System.out.println("Ship number " + boat + " sent " + receivedList);
 				checkRequest(receivedList.get(0));
 			}
-
 		} else {
 			if (!receivedList.isEmpty()) {
 				System.out.println("Invalid packet " + boat + " " + receivedList.get(0).getOriginId());
-
 			}
 			addTimeout(boat_id);
-
 		}
 		receivedList.clear();
-
-
 	}
 
 	private void addTimeout(Integer boat_id) {
@@ -240,8 +237,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		if (frame.getHeader().getPacketType().equals(PacketType.ACK.toString())) {
 			connectedBoats.add(Integer.parseInt(frame.getOriginId(), 2));
 			System.out.println(connectedBoats);
-			Ship ship = new Ship(frame.getOriginId());
-			updateMap(ship);
+			//Ship ship = new Ship(frame.getOriginId());
+			//updateMap(ship);
 		} else {
 			receivedList.add(frame);
 		}

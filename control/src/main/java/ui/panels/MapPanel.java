@@ -106,7 +106,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)), (int) (point.getX() + BOAT_WIDTH/2 - 4), (int) (point.getY() + BOAT_HEIGHT / 2 + 3));
 				break;
 		}
-		this.repaintAllElements();
+
 	}
 
 	//Funtzio hau puta mierda bat da
@@ -160,7 +160,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 				g.setColor(new Color(77, 244, 65));
 			}
 			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(i+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
-			g.drawString(port.getDock().getMoorings().get(i+Math.round(port.getDock().getMoorings().size()/2)).getId(), (panelLocation.x+(panelDimension.width/2))+(i+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT-2);
+			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(i+Math.round(port.getDock().getMoorings().size()/2)).getId(), 2)), (panelLocation.x+(panelDimension.width/2))+(i+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT-2);
 		}
 		if(port.getDock().getMoorings().size() % 2 != 0) {
 			if(port.getDock().getMoorings().get(port.getDock().getMoorings().size()-1).getShip() != null){
@@ -169,7 +169,8 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 				g.setColor(new Color(77, 244, 65));
 			}
 			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(Math.round(port.getDock().getMoorings().size()/2)+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
-			g.drawString(port.getDock().getMoorings().get(port.getDock().getMoorings().size()-1).getId(), (panelLocation.x+(panelDimension.width/2))+((Math.round(port.getDock().getMoorings().size()/2)+1)+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT-2);
+			// TODO Put in decimal
+			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(port.getDock().getMoorings().size()-1).getId(), 2)), (panelLocation.x+(panelDimension.width/2))+((Math.round(port.getDock().getMoorings().size()/2)+1)+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT-2);
 		}
 
 	}
