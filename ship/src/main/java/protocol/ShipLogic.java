@@ -10,6 +10,7 @@ import java.util.Observer;
 import helpers.Helpers;
 import models.Frame;
 import models.Ship;
+import models.Status;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.DataType;
 import protocol.ProtocolProperties.PacketType;
@@ -73,10 +74,12 @@ public class ShipLogic extends Observable implements Observer{
 	public Frame checkToken(Frame frame, Ship ship) {
 		Frame sendFrame = null;
 		if(ship.getActionList().size() > 0) {
-			if(ship.getActionList().get(0).equals(ActionType.IDLE.toString())) {
+			System.out.println("Nueva accion");
+			System.out.println("Numero de acciones "+ship.getActionList().size());
+			if(ship.getActionList().get(0).getAction().equals(ActionType.IDLE.toString())) {
 				sendFrame = FrameCreator.createStatus(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
 				System.out.println("Ship number " + Integer.parseInt(ship.getId()) + " sends STATUS: " + sendFrame.toString());
-			}else if (ship.getActionList().get(0).equals(ActionType.ENTER.toString()) || ship.getActionList().get(0).equals(ActionType.LEAVE.toString())) {
+			}else if (ship.getActionList().get(0).getAction().equals(ActionType.ENTER.toString()) || ship.getActionList().get(0).getAction().equals(ActionType.LEAVE.toString())) {
 				sendFrame = FrameCreator.createRequest(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
 				System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends REQUEST: " + sendFrame.toString());
 			}
@@ -95,16 +98,25 @@ public class ShipLogic extends Observable implements Observer{
 	public void checkShipMovement(Frame frame, Ship ship) {
 		if(frame.getData().getType().equals(DataType.RESPONSE.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " has permission to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name());
-			if(frame.getData().getStatus().getAction().equals(ActionType.ENTER.toString())) {
-				System.out.println("Parking assigned: "+frame.getData().getParking());
-				ship.setParking(frame.getData().getParking());
+			
+			if(frame.getData().getStatus().getStatus().equals(ship.getActionList().get(0).getStatus())) {
+				System.out.println("Operation finish for ship number " + Integer.parseInt(ship.getId(), 2) + " status: " + StatusType.getName(ship.getStatus().getStatus()).name());
+				System.out.println("Setting ship status to IDLE and now can ask for a new action");
+				ship.setStatus(new Status(frame.getData().getStatus().getStatus(), ActionType.IDLE.toString(), PermissionType.ASK.toString()));
+				ship.setActionList(new ArrayList<Status>());
+			}else if (frame.getData().getStatus().getStatus().equals(StatusType.TRANSIT.toString())) {
+				System.out.println("Performing the operation for ship number "+Integer.parseInt(ship.getId(), 2));
+				ship.setStatus(frame.getData().getStatus());
+			}else{
+				System.out.println("Ship changes to new status, STATUS: "+StatusType.getName(frame.getData().getStatus().getStatus()) + 
+						", ACTION: "+ActionType.getName(frame.getData().getStatus().getAction()).name() + 
+						" PERMISSION: "+PermissionType.getName(frame.getData().getStatus().getPermission()).name());
+				if(frame.getData().getStatus().getAction().equals(ActionType.ENTER.toString())) {
+					System.out.println("Parking assigned: "+frame.getData().getParking());
+					ship.setParking(frame.getData().getParking());
+				}
+				ship.setStatus(frame.getData().getStatus());
 			}
-			System.out.println("Ship changes to new status, STATUS: "+StatusType.getName(frame.getData().getStatus().getStatus()) + 
-					", ACTION: "+ActionType.getName(frame.getData().getStatus().getAction()).name() + 
-					" PERMISSION: "+PermissionType.getName(frame.getData().getStatus().getPermission()).name());
-			ship.setStatus(frame.getData().getStatus());
-			ship.setActionList(new ArrayList<String>());
-
 		}
 		if (frame.getData().getType().equals(DataType.RESPONSE.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.DENY.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " has NOT permission to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name());
@@ -113,10 +125,6 @@ public class ShipLogic extends Observable implements Observer{
 					" PERMISSION: "+PermissionType.getName(frame.getData().getStatus().getPermission()).name());
 			ship.setStatus(frame.getData().getStatus());
 
-		}
-		if(frame.getData().getType().equals(DataType.STATUS.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
-			System.out.println("Ship number " + Integer.parseInt(ship.getId()) + " has started to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name() + " and controller is asking to change its status");
-			ship.setActionList(new ArrayList<String>());
 		}
 	}
 

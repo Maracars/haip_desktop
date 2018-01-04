@@ -8,7 +8,7 @@ public class Ship {
 	private String id;
 	private Status status;
 	private String parking;
-	private List<String> actionList;
+	private List<Status> actionList;
 	
 	public Ship(String id, Status status) {
 		this.id = id;
@@ -33,17 +33,17 @@ public class Ship {
 	public void setStatus(Status status) {
 		this.status = status;
 	}
-
-	public List<String> getActionList() {
+	
+	public List<Status> getActionList() {
 		return actionList;
 	}
 
-	public void setActionList(List<String> actionList) {
+	public void setActionList(List<Status> actionList) {
 		this.actionList = actionList;
 	}
-	
-	public void addAction(String action) {
-		this.actionList.add(action);
+
+	public void addAction(Status newStatus) {
+		this.actionList.add(newStatus);
 	}
 
 	public String getParking() {

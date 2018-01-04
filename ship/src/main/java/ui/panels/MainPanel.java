@@ -43,8 +43,8 @@ import javax.swing.event.ListSelectionListener;
 import helpers.Helpers;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
-import jssc.SerialPortException;
 import models.Ship;
+import models.Status;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
@@ -79,14 +79,14 @@ public class MainPanel implements ListSelectionListener, Observer{
 
 	//Labels for ship info
 	private JLabel permissionLabel, statusLabel;
-	
+
 	//Lists 
 	private JList<String> statusList, decisionList;
 	private StatusListRenderer statusRenderer;
-	
+
 	//ShipLogic
 	private ShipLogic shipLogic;
-	
+
 	//SimulationShipLogic
 	private SimulationShipLogic simulationShipLogic;
 
@@ -113,9 +113,9 @@ public class MainPanel implements ListSelectionListener, Observer{
 		//this.serial.addObserver(this.serialObserver);
 
 		this.ship = ship;
-		
+
 		this.shipLogic = shipLogic;
-		
+
 		this.simulationShipLogic = simulationShipLogic;
 
 		this.shipDiscovered = false;
@@ -213,7 +213,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 		permissionLabel.setVerticalAlignment(SwingConstants.CENTER);
 		return permissionLabel;
 	}
-	
+
 	private void checkStatusLabel() {
 		statusLabel.setText("Your status is: " + StatusType.getName(ship.getStatus().getStatus()).name()+
 				"\nYou are asking for: " + ActionType.getName(ship.getStatus().getAction()).name());
@@ -388,15 +388,35 @@ public class MainPanel implements ListSelectionListener, Observer{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			//Save the action
-			ship.addAction(decisionList.getSelectedValue().toString());
+			String a = ActionType.valueOf(decisionList.getSelectedValue()).toString();
+			String s = checkNewAction();
+			Status newStatus = new Status(s, a);
+			ship.addAction(newStatus);
+			ship.getStatus().setAction(a);
+			ship.getStatus().setPermission(PermissionType.ASK.toString());
 			actionButton.setEnabled(false);
 		}
 
+		private String checkNewAction() {
+			String newStatus = null;
+			ActionType at = ActionType.valueOf(decisionList.getSelectedValue());
+			switch(at) {
+			case ENTER:
+				newStatus = StatusType.PARKING.toString();
+				break;
+			case LEAVE:
+				newStatus = StatusType.SEA.toString();
+				break;
+			case IDLE:
+				newStatus = ship.getStatus().getStatus();
+				break;
+			}
+			return newStatus;
+		}
 	}
-	
+
 	public class SimulationAction extends AbstractAction {
-		
+
 		private static final long serialVersionUID = 1L;
 		String text;
 		Icon icon;
@@ -413,9 +433,9 @@ public class MainPanel implements ListSelectionListener, Observer{
 		public void actionPerformed(ActionEvent e) {
 			SimulationDialog simulationDialog = new SimulationDialog(window, simulationShipLogic);
 			serial.addObserver(simulationShipLogic);
-			
+
 		}
-		
+
 	}
 
 	public class ConnectAction extends AbstractAction {
@@ -508,7 +528,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 	public void valueChanged(ListSelectionEvent e) {
 		repaintElements();
 	}
-	
+
 	public void repaintElements() {
 		decisionList.repaint();
 		statusRenderer.setStatusType(StatusType.getName(ship.getStatus().getStatus()).name());
@@ -527,6 +547,6 @@ public class MainPanel implements ListSelectionListener, Observer{
 		checkActionButton();
 		repaintElements();
 	}
-	
-	
+
+
 }
