@@ -60,6 +60,15 @@ public class MainPanel {
 		this.addContentToJFrame();
 	}
 
+	private void createJFrame() {
+		this.window = new JFrame("Haip Ain't an Infor Project");
+		this.window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
+		this.window.setLocation(0, 0);
+		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
+		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+		this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+	}
+
 	private void initThings(Serial serial, Port port) {
 		IconFontSwing.register(FontAwesome.getIconFont());
 		this.initActions();
@@ -70,7 +79,7 @@ public class MainPanel {
 		} catch (IOException e) {
 			this.logModel.add(ERROR_READING_SETTINGS);
 		}
-		initMoorings(port);
+		this.initMoorings(port);
 
 		this.serial = serial;
 		this.controllerLogic = new ControllerLogic(this.serial, port);
@@ -80,25 +89,23 @@ public class MainPanel {
 		this.serial.addObserver(this.serialObserver);
 		this.controllerLogic.addObserver(this.serialObserver);
 	}
-	
-	public void initMoorings(Port port) {
-		ArrayList<Mooring> moorings = new ArrayList<Mooring>();
-		for (Integer i = 0; i < Settings.getProperties().get(0); i++) {
-			Ship ship = null;
-			moorings.add(new Mooring(Helpers.toByteBinString(i.toString(), 8), ship));
-		}
-		port.getDock().setMoorings(moorings);
-	}
 
-	private void readSettings() throws IOException {
-		this.properties = new Properties();
-		this.properties.load(new FileReader(FILE_NAME));
+	private void initActions() {
+		connectAction = new ConnectAction("Connect to board", IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
+				"Connection", KeyEvent.VK_C);
+		connectAction.setEnabled(true);
 
-		List<String> settings = new ArrayList<>();
-		for (int i = 0; i < NUM_OF_SETTINGS; i++) {
-			settings.add(properties.getProperty(PROPERTY_NAMES[i], String.valueOf(SHIP_LIMITS[i])));
-		}
-		Settings.setProperties(settings);
+		logicAction = new LogicAction("Initialize system", IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32),
+				"Initialize system", KeyEvent.VK_L);
+		logicAction.setEnabled(false);
+
+		settingsAction = new SettingsAction("Settings", IconFontSwing.buildIcon(FontAwesome.SLIDERS, 32),
+				"Change port properties", KeyEvent.VK_S);
+		settingsAction.setEnabled(true);
+
+		exitAction = new ExitAction("Exit", IconFontSwing.buildIcon(FontAwesome.WINDOW_CLOSE, 32),
+				"Close program", KeyEvent.VK_X);
+		exitAction.setEnabled(true);
 	}
 
 	private void initTable() {
@@ -112,13 +119,24 @@ public class MainPanel {
 		this.table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
 	}
 
-	private void createJFrame() {
-		this.window = new JFrame("Haip Ain't an Infor Project");
-		this.window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
-		this.window.setLocation(0, 0);
-		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
-		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-		this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+	private void readSettings() throws IOException {
+		this.properties = new Properties();
+		this.properties.load(new FileReader(FILE_NAME));
+
+		List<String> settings = new ArrayList<>();
+		for (int i = 0; i < NUM_OF_SETTINGS; i++) {
+			settings.add(properties.getProperty(PROPERTY_NAMES[i], String.valueOf(SHIP_LIMITS[i])));
+		}
+		Settings.setProperties(settings);
+	}
+
+	public void initMoorings(Port port) {
+		ArrayList<Mooring> moorings = new ArrayList<Mooring>();
+		for (Integer i = 0; i < Settings.getProperties().get(0); i++) {
+			Ship ship = null;
+			moorings.add(new Mooring(Helpers.toByteBinString(i.toString(), 8), ship));
+		}
+		port.getDock().setMoorings(moorings);
 	}
 
 	private void addContentToJFrame() {
@@ -238,24 +256,6 @@ public class MainPanel {
 		fileMenu.add(settingsAction);
 		fileMenu.add(exitAction);
 		return fileMenu;
-	}
-
-	private void initActions() {
-		connectAction = new ConnectAction("Connect to board", IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
-				"Connection", KeyEvent.VK_C);
-		connectAction.setEnabled(true);
-
-		logicAction = new LogicAction("Initialize system", IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32),
-                "Initialize system", KeyEvent.VK_L);
-		logicAction.setEnabled(false);
-
-		settingsAction = new SettingsAction("Settings", IconFontSwing.buildIcon(FontAwesome.SLIDERS, 32),
-				"Change port properties", KeyEvent.VK_S);
-		settingsAction.setEnabled(true);
-
-		exitAction = new ExitAction("Exit", IconFontSwing.buildIcon(FontAwesome.WINDOW_CLOSE, 32),
-				"Close program", KeyEvent.VK_X);
-		exitAction.setEnabled(true);
 	}
 
 	public class ConnectAction extends AbstractAction {
