@@ -86,7 +86,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		switch(st) {
 			case PARKING:
 				int parkingIndex = checkBoatParking(ship);
-				x = (panelLocation.x+(panelDimension.width/2))+(parkingIndex+1)*PARKING_WIDTH;
+				x = (panelLocation.x+(panelDimension.width/2))+(parkingIndex)*PARKING_WIDTH;
 				y = panelDimension.height-(PARKING_HEIGHT/2);
 				g.fillOval(x,y, BOAT_WIDTH, BOAT_HEIGHT);
 				g.setColor(Color.BLACK);
@@ -159,8 +159,8 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 			}else {
 				g.setColor(new Color(77, 244, 65));
 			}
- 			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(i+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
-			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(i+Math.round(port.getDock().getMoorings().size()/2)).getId(), 2)), (panelLocation.x+(panelDimension.width/2))+(i+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT-2);
+ 			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(i*PARKING_WIDTH), panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
+			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(i+Math.round(port.getDock().getMoorings().size()/2)).getId(), 2)), (panelLocation.x+(panelDimension.width/2))+(i*PARKING_WIDTH), panelDimension.height-PARKING_HEIGHT-2);
 		}
 		if(port.getDock().getMoorings().size() % 2 != 0) {
 			if(port.getDock().getMoorings().get(port.getDock().getMoorings().size()-1).getShip() != null){
@@ -168,8 +168,8 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 			}else {
 				g.setColor(new Color(77, 244, 65));
 			}
-			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(Math.round(port.getDock().getMoorings().size()/2)+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
-			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(port.getDock().getMoorings().size()-1).getId(), 2)), (panelLocation.x+(panelDimension.width/2))+((Math.round(port.getDock().getMoorings().size()/2)+1))*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT-2);
+			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(Math.round(port.getDock().getMoorings().size()/2))*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
+			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(port.getDock().getMoorings().size()-1).getId(), 2)), (panelLocation.x+(panelDimension.width/2))+((Math.round(port.getDock().getMoorings().size()/2)))*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT-2);
 		}
 
 	}

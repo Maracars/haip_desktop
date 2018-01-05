@@ -35,24 +35,42 @@ public class Port {
 	}
 
 
-	public boolean addToTransitionZone(Ship ship, String action) {
-		if (transitZone.size() < Settings.getProperties().get(1) || transitZone.contains(ship)) {
+	public boolean addToTransitionZone(Ship ship, String action) {	
+		if(!transitQueue.contains(ship)) {
+			transitQueue.add(ship);
+		}
+		if(transitQueue.getFirst().equals(ship)) {
 			transitZone.add(ship);
 			if (action.equals(ActionType.LEAVE.toString())) {
 				freeMooring(ship);
 			}
+			transitQueue.removeFirst();
+			return true;
+		}
+		return false;
+		/*if ((transitZone.size() < Settings.getProperties().get(1) || transitZone.contains(ship)) && isFirst(ship)) {
+			transitZone.add(ship);
+			if(transitQueue.contains(ship)) {
+				transitQueue.remove(ship);
+			}
 			return true;
 		} else {
+			System.out.println("ADD TO TRANSIT QUEUE: "+ship.getId());
 			transitQueue.add(ship);
 			return false;
-		}
+		}*/
 	}
 
 	public void removeFromTransitZone(Ship ship) {
 		transitZone.remove(ship);
-		if (!transitQueue.isEmpty()) {
+		System.out.println("REMOVE FROM TRANSIT ZONE: "+ship.getId());
+		/*if (!transitQueue.isEmpty()) {
 			transitZone.add(transitQueue.removeFirst());
-		}
+		}*/
+	}
+	
+	public boolean isFirst(Ship ship) {
+		return transitQueue.isEmpty() || transitQueue.getFirst().equals(ship);
 	}
 
 	private void freeMooring(Ship ship) {
