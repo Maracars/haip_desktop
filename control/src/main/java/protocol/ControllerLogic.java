@@ -31,17 +31,17 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		idleBoats = new CopyOnWriteArraySet<>();
 		timeouts = new HashMap<>();
 		this.serial = serial;
-
 	}
 
 	public void startLogic() {
 		this.running = true;
 		this.thread = new Thread(this);
+		this.thread.start();
 	}
 
 	public void stopLogic() {
+		this.running = false;
 		try {
-			this.running = false;
 			this.thread.join();
 		} catch (InterruptedException e) {
 			LogModel.add("Couldn't stop system");
@@ -71,6 +71,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
 			}
 			LogModel.add("Discovery is sent to boats");
+			System.out.println("Discovery");
 
 			try {
 				//TODO I have no fucking idea how big the delay should be
