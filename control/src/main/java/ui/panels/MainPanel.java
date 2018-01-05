@@ -39,7 +39,6 @@ public class MainPanel {
 	private JFrame window;
 	private JTable table;
 	private TableModel tableModel;
-	private LogModel logModel;
 	private JButton connectButton, logicButton;
 	private AbstractAction connectAction, logicAction, settingsAction, exitAction;
 
@@ -77,7 +76,7 @@ public class MainPanel {
 		try {
 			this.readSettings();
 		} catch (IOException e) {
-			this.logModel.add(ERROR_READING_SETTINGS);
+			LogModel.add(ERROR_READING_SETTINGS);
 		}
 		this.initMoorings(port);
 
@@ -172,7 +171,7 @@ public class MainPanel {
 		try {
             logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
 		} catch (IOException e) {
-			this.logModel.add(ERROR_READING_LOGO);
+			LogModel.add(ERROR_READING_LOGO);
 		}
         logoPanel.scaleImage(this.window.getWidth() / 7, this.window.getWidth() / 7);
 
@@ -180,8 +179,7 @@ public class MainPanel {
 	}
 
 	private Component createLogPanel() {
-        this.logModel = new LogModel();
-		return new LogPanel(logModel);
+		return new LogPanel(new LogModel());
 	}
 
 	private Component createButtonsPanel() {
@@ -277,22 +275,22 @@ public class MainPanel {
 				try {
 					serial.openConnection();
 					connectButton.setText("Disconnect from board");
+					LogModel.add(CONNECTION_ESTABLISHED);
 					logicAction.setEnabled(true);
-					logModel.add(CONNECTION_ESTABLISHED);
 				}
 				catch (Exception e) {
-					logModel.add(e.getMessage());
+					LogModel.add(e.getMessage());
 				}
 			}
 			else {
 				try {
 					serial.closeConnection();
 					connectButton.setText("Connect to board");
+					LogModel.add(CONNECTION_CLOSED);
 					logicAction.setEnabled(false);
-					logModel.add(CONNECTION_CLOSED);
 				}
 				catch (Exception e) {
-					logModel.add(e.getMessage());
+					LogModel.add(e.getMessage());
 				}
 			}
 		}
@@ -314,21 +312,21 @@ public class MainPanel {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (!controllerLogic.isRunning()) {
-				controllerLogic.startLogic();
-
 				logicButton.setText("Stop system");
 				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
+				LogModel.add(SYSTEM_INITIALIZED);
 				connectAction.setEnabled(false);
 				settingsAction.setEnabled(false);
-				logModel.add(SYSTEM_INITIALIZED);
-			} else {
-				controllerLogic.stopLogic();
 
+				controllerLogic.startLogic();
+			} else {
 				logicButton.setText("Initialize system");
 				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
+				LogModel.add(SYSTEM_STOPPED);
 				connectAction.setEnabled(true);
 				settingsAction.setEnabled(true);
-				logModel.add(SYSTEM_STOPPED);
+
+				controllerLogic.stopLogic();
 			}
 		}
 	}
@@ -357,7 +355,7 @@ public class MainPanel {
 				try {
 					properties.store(new FileWriter(FILE_NAME), null);
 				} catch (IOException e) {
-					logModel.add(ERROR_WRITING_SETTINGS);
+					LogModel.add(ERROR_WRITING_SETTINGS);
 				}
 				fieldList.get(i).setText(settings.get(i));
 			}
@@ -408,7 +406,7 @@ public class MainPanel {
 				try {
 					this.serial.closeConnection();
 				} catch (Exception e) {
-					this.logModel.add(e.getMessage());
+					LogModel.add(e.getMessage());
 				}
 				this.exitProgram();
 			}

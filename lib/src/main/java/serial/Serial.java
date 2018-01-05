@@ -95,7 +95,6 @@ public class Serial extends Observable implements SerialPortEventListener {
 	}
 
 	public void writeString(String string) throws SerialPortException {
-		System.out.println(string);
 		serialPort.writeString(string);
 	}
 

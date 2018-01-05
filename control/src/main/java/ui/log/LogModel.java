@@ -8,8 +8,8 @@ import java.util.List;
 
 public class LogModel implements ListModel<String> {
 
-	List<String> messageList;
-	List<ListDataListener> listenerList;
+	private static List<String> messageList;
+	private static List<ListDataListener> listenerList;
 	
 	public LogModel() {
 		messageList = new ArrayList<>();
@@ -36,19 +36,19 @@ public class LogModel implements ListModel<String> {
 		listenerList.remove(listener);
 	}
 
-	public void add(String text) {
+	public static void add(String text) {
 		messageList.add(text);
 		for (ListDataListener listener : listenerList) {
-			listener.contentsChanged(
-					new ListDataEvent(messageList, ListDataEvent.CONTENTS_CHANGED, 0, messageList.size()));
+			listener.contentsChanged(new ListDataEvent(
+					messageList, ListDataEvent.CONTENTS_CHANGED, 0, messageList.size()));
 		}
 	}
 
-	public void remove(int index) {
+	public static void remove(int index) {
 		messageList.remove(index);
 		for (ListDataListener listener : listenerList) {
-			listener.contentsChanged(
-					new ListDataEvent(messageList, ListDataEvent.CONTENTS_CHANGED, index, index));
+			listener.contentsChanged(new ListDataEvent(
+					messageList, ListDataEvent.CONTENTS_CHANGED, index, index));
 		}
 	}
 }

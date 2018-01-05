@@ -65,11 +65,13 @@ public class Port {
 
 	public Mooring getFreeMooring(Ship ship) {
 
+		// Check if ship already has mooring assigned
 		for (Mooring mooring : dock.getMoorings()) {
 			if (mooring.getShip() != null && ship.equals(mooring.getShip())) {
 				return mooring;
 			}
 		}
+		// If it doesn't have one assigned, assign one
 		for (Mooring mooring : dock.getMoorings()) {
 			if (mooring.getShip() == null) {
 				mooring.setShip(ship);

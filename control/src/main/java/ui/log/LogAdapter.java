@@ -11,8 +11,8 @@ public class LogAdapter implements ListCellRenderer<String> {
 		
 		JLabel label = new JLabel();
 		label.setText(text);
-		
-		if (text.substring(0, 5).equals("ERROR")) {
+
+		if (text.length() >= "ERROR".length() && text.substring(0, "ERROR".length()).equals("ERROR")) {
 			label.setForeground(Color.red);
 		}
 		return label;
