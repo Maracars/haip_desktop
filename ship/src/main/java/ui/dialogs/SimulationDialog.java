@@ -41,9 +41,9 @@ public class SimulationDialog extends JDialog implements ActionListener{
 		this.window = window;
 		this.simShipLogic = simShipLogic;
 		numBoats = 0;
-		simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic.getShipLogic());
+		/*simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic.getShipLogic());
 		simShipLogic.getShipLogic().setSimulationStarted();
-		simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic);
+		simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic);*/
 
 		this.setSize((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() - 500),
 				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight()/4);
@@ -111,7 +111,7 @@ public class SimulationDialog extends JDialog implements ActionListener{
 				bStart.setEnabled(false);
 				simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic.getShipLogic());
 				simShipLogic.getShipLogic().setSimulationStarted();
-				simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic);
+				simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic);
 			}catch (NumberFormatException ex) {
 				JOptionPane.showMessageDialog(window,
 						"Remember to insert a valid number, please",
