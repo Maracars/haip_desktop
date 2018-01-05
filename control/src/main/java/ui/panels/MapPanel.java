@@ -86,14 +86,14 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		switch(st) {
 			case PARKING:
 				int parkingIndex = checkBoatParking(ship);
-				x = (panelLocation.x+(panelDimension.width/2))+(parkingIndex)*PARKING_WIDTH;
-				y = panelDimension.height-(PARKING_HEIGHT/2);
-				g.fillOval(x,y, BOAT_WIDTH, BOAT_HEIGHT);
+				x = (panelLocation.x + (panelDimension.width / 2)) + (parkingIndex) * PARKING_WIDTH;
+				y = panelDimension.height - (PARKING_HEIGHT / 2);
+				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
 				g.setColor(Color.BLACK);
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)), x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
 				break;
 			case TRANSIT:
-				x = (int) (panelLocation.getX() + transitWidth + BOAT_WIDTH / 2);
+				x = (int) (panelLocation.getX() + transitWidth + (BOAT_WIDTH )*port.getTransitZone().size());
 				y = seaHeight + transitHeight/2;
 				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
 				g.setColor(Color.BLACK);
@@ -109,12 +109,11 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 
 	}
 
-	//Funtzio hau puta mierda bat da
 	private int checkBoatParking(Ship ship) {
 		for (int i = 0; i < port.getDock().getMoorings().size(); i++) {
 			if (port.getDock().getMoorings().get(i).getShip() != null
 					&& port.getDock().getMoorings().get(i).getShip().getId().equals(ship.getId())) {
-				return (i < Math.round(port.getDock().getMoorings().size() / 2)) ? i - Math.round(port.getDock().getMoorings().size() / 2) : i;
+				return (i < Math.round(port.getDock().getMoorings().size() / 2)) ? i - Math.round(port.getDock().getMoorings().size() / 2) : i/2;
 			}
 		}
 		return -1;
@@ -135,13 +134,11 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 			y = seaHeight/2;
 			return new Point(x, y);
 		}
-
 	}
 
 	private void checkBoatActionTypeAndPermissions(Graphics g, Ship ship) {
 		ActionType at = ActionType.getName(ship.getStatus().getAction());
 		PermissionType pt = PermissionType.getName(ship.getStatus().getPermission());
-		System.out.println(pt.toString());
 		if (at.equals(ActionType.IDLE)) {
 			g.setColor(new Color(244, 160, 65));
 		}

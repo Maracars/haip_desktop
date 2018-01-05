@@ -24,9 +24,7 @@ public class Helpers {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
-
 
 	public static <E extends Enum<E>> boolean isInEnums(Class<E> e, String eq) {
 		return Arrays.stream(e.getEnumConstants()).map(Enum::toString).anyMatch(s -> s.equals(eq));

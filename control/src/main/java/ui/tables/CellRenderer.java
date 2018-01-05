@@ -14,8 +14,6 @@ public class CellRenderer extends DefaultTableCellRenderer{
 		super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		JLabel label = new JLabel();
 
-		/*switch (column) {}*/
-
 		if (value.getClass().equals(Boolean.class)) {
 			label.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
 			label.setText("" + value);
@@ -30,9 +28,6 @@ public class CellRenderer extends DefaultTableCellRenderer{
 		}
 		else {
 			this.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
-			/*if (label.getText().substring(0, 5).equals("ERROR")) {
-				label.setForeground(Color.RED);
-			}*/
 		}
 
 		this.setOpaque(true);

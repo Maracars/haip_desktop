@@ -42,10 +42,13 @@ public class DecisionMaker {
 	public static Status getRandomAction(StatusType status) {
 		List<ActionType> actionList = decisionMap.get(status);
 		ActionType action = actionList.get(new Random().nextInt(actionList.size()));
-		System.out.println("ACTION: "+action.name());
 		StatusType finalStatus = ((objectiveMap.get(action)) == null ? status : objectiveMap.get(action));
 		return new Status(finalStatus.toString(), action.toString());
-		
+	}
+	
+	public static Status getNewPossibleAction(ActionType action) {
+		StatusType status = objectiveMap.get(action);
+		return new Status(status.toString(), action.toString());
 	}
 
 }

@@ -5,6 +5,7 @@ import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
 import models.Ship;
 import models.Status;
+import protocol.DecisionMaker;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
@@ -193,6 +194,25 @@ public class MainPanel implements ListSelectionListener, Observer{
 
 	private Component createDecisionInfoPanel() {
 		JPanel decisionPanel = new JPanel(new GridLayout(1,2));
+		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
+		decisionPanel.add(createStatusList());
+		decisionPanel.add(createDecisionList());
+		decisionPanel.setBorder(statusBorder);
+		return decisionPanel;
+	}
+
+	private Component createDecisionList() {
+		decisionList = new JList<String>(Helpers.getNames(ActionType.class));
+		decisionList.addListSelectionListener(this);
+		DecisionListRenderer decisionRenderer = new DecisionListRenderer(statusList);
+		decisionList.setCellRenderer(decisionRenderer);
+		decisionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		decisionList.setLayoutOrientation(JList.VERTICAL);
+		decisionList.setBorder(BorderFactory.createMatteBorder(0,3,0,0, Color.darkGray));
+		return decisionList;
+	}
+
+	private Component createStatusList() {
 		statusList = new JList<String>(Helpers.getNames(StatusType.class));
 		statusList.setSelectedValue(StatusType.getName(ship.getStatus().getStatus()).name(), true);
 		statusList.addListSelectionListener(this);
@@ -201,28 +221,15 @@ public class MainPanel implements ListSelectionListener, Observer{
 		statusList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		statusList.setLayoutOrientation(JList.VERTICAL);
 		statusList.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 3, Color.darkGray));
-		decisionList = new JList<String>(Helpers.getNames(ActionType.class));
-		decisionList.addListSelectionListener(this);
-		DecisionListRenderer decisionRenderer = new DecisionListRenderer(statusList);
-		decisionList.setCellRenderer(decisionRenderer);
-		decisionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		decisionList.setLayoutOrientation(JList.VERTICAL);
-		decisionList.setBorder(BorderFactory.createMatteBorder(0,3,0,0, Color.darkGray));
-		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
-		decisionPanel.add(statusList);
-		decisionPanel.add(decisionList);
-		decisionPanel.setBorder(statusBorder);
-		return decisionPanel;
+		return statusList;
 	}
 
 	private Component createInfoPanel() {
 		JPanel infoPanel = new JPanel(new GridLayout(1,2));
 		infoPanel.setPreferredSize(new Dimension(this.window.getWidth(), this.window.getHeight()/3));
 		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
-
 		infoPanel.add(crateStatusLabel(statusBorder));
 		infoPanel.add(createPermissionsLabel(statusBorder));
-
 		return infoPanel;
 
 	}
@@ -407,30 +414,12 @@ public class MainPanel implements ListSelectionListener, Observer{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String a = ActionType.valueOf(decisionList.getSelectedValue()).toString();
-			String s = checkNewAction();
-			Status newStatus = new Status(s, a);
+			ActionType at = ActionType.valueOf(decisionList.getSelectedValue());
+			Status newStatus = DecisionMaker.getNewPossibleAction(at);
 			ship.addAction(newStatus);
-			ship.getStatus().setAction(a);
+			ship.getStatus().setAction(at.toString());
 			ship.getStatus().setPermission(PermissionType.ASK.toString());
 			actionButton.setEnabled(false);
-		}
-
-		private String checkNewAction() {
-			String newStatus = null;
-			ActionType at = ActionType.valueOf(decisionList.getSelectedValue());
-			switch(at) {
-			case ENTER:
-				newStatus = StatusType.PARKING.toString();
-				break;
-			case LEAVE:
-				newStatus = StatusType.SEA.toString();
-				break;
-			case IDLE:
-				newStatus = ship.getStatus().getStatus();
-				break;
-			}
-			return newStatus;
 		}
 	}
 

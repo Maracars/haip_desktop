@@ -62,14 +62,11 @@ public class ShipLogic extends Observable implements Observer{
 			sendFrame = checkToken(frame, ship);
 			if(serial != null) {
 				replyController(sendFrame);
-
 			}
 			break;
 		default:
 			break;
 		}
-
-
 	}
 
 	public Frame checkToken(Frame frame, Ship ship) {

@@ -128,86 +128,101 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 	private void checkRequest(Frame frame) {
 		Status nextStatus = frame.getData().getStatus();
-		String status_str = nextStatus.getStatus();
-		String action_str = nextStatus.getAction();
+		String statusStr = nextStatus.getStatus();
+		String actionStr = nextStatus.getAction();
 
 		Ship ship = new Ship(frame.getOriginId());
 		int shipID = Integer.parseInt(frame.getOriginId(), 2);
 		String parking = null;
 
 		// Dock, leave
-		if (status_str.equals(StatusType.PARKING.toString()) && action_str.equals(ActionType.LEAVE.toString())) {
-			boolean okay = port.addToTransitionZone(ship, action_str);
-			if (okay) {
-				nextStatus.setStatus(StatusType.TRANSIT.toString());
-				nextStatus.setAction(ActionType.LEAVE.toString());
-				nextStatus.setPermission(PermissionType.ALLOW.toString());
-				LogModel.add("Ship " + shipID + " leaving dock");
-			} else {
-				//nextStatus.setStatus(StatusType.PARKING.toString());
-				//nextStatus.setAction(ActionType.LEAVE.toString());
-				nextStatus.setPermission(PermissionType.DENY.toString());
-				LogModel.add("Not enough space in transit for ship " + shipID);
-			}
+		if (statusStr.equals(StatusType.PARKING.toString()) && actionStr.equals(ActionType.LEAVE.toString())) {
+			checkDockLeaveRequest(ship, actionStr, nextStatus, shipID);
 		}
 		// Transit, leave or enter
-		else if (status_str.equals(StatusType.TRANSIT.toString()) &&
-				(action_str.equals(ActionType.ENTER.toString())) || action_str.equals(ActionType.LEAVE.toString())) {
-
-			if (action_str.equals(ActionType.LEAVE.toString())) {
-				nextStatus.setStatus(StatusType.SEA.toString());
-				//nextStatus.setAction(ActionType.LEAVE.toString());
-				nextStatus.setPermission(PermissionType.ALLOW.toString());
-				LogModel.add("Ship " + shipID + " leaving to the sea");
-			} else {
-				nextStatus.setStatus(StatusType.PARKING.toString());
-				//nextStatus.setAction(ActionType.ENTER.toString());
-				nextStatus.setPermission(PermissionType.ALLOW.toString());
-				LogModel.add("Ship " + shipID + " entering dock");
-			}
-			port.removeFromTransitZone(ship);
+		else if (statusStr.equals(StatusType.TRANSIT.toString()) &&
+				(actionStr.equals(ActionType.ENTER.toString())) || actionStr.equals(ActionType.LEAVE.toString())) {
+			checkTransitRequest(ship, actionStr, nextStatus, shipID);
 		}
 		// Sea, enter
-		else if (status_str.equals(StatusType.SEA.toString()) && action_str.equals(ActionType.ENTER.toString())) {
-			Mooring freeMooring = port.getFreeMooring(ship);
-
-			if (freeMooring != null) {
-				parking = freeMooring.getId();
-				LogModel.add("Assigned mooring " + Integer.parseInt(parking, 2));
-				boolean freeTransit = port.addToTransitionZone(ship, action_str);
-
-				if (freeTransit) {
-					nextStatus.setStatus(StatusType.TRANSIT.toString());
-					nextStatus.setAction(ActionType.ENTER.toString());
-					nextStatus.setPermission(PermissionType.ALLOW.toString());
-					LogModel.add("Ship " + shipID + " entering transit zone");
-				} else {
-					//nextStatus.setStatus(StatusType.SEA.toString());
-					//nextStatus.setAction(ActionType.ENTER.toString());
-					nextStatus.setPermission(PermissionType.DENY.toString());
-					LogModel.add("Not enough space in transit for ship " + shipID);
-				}
-			}
-			else {
-				//nextStatus.setStatus(StatusType.SEA.toString());
-				//nextStatus.setAction(ActionType.ENTER.toString());
-				nextStatus.setPermission(PermissionType.DENY.toString());
-				LogModel.add("Ship " + shipID + " access denied, no free mooring");
-			}
+		else if (statusStr.equals(StatusType.SEA.toString()) && actionStr.equals(ActionType.ENTER.toString())) {
+			parking = checkSeaEnterRequest(ship, actionStr, nextStatus, shipID);
 		}
 		// Invalid
 		else {
-			//nextStatus.setStatus(StatusType.TRANSIT.toString());
-			//nextStatus.setAction(ActionType.ENTER.toString());
-			nextStatus.setPermission(PermissionType.INVALID.toString());
-			LogModel.add("Ship " + shipID + " is in an invalid state");
+			 checkInvalidRequest(nextStatus, shipID);
 		}
 		Frame nextFrame = FrameCreator.createResponse(MASTER_ID, ship.getId(), nextStatus, parking);
 		System.out.println("Next frame to send: " + nextFrame.toString());
 
 		// Send frame
+		sendFrame(nextFrame);
+		setSentRequest(nextFrame);
+
+		ship.setStatus(nextStatus);
+		updateMap(ship);
+	}
+
+	private void checkDockLeaveRequest(Ship ship, String actionStr, Status nextStatus, int shipID){
+		boolean okay = port.addToTransitionZone(ship, actionStr);
+		if (okay) {
+			nextStatus.setStatus(StatusType.TRANSIT.toString());
+			nextStatus.setAction(ActionType.LEAVE.toString());
+			nextStatus.setPermission(PermissionType.ALLOW.toString());
+			LogModel.add("Ship " + shipID + " leaving dock");
+		} else {
+			nextStatus.setPermission(PermissionType.DENY.toString());
+			LogModel.add("Not enough space in transit for ship " + shipID);
+		}
+	}
+
+	private void checkTransitRequest(Ship ship, String actionStr, Status nextStatus, int shipID) {
+		if (actionStr.equals(ActionType.LEAVE.toString())) {
+			nextStatus.setStatus(StatusType.SEA.toString());
+			nextStatus.setPermission(PermissionType.ALLOW.toString());
+			LogModel.add("Ship " + shipID + " leaving to the sea");
+		} else {
+			nextStatus.setStatus(StatusType.PARKING.toString());
+			nextStatus.setPermission(PermissionType.ALLOW.toString());
+			LogModel.add("Ship " + shipID + " entering dock");
+		}
+		port.removeFromTransitZone(ship);
+	}
+
+	private String checkSeaEnterRequest(Ship ship, String actionStr, Status nextStatus, int shipID){
+		Mooring freeMooring = port.getFreeMooring(ship);
+		String parking = null;
+
+		if (freeMooring != null) {
+			parking = freeMooring.getId();
+			LogModel.add("Assigned mooring " + Integer.parseInt(parking, 2));
+			boolean freeTransit = port.addToTransitionZone(ship, actionStr);
+
+			if (freeTransit) {
+				nextStatus.setStatus(StatusType.TRANSIT.toString());
+				nextStatus.setAction(ActionType.ENTER.toString());
+				nextStatus.setPermission(PermissionType.ALLOW.toString());
+				LogModel.add("Ship " + shipID + " entering transit zone");
+			} else {
+				nextStatus.setPermission(PermissionType.DENY.toString());
+				LogModel.add("Not enough space in transit for ship " + shipID);
+			}
+		}
+		else {
+			nextStatus.setPermission(PermissionType.DENY.toString());
+			LogModel.add("Ship " + shipID + " access denied, no free mooring");
+		}
+		return parking;
+	}
+
+	private void checkInvalidRequest(Status nextStatus, int shipID) {
+		nextStatus.setPermission(PermissionType.INVALID.toString());
+		LogModel.add("Ship " + shipID + " is in an invalid state");
+	}
+	
+	private void sendFrame(Frame frame) {
 		if (serial != null && serial.isConnected()) {
-			Helpers.sendParsedFrame(nextFrame, serial);
+			Helpers.sendParsedFrame(frame, serial);
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -216,10 +231,6 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		} else {
 			System.out.println("Sent frame");
 		}
-		setSentRequest(nextFrame);
-
-		ship.setStatus(nextStatus);
-		updateMap(ship);
 	}
 
 	private void addConnectedBoat(Integer boat) {
@@ -242,17 +253,14 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	@Override
 	public void update(Observable o, Object arg) {
 		Frame frame = (Frame) arg;
-		//if (PacketType.ACK.equals(PacketType.getName(frame.getHeader().getPacketType()))) {
 		if (frame.getHeader().getPacketType().equals(PacketType.ACK.toString())) {
 			connectedBoats.add(Integer.parseInt(frame.getOriginId(), 2));
 			System.out.println(connectedBoats);
-			//Ship ship = new Ship(frame.getOriginId());
-			//updateMap(ship);
 		} else {
 			receivedList.add(frame);
 		}
 	}
-	
+
 	private void updateMap(Ship ship) {
 		setChanged();
 		notifyObservers(ship);
