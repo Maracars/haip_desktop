@@ -297,6 +297,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 	private JMenu createFileMenu() {
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic(KeyEvent.VK_F);
+		simulationAction.setEnabled(false);
 		fileMenu.add(simulationAction);
 		fileMenu.add(exitAction);
 		return fileMenu;
@@ -322,6 +323,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 					serial.openConnection();
 					connectButton.setText("Disconnect from board");
 					logicButton.setEnabled(true);
+					simulationAction.setEnabled(true);
 					logModel.add(CONNECTION_ESTABLISHED);
 				}
 				catch (Exception e) {
@@ -331,6 +333,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 			else {
 				try {
 					serial.closeConnection();
+					simulationAction.setEnabled(false);
 					connectButton.setText("Connect to board");
 					logicButton.setEnabled(false);
 					logModel.add(CONNECTION_CLOSED);

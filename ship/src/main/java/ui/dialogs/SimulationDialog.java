@@ -3,20 +3,16 @@ package ui.dialogs;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -24,10 +20,10 @@ import helpers.Helpers;
 import models.Ship;
 import models.Status;
 import protocol.DecisionMaker;
-import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
 import protocol.SimulationShipLogic;
+import ui.panels.TextFieldPanel;
 
 public class SimulationDialog extends JDialog implements ActionListener{
 
@@ -37,22 +33,24 @@ public class SimulationDialog extends JDialog implements ActionListener{
 	JButton bStart;
 	JButton bStop;
 	SimulationShipLogic simShipLogic;
-	JTextField boatNumbers;
+	TextFieldPanel boatNumbers;
+	int numBoats;
 
 	public SimulationDialog(JFrame window, SimulationShipLogic simShipLogic) {
 		super(window, "Haip Simulation", true);
 		this.window = window;
 		this.simShipLogic = simShipLogic;
+		numBoats = 0;
 		simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic.getShipLogic());
 		simShipLogic.getShipLogic().setSimulationStarted();
 		simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic);
 
 		this.setSize((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() - 500),
-				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 150);
+				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight()/4);
 
 
 		this.setLocation((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 5),
-				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 15);
+				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 6);
 
 		this.setContentPane(createWindowPanel());
 
@@ -77,7 +75,7 @@ public class SimulationDialog extends JDialog implements ActionListener{
 
 		bStart = new JButton("Start Simulation");
 		bStart.addActionListener(this);
-		
+
 		bStop = new JButton("Stop Simulation");
 		bStop.addActionListener(this);
 		bStop.setEnabled(false);
@@ -97,28 +95,39 @@ public class SimulationDialog extends JDialog implements ActionListener{
 	}
 
 	private Component createText() {
-		JPanel panel = new JPanel();
-		JLabel label = new JLabel();
-		boatNumbers = new JTextField();
-		boatNumbers.setMinimumSize(new Dimension(50, 20));
-		label.setText("Choose a number of boats:");
-		panel.add(label);
-		panel.add(boatNumbers);
-		return panel;
+		boatNumbers = new TextFieldPanel("Choose a number of boats:", "");
+		return boatNumbers;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(bStart)) {
-			int numBoats = Integer.parseInt(boatNumbers.getText());
-			initializeBoats(numBoats);
-			bStop.setEnabled(true);
-			bStart.setEnabled(false);
+			try {
+				if(numBoats != Integer.parseInt(boatNumbers.getText()) || numBoats == 0) {
+					numBoats = Integer.parseInt(boatNumbers.getText());
+					initializeBoats(numBoats);
+				}
+				bStop.setEnabled(true);
+				bStart.setEnabled(false);
+				simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic.getShipLogic());
+				simShipLogic.getShipLogic().setSimulationStarted();
+				simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic);
+			}catch (NumberFormatException ex) {
+				JOptionPane.showMessageDialog(window,
+						"Remember to insert a valid number, please",
+						"Number of boats Error",
+						JOptionPane.ERROR_MESSAGE);
+				boatNumbers.setText("");
+			}
 		}else if(e.getSource().equals(bStop)){
 			bStart.setEnabled(true);
 			bStop.setEnabled(false);
+
+			simShipLogic.getShipLogic().setSimulationStopped();
+			simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic);
+			simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic.getShipLogic());
 		}
-		
+
 	}
 
 	private void initializeBoats(int numBoats) {

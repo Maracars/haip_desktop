@@ -2,6 +2,7 @@ package protocol;
 
 import static protocol.ProtocolProperties.MASTER_ID;
 
+import java.awt.Desktop.Action;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -73,6 +74,16 @@ public class ShipLogic extends Observable implements Observer{
 
 	public Frame checkToken(Frame frame, Ship ship) {
 		Frame sendFrame = null;
+
+		if(simulation && ship.getStatus().getAction().equals(ActionType.IDLE.toString()) && ship.getIdleTime() >= 20) {
+			Status newStatus = DecisionMaker.getRandomAction(StatusType.getName(ship.getStatus().getStatus()));
+			ship.setStatus(new Status(ship.getStatus().getStatus(), newStatus.getAction(), PermissionType.ASK.toString()));
+			ship.setActionList(new ArrayList<>());
+			ship.addAction(newStatus);
+		}else if (ship.getIdleTime() < 20 && simulation) {
+			ship.addIdleTime(1);
+		}
+		
 		if(ship.getActionList().size() > 0) {
 			System.out.println("Nueva accion");
 			System.out.println("Numero de acciones "+ship.getActionList().size());
@@ -98,7 +109,7 @@ public class ShipLogic extends Observable implements Observer{
 	public void checkShipMovement(Frame frame, Ship ship) {
 		if(frame.getData().getType().equals(DataType.RESPONSE.toString()) && frame.getData().getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
 			System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " has permission to perform the operation: " + ActionType.getName(ship.getStatus().getAction()).name());
-			
+
 			if(frame.getData().getStatus().getStatus().equals(ship.getActionList().get(0).getStatus())) {
 				System.out.println("Operation finish for ship number " + Integer.parseInt(ship.getId(), 2) + " status: " + StatusType.getName(ship.getStatus().getStatus()).name());
 				System.out.println("Setting ship status to IDLE and now can ask for a new action");
@@ -147,7 +158,10 @@ public class ShipLogic extends Observable implements Observer{
 
 	public void setSimulationStarted() {
 		simulation = true;
-		
+	}
+	
+	public void setSimulationStopped() {
+		simulation = false;
 	}
 
 }

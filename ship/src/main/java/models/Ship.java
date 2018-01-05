@@ -9,10 +9,12 @@ public class Ship {
 	private Status status;
 	private String parking;
 	private List<Status> actionList;
+	int idleTime;
 	
 	public Ship(String id, Status status) {
 		this.id = id;
 		this.status = status;
+		idleTime = 0;
 		actionList = new ArrayList<>();
 	}
 	
@@ -53,6 +55,17 @@ public class Ship {
 	public void setParking(String parking) {
 		this.parking = parking;
 	}
+
+	public int getIdleTime() {
+		return idleTime;
+	}
+
+	public void setIdleTime(int idleTime) {
+		this.idleTime = idleTime;
+	}
 	
+	public void addIdleTime(int sumTime) {
+		idleTime += sumTime;
+	}
 	
 }

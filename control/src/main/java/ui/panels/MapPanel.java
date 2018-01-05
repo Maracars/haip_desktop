@@ -169,7 +169,6 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 				g.setColor(new Color(77, 244, 65));
 			}
 			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(Math.round(port.getDock().getMoorings().size()/2)+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
-			// TODO Put in decimal
 			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(port.getDock().getMoorings().size()-1).getId(), 2)), (panelLocation.x+(panelDimension.width/2))+((Math.round(port.getDock().getMoorings().size()/2)+1)+1)*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT-2);
 		}
 
