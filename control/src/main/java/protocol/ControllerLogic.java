@@ -11,7 +11,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import static protocol.ProtocolProperties.*;
 
-// TODO These functions have been done here. Why? Idk, but have to be moved somewhere else. Where? Idk.
 public class ControllerLogic extends Observable implements Observer, Runnable {
 	private Port port;
 	private List<Frame> receivedList;
@@ -33,20 +32,19 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		timeouts = new HashMap<>();
 		this.serial = serial;
 
-		this.thread = new Thread(this);
 	}
 
 	public void startLogic() {
-		if (!this.thread.isAlive()) {
-			this.running = true;
-			// TODO Illegal Thread state when restarting
-			this.thread.start();
-		}
+		this.running = true;
+		this.thread = new Thread(this);
 	}
 
 	public void stopLogic() {
-		if (this.thread.isAlive()) {
+		try {
 			this.running = false;
+			this.thread.join();
+		} catch (InterruptedException e) {
+			LogModel.add("Couldn't stop system");
 		}
 	}
 

@@ -277,8 +277,7 @@ public class MainPanel {
 					connectButton.setText("Disconnect from board");
 					LogModel.add(CONNECTION_ESTABLISHED);
 					logicAction.setEnabled(true);
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					LogModel.add(e.getMessage());
 				}
 			}
@@ -288,8 +287,7 @@ public class MainPanel {
 					connectButton.setText("Connect to board");
 					LogModel.add(CONNECTION_CLOSED);
 					logicAction.setEnabled(false);
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					LogModel.add(e.getMessage());
 				}
 			}
