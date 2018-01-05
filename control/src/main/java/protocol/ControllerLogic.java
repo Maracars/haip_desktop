@@ -71,11 +71,10 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
 			}
 			LogModel.add("Discovery is sent to boats");
-			System.out.println("Discovery");
 
 			try {
 				//TODO I have no fucking idea how big the delay should be
-				Thread.sleep(2000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -89,7 +88,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		if (serial != null && serial.isConnected()) {
 			Helpers.sendParsedFrame(fr, serial);
 		}
-		LogModel.add("Sent validFrame token to boat number :" + boat_id);
+		System.out.println("Sent validFrame token to boat number :" + boat_id);
 
 		long count = 0;
 		//noinspection StatementWithEmptyBody
@@ -101,20 +100,20 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			if (receivedList.get(0).getData().getStatus().getAction().equals(ActionType.IDLE.toString())) {
 				addTimeout(boat_id);
 				updateMap(new Ship(receivedList.get(0).getOriginId(), receivedList.get(0).getData().getStatus()));
-				LogModel.add("Asked for idle, and added timeout" + timeouts);
+				System.out.println("Asked for idle, and added timeout" + timeouts);
 			}
 			else {
 				//TODO Here we must send the response to the request.
 				if (idleBoats.contains(boat_id)) {
 					addConnectedBoat(boat_id);
 				}
-				LogModel.add("Ship number " + boat + " sent " + receivedList);
+				System.out.println("Ship number " + boat + " sent " + receivedList);
 				checkRequest(receivedList.get(0));
 			}
 		}
 		else {
 			if (!receivedList.isEmpty()) {
-				LogModel.add("Invalid packet " + boat + " " + receivedList.get(0).getOriginId());
+				System.out.println("Invalid packet " + boat + " " + receivedList.get(0).getOriginId());
 			}
 			addTimeout(boat_id);
 		}
@@ -128,11 +127,9 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	}
 
 	private void checkRequest(Frame frame) {
-		Status status = frame.getData().getStatus();
-		Status nextStatus;
-
-		String status_str = status.getStatus();
-		String action_str = status.getAction();
+		Status nextStatus = frame.getData().getStatus();
+		String status_str = nextStatus.getStatus();
+		String action_str = nextStatus.getAction();
 
 		Ship ship = new Ship(frame.getOriginId());
 		String parking = null;
@@ -140,33 +137,38 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		// Dock, leave
 		if (status_str.equals(StatusType.PARKING.toString()) && action_str.equals(ActionType.LEAVE.toString())) {
 			boolean okay = port.addToTransitionZone(ship, action_str);
-			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.LEAVE.toString());
-
 			if (okay) {
+				nextStatus.setStatus(StatusType.TRANSIT.toString());
+				nextStatus.setAction(ActionType.LEAVE.toString());
 				nextStatus.setPermission(PermissionType.ALLOW.toString());
-				LogModel.add("Ship :" + frame.getOriginId() + " is going from the dock to the transit zone");
+				LogModel.add("Ship " + frame.getOriginId() + " is going from the dock to the transit zone.");
 			} else {
+				//nextStatus.setStatus(StatusType.PARKING.toString());
+				//nextStatus.setAction(ActionType.LEAVE.toString());
 				nextStatus.setPermission(PermissionType.DENY.toString());
-				LogModel.add("Ship " + frame.getOriginId() + " access to transit zone denied, not enough space");
+				LogModel.add("Ship " + frame.getOriginId() + " access to transit zone denied, not enough space.");
 			}
 		}
 		// Transit, leave or enter
 		else if (status_str.equals(StatusType.TRANSIT.toString()) &&
 				(action_str.equals(ActionType.ENTER.toString())) || action_str.equals(ActionType.LEAVE.toString())) {
-			port.removeFromTransitZone(ship);
 
 			if (action_str.equals(ActionType.LEAVE.toString())) {
-				nextStatus = new Status(StatusType.SEA.toString(), ActionType.LEAVE.toString(), PermissionType.ALLOW.toString());
+				nextStatus.setStatus(StatusType.SEA.toString());
+				nextStatus.setAction(ActionType.LEAVE.toString());
+				nextStatus.setPermission(PermissionType.ALLOW.toString());
 				LogModel.add("Ship " + frame.getOriginId() + " is going from the transit zone to the sea. Goodbye!");
 			} else {
-				nextStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString(), PermissionType.ALLOW.toString());
-				LogModel.add("Ship " + frame.getOriginId() + " is going from the transit zone to the dock");
+				nextStatus.setStatus(StatusType.PARKING.toString());
+				nextStatus.setAction(ActionType.ENTER.toString());
+				nextStatus.setPermission(PermissionType.ALLOW.toString());
+				LogModel.add("Ship " + frame.getOriginId() + " is going from the transit zone to the dock.");
 			}
+			port.removeFromTransitZone(ship);
 		}
 		// Sea, enter
 		else if (status_str.equals(StatusType.SEA.toString()) && action_str.equals(ActionType.ENTER.toString())) {
 			Mooring freeMooring = port.getFreeMooring(ship);
-			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString());
 
 			if (freeMooring != null) {
 				parking = freeMooring.getId();
@@ -174,25 +176,33 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				boolean freeTransit = port.addToTransitionZone(ship, action_str);
 
 				if (freeTransit) {
+					nextStatus.setStatus(StatusType.TRANSIT.toString());
+					nextStatus.setAction(ActionType.ENTER.toString());
 					nextStatus.setPermission(PermissionType.ALLOW.toString());
 					LogModel.add("Ship " + frame.getOriginId() + " is going from the sea to the transit zone");
 				} else {
+					//nextStatus.setStatus(StatusType.SEA.toString());
+					//nextStatus.setAction(ActionType.ENTER.toString());
 					nextStatus.setPermission(PermissionType.DENY.toString());
 					LogModel.add("Ship " + frame.getOriginId() + " access to transit zone denied, not enough space in transit zone");
 				}
 			}
 			else {
+				//nextStatus.setStatus(StatusType.SEA.toString());
+				//nextStatus.setAction(ActionType.ENTER.toString());
 				nextStatus.setPermission(PermissionType.DENY.toString());
 				LogModel.add("Ship " + frame.getOriginId() + " access denied, no free mooring");
 			}
 		}
 		// Invalid
 		else {
-			nextStatus = new Status(StatusType.TRANSIT.toString(), ActionType.ENTER.toString(), PermissionType.INVALID.toString());
-			LogModel.add("Invalid state");
+			//nextStatus.setStatus(StatusType.TRANSIT.toString());
+			//nextStatus.setAction(ActionType.ENTER.toString());
+			nextStatus.setPermission(PermissionType.INVALID.toString());
+			LogModel.add("Ship " + frame.getOriginId() + " is in an invalid state");
 		}
 		Frame nextFrame = FrameCreator.createResponse(MASTER_ID, ship.getId(), nextStatus, parking);
-		LogModel.add("next frame to send: " + nextFrame.toString());
+		System.out.println("Next frame to send: " + nextFrame.toString());
 
 		// Send frame
 		if (serial != null && serial.isConnected()) {
@@ -203,16 +213,11 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				e.printStackTrace();
 			}
 		} else {
-			LogModel.add("Sent frame");
+			System.out.println("Sent frame");
 		}
 		setSentRequest(nextFrame);
-		
-		if (nextStatus.getPermission().equals(PermissionType.ALLOW.toString())) {
-			ship.setStatus(nextStatus);
-		} else {
-			status.setPermission(PermissionType.DENY.toString());
-			ship.setStatus(status);
-		}
+
+		ship.setStatus(nextStatus);
 		updateMap(ship);
 	}
 
