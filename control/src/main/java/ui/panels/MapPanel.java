@@ -12,19 +12,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 public class MapPanel extends JPanel implements ComponentListener, Observer {
 	private static final long serialVersionUID = 1L;
 
+	private static final int TRANSITION_WIDTH = 100;
 	private static final int TRANSITION_HEIGHT = 100;
-	private static final int PARKING_HEIGHT = 80;
 	private static final int PARKING_WIDTH = 80;
-	private static final int BOAT_HEIGHT = 30;
+	private static final int PARKING_HEIGHT = 80;
 	private static final int BOAT_WIDTH = 30;
+	private static final int BOAT_HEIGHT = 30;
 
 	private Dimension panelDimension;
 	private Point panelLocation;
@@ -37,7 +36,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		this.setLayout(new BorderLayout());
 		this.addComponentListener(this);
-		shipList = new ArrayList<>();
+		this.shipList = new ArrayList<>();
 		this.port = port;
 	}
 
@@ -49,7 +48,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		seaWidth = displayWidth;
 
 		transitHeight = TRANSITION_HEIGHT;
-		transitWidth = displayWidth;
+		transitWidth = TRANSITION_WIDTH;
 
 		parkingHeight = displayHeight/2 - TRANSITION_HEIGHT/2;
 		parkingWidth = displayWidth;
@@ -63,7 +62,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		paintTransitZone(g);
 
 		g.setColor(new Color(52, 120, 229));
-		g.fillRect(0, seaHeight+transitHeight, parkingWidth, parkingHeight);
+		g.fillRect(0, seaHeight + transitHeight, parkingWidth, parkingHeight);
 		paintParkings(g);
 
 		paintBoats(g);
@@ -93,17 +92,21 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)), x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
 				break;
 			case TRANSIT:
-				x = (int) (panelLocation.getX() + transitWidth + (BOAT_WIDTH )*port.getTransitZone().size());
+				int index = port.getTransitZone().getIndex(ship);
+				x = (int) (panelLocation.getX() + transitWidth + (TRANSITION_WIDTH * index));
 				y = seaHeight + transitHeight/2;
 				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
 				g.setColor(Color.BLACK);
-				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)), x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
+				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
+						x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
 				break;
 			case SEA:
-				Point point = checkBoatLocation(ship);
-				g.fillOval((int)point.getX(), (int)point.getY(), BOAT_WIDTH, BOAT_HEIGHT);
+				Point pointSea = checkBoatLocation(ship);
+				g.fillOval((int)pointSea.getX(), (int)pointSea.getY(), BOAT_WIDTH, BOAT_HEIGHT);
 				g.setColor(Color.BLACK);
-				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)), (int) (point.getX() + BOAT_WIDTH/2 - 4), (int) (point.getY() + BOAT_HEIGHT / 2 + 3));
+				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
+						(int) (pointSea.getX() + BOAT_WIDTH/2 - 4),
+						(int) (pointSea.getY() + BOAT_HEIGHT / 2 + 3));
 				break;
 		}
 

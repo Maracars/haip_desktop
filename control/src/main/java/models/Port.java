@@ -1,5 +1,6 @@
 package models;
 
+import helpers.IndexAwareSet;
 import settings.Settings;
 
 import java.util.LinkedList;
@@ -11,14 +12,12 @@ import static protocol.ProtocolProperties.ActionType;
 public class Port {
 
 	private Dock dock;
-	private Set<Ship> transitZone;
+	private IndexAwareSet<Ship> transitZone;
 	private LinkedList<Ship> transitQueue;
-
 
 	public Port(Dock dock) {
 		this.dock = dock;
-		this.transitZone = new CopyOnWriteArraySet<>();
-
+		this.transitZone = new IndexAwareSet<>(new CopyOnWriteArraySet<>());
 		this.transitQueue = new LinkedList<>();
 	}
 
@@ -26,7 +25,7 @@ public class Port {
 		return dock;
 	}
 
-	public Set<Ship> getTransitZone() {
+	public IndexAwareSet<Ship> getTransitZone() {
 		return transitZone;
 	}
 
@@ -36,10 +35,10 @@ public class Port {
 
 
 	public boolean addToTransitionZone(Ship ship, String action) {	
-		if(!transitQueue.contains(ship)) {
+		if (!transitQueue.contains(ship)) {
 			transitQueue.add(ship);
 		}
-		if(transitQueue.getFirst().equals(ship) && transitZone.size() < Settings.getProperties().get(1)) {
+		if (transitQueue.getFirst().equals(ship) && transitZone.size() < Settings.getProperties().get(1)) {
 			transitZone.add(ship);
 			if (action.equals(ActionType.LEAVE.toString())) {
 				freeMooring(ship);
@@ -53,10 +52,7 @@ public class Port {
 	public void removeFromTransitZone(Ship ship) {
 		transitZone.remove(ship);
 	}
-	
-	public boolean isFirst(Ship ship) {
-		return transitQueue.isEmpty() || transitQueue.getFirst().equals(ship);
-	}
+
 
 	private void freeMooring(Ship ship) {
 		for (Mooring mooring : dock.getMoorings()) {
@@ -67,7 +63,6 @@ public class Port {
 	}
 
 	public Mooring getFreeMooring(Ship ship) {
-
 		// Check if ship already has mooring assigned
 		for (Mooring mooring : dock.getMoorings()) {
 			if (mooring.getShip() != null && ship.equals(mooring.getShip())) {

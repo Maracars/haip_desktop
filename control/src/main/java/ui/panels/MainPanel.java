@@ -133,7 +133,7 @@ public class MainPanel {
 		ArrayList<Mooring> moorings = new ArrayList<Mooring>();
 		for (Integer i = 0; i < Settings.getProperties().get(0); i++) {
 			Ship ship = null;
-			moorings.add(new Mooring(Helpers.toByteBinString(i.toString(), 8), ship));
+			moorings.add(new Mooring(Helpers.toNbitBinaryString(i.toString(), 8), ship));
 		}
 		port.getDock().setMoorings(moorings);
 	}

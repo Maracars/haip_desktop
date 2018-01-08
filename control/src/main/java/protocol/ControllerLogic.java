@@ -84,7 +84,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	private void control(String boat) {
 		Integer boat_id = Integer.parseInt(boat);
 
-		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toByteBinString(boat, 8));
+		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toNbitBinaryString(boat, 8));
 		if (serial != null && serial.isConnected()) {
 			Helpers.sendParsedFrame(fr, serial);
 		}
@@ -96,7 +96,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 		// TODO Here we take the first packet received, dunno if we must ensure we have just one...
 		// Here we check that we have received something or has timed out, and that the boat that has sent is the one we want
-		if (!receivedList.isEmpty() && receivedList.get(0).getOriginId().equals(Helpers.toByteBinString(boat, 8))) {
+		if (!receivedList.isEmpty() && receivedList.get(0).getOriginId().equals(Helpers.toNbitBinaryString(boat, 8))) {
 			if (receivedList.get(0).getData().getStatus().getAction().equals(ActionType.IDLE.toString())) {
 				addTimeout(boat_id);
 				updateMap(new Ship(receivedList.get(0).getOriginId(), receivedList.get(0).getData().getStatus()));

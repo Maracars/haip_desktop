@@ -14,7 +14,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import helpers.Helpers;
 import models.Ship;
@@ -135,7 +134,7 @@ public class SimulationDialog extends JDialog implements ActionListener{
 		for(int i = 0; i < numBoats; i++) {
 			Status newStatus = DecisionMaker.getRandomAction(StatusType.SEA);
 			Status status = new Status(StatusType.SEA.toString(), newStatus.getAction(), PermissionType.ASK.toString());
-			Ship ship = new Ship(Helpers.toByteBinString(String.valueOf(i+1), 8), status);
+			Ship ship = new Ship(Helpers.toNbitBinaryString(String.valueOf(i+1), 8), status);
 			ship.addAction(newStatus);
 			simShipLogic.addShipToSimulation(ship);
 		}

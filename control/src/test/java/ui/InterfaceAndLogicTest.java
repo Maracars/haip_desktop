@@ -54,7 +54,6 @@ public class InterfaceAndLogicTest {
 		this.scanner = new Scanner(System.in);
 	}
 
-	@Test
 	public void receiveFrames() {
 		mainPanel.startLogic();
 
@@ -94,7 +93,6 @@ public class InterfaceAndLogicTest {
 		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitLeave).toString());
 	}
 
-	@Test
 	public void waitAndSendToParser(String packet) {
 		try {
 			Thread.sleep(10);

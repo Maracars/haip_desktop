@@ -55,7 +55,6 @@ public class ParserRxTest extends Observable {
 		thread.start();
 	}
 
-	@Test
 	public void initMoorings(ArrayList<Mooring> moorings) {
 		for (Integer i = 0; i < 10; i++) {
 			Ship ship = null;
@@ -66,7 +65,6 @@ public class ParserRxTest extends Observable {
 		}
 	}
 
-	@Test
 	public void receiveFrames() {
 		sendToParserAndWait(PACKET_4_A);
 		sendToParserAndWait(PACKET_4_B);
@@ -76,7 +74,6 @@ public class ParserRxTest extends Observable {
 		sendToParserAndWait(PACKET_6_B);
 	}
 
-	@Test
 	public void sendToParserAndWait(String packet) {
 		try {
 			TimeUnit.SECONDS.sleep(1);

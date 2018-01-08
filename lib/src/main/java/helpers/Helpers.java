@@ -10,7 +10,7 @@ import java.util.List;
 public class Helpers {
 
 
-	public static String toByteBinString(String str, Integer num_bits) {
+	public static String toNbitBinaryString(String str, Integer num_bits) {
 		if (str == null || str.isEmpty()) return "";
 
 		return String.format("%" + num_bits + "s", Integer.toBinaryString((byte) Integer.parseInt(str) & 0xFF)).replace(' ', '0');

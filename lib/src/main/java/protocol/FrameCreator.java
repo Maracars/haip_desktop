@@ -63,7 +63,7 @@ public class FrameCreator {
 		String dataStr = data.toString();
 
 		// TODO We have think about how the counter work
-		Header header = new Header(Helpers.toByteBinString("" + dataStr.length() / 8, 3), type.toString(), "000");
+		Header header = new Header(Helpers.toNbitBinaryString("" + dataStr.length() / 8, 3), type.toString(), "000");
 		Frame frame = new Frame(header, origin, dest, data);
 		String checksum = CRC8.toCRC8(frame.toString());
 		frame.setChecksum(checksum);

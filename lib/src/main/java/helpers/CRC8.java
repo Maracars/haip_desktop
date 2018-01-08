@@ -42,7 +42,7 @@ public class CRC8 {
 	public static String toCRC8(String string) {
 		reset();
 		update(string.getBytes());
-		return Helpers.toByteBinString("" + getValue(), 8);
+		return Helpers.toNbitBinaryString("" + getValue(), 8);
 	}
 
 }
