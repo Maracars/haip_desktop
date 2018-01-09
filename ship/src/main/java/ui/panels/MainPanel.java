@@ -52,13 +52,13 @@ import protocol.ShipLogic;
 import protocol.SimulationShipLogic;
 import serial.Serial;
 import ui.dialogs.SimulationDialog;
-import ui.log.LogModel;
-import ui.log.LogPanel;
+import ui.log.LogListModel;
+import ui.log.AutoScrollLogPanel;
 
 public class MainPanel implements Observer{
 	// Swing Elements
 	private JFrame window;
-	private LogModel logModel;
+	private LogListModel logListModel;
 	private JButton connectButton, logicButton, actionButton;
 	private AbstractAction exitAction, connectAction, logicAction, decisionAction, simulationAction;
 	private JLabel permissionLabel, statusLabel;
@@ -158,7 +158,7 @@ public class MainPanel implements Observer{
 		try {
 			logoPanel = new ImagePanel("ship/src/main/resources/HAIP_logo.png");
 		} catch (IOException e) {
-			LogModel.add(ERROR_READING_LOGO);
+			LogListModel.add(ERROR_READING_LOGO);
 		}
 		logoPanel.scaleImage(this.window.getWidth() / 7, this.window.getWidth() / 7);
 
@@ -166,8 +166,8 @@ public class MainPanel implements Observer{
 	}
 
 	private Component createLogPanel() {
-		this.logModel = new LogModel();
-		return new LogPanel(logModel);
+		this.logListModel = new LogListModel();
+		return new AutoScrollLogPanel(logListModel);
 	}
 
 	private Component createButtonsPanel() {
@@ -346,10 +346,10 @@ public class MainPanel implements Observer{
 					connectButton.setText("Disconnect from board");
 					logicButton.setEnabled(true);
 					simulationAction.setEnabled(true);
-					LogModel.add(CONNECTION_ESTABLISHED);
+					LogListModel.add(CONNECTION_ESTABLISHED);
 				}
 				catch (Exception e) {
-					LogModel.add(e.getMessage());
+					LogListModel.add(e.getMessage());
 				}
 			}
 			else {
@@ -358,10 +358,10 @@ public class MainPanel implements Observer{
 					simulationAction.setEnabled(false);
 					connectButton.setText("Connect to board");
 					logicButton.setEnabled(false);
-					LogModel.add(CONNECTION_CLOSED);
+					LogListModel.add(CONNECTION_CLOSED);
 				}
 				catch (Exception e) {
-					LogModel.add(e.getMessage());
+					LogListModel.add(e.getMessage());
 				}
 			}
 		}
@@ -390,7 +390,7 @@ public class MainPanel implements Observer{
 				logicButton.setText("Reject communications");
 				connectButton.setEnabled(false);
 				actionButton.setEnabled(true);
-				LogModel.add(LOGIC_INITIALIZED);
+				LogListModel.add(LOGIC_INITIALIZED);
 			}
 			else {
 				// Reject communications
@@ -399,7 +399,7 @@ public class MainPanel implements Observer{
 				logicButton.setText("Wait for discovery");
 				connectButton.setEnabled(true);
 				actionButton.setEnabled(false);
-				LogModel.add(LOGIC_STOPPED);
+				LogListModel.add(LOGIC_STOPPED);
 			}
 		}
 	}
@@ -501,7 +501,7 @@ public class MainPanel implements Observer{
 				try {
 					this.serial.closeConnection();
 				} catch (Exception e) {
-					LogModel.add(e.getMessage());
+					LogListModel.add(e.getMessage());
 				}
 				this.exitProgram();
 			}
