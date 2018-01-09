@@ -47,7 +47,7 @@ public class LogListModel implements ListModel<String> {
 		messageList.remove(index);
 		for (ListDataListener listener : listenerList) {
 			listener.intervalRemoved(
-					new ListDataEvent(messageList, ListDataEvent.CONTENTS_CHANGED, index, index));
+					new ListDataEvent(messageList, ListDataEvent.INTERVAL_REMOVED, index, index));
 		}
 	}
 }

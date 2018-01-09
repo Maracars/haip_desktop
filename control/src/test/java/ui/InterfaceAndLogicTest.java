@@ -54,7 +54,7 @@ public class InterfaceAndLogicTest {
 		this.scanner = new Scanner(System.in);
 	}
 
-	public void receiveFrames() {
+	/*public void receiveFrames() {
 		mainPanel.startLogic();
 
 		Status seaEnter = new Status(StatusType.SEA.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
@@ -91,7 +91,7 @@ public class InterfaceAndLogicTest {
 		waitAndSendToParser(FrameCreator.createRequest("00000001", MASTER_ID, dockIdle).toString());
 		//scanner.nextLine();
 		waitAndSendToParser(FrameCreator.createRequest("00000010", MASTER_ID, transitLeave).toString());
-	}
+	}*/
 
 	public void waitAndSendToParser(String packet) {
 		try {

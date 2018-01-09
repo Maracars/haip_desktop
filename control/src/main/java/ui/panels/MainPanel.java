@@ -415,8 +415,4 @@ public class MainPanel {
 		this.window.dispose();
 		System.exit(0);
 	}
-
-	public void startLogic() {
-		controllerLogic.startLogic();
-	}
 }
