@@ -89,12 +89,15 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 				y = panelDimension.height - (PARKING_HEIGHT / 2);
 				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
 				g.setColor(Color.BLACK);
-				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)), x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
+				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
+						x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
 				break;
 			case TRANSIT:
 				int index = port.getTransitZone().getIndex(ship);
-				x = (int) (panelLocation.getX() + transitWidth + (TRANSITION_WIDTH * index));
-				y = seaHeight + transitHeight/2;
+				System.out.println(transitWidth);
+				x = (int) (panelLocation.getX() + transitWidth
+						+ (TRANSITION_WIDTH * index) + TRANSITION_WIDTH/2 - BOAT_WIDTH/2);
+				y = seaHeight + transitHeight/2 - BOAT_HEIGHT/2;
 				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
 				g.setColor(Color.BLACK);
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
@@ -109,18 +112,17 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 						(int) (pointSea.getY() + BOAT_HEIGHT / 2 + 3));
 				break;
 		}
-
 	}
 
 	private int checkBoatParking(Ship ship) {
 		for (int i = 0; i < port.getDock().getMoorings().size(); i++) {
 			if (port.getDock().getMoorings().get(i).getShip() != null
 					&& port.getDock().getMoorings().get(i).getShip().getId().equals(ship.getId())) {
-				return (i < Math.round(port.getDock().getMoorings().size() / 2)) ? i - Math.round(port.getDock().getMoorings().size() / 2) : i/2;
+				return (i < Math.round(port.getDock().getMoorings().size() / 2)) ?
+						i - Math.round(port.getDock().getMoorings().size() / 2) : i/2;
 			}
 		}
 		return -1;
-
 	}
 
 	private Point checkBoatLocation(Ship ship) {
