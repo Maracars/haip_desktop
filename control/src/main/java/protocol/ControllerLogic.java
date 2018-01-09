@@ -194,7 +194,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		String parking = null;
 
 		if (freeMooring != null) {
-			parking = freeMooring.getId();
+			parking = ship.getId();
+			//parking = freeMooring.getId();
 			LogModel.add("Assigned mooring " + Integer.parseInt(parking, 2));
 			boolean freeTransit = port.addToTransitionZone(ship, actionStr);
 

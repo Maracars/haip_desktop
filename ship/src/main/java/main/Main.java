@@ -17,7 +17,7 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		Status status = new Status(StatusType.SEA.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
-		Ship ship = new Ship("00000001", status);
+		Ship ship = new Ship("00000110", status);
 		Status newStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString());
 		ship.addAction(newStatus);
 		Serial serial = new Serial();

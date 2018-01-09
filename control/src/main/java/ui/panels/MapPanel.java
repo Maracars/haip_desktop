@@ -83,34 +83,34 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		g.setColor(new Color(77, 244, 65));
 		checkBoatActionTypeAndPermissions(g, ship);
 		switch(st) {
-			case PARKING:
-				int parkingIndex = checkBoatParking(ship);
-				x = (panelLocation.x + (panelDimension.width / 2)) + (parkingIndex) * PARKING_WIDTH;
-				y = panelDimension.height - (PARKING_HEIGHT / 2);
-				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
-				g.setColor(Color.BLACK);
-				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
-						x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
-				break;
-			case TRANSIT:
-				int index = port.getTransitZone().getIndex(ship);
-				System.out.println(transitWidth);
-				x = (int) (panelLocation.getX() + transitWidth
-						+ (TRANSITION_WIDTH * index) + TRANSITION_WIDTH/2 - BOAT_WIDTH/2);
-				y = seaHeight + transitHeight/2 - BOAT_HEIGHT/2;
-				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
-				g.setColor(Color.BLACK);
-				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
-						x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
-				break;
-			case SEA:
-				Point pointSea = checkBoatLocation(ship);
-				g.fillOval((int)pointSea.getX(), (int)pointSea.getY(), BOAT_WIDTH, BOAT_HEIGHT);
-				g.setColor(Color.BLACK);
-				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
-						(int) (pointSea.getX() + BOAT_WIDTH/2 - 4),
-						(int) (pointSea.getY() + BOAT_HEIGHT / 2 + 3));
-				break;
+		case PARKING:
+			int parkingIndex = checkBoatParking(ship);
+			x = (panelLocation.x + (panelDimension.width / 2)) + (parkingIndex) * PARKING_WIDTH;
+			y = panelDimension.height - (PARKING_HEIGHT / 2);
+			g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
+			g.setColor(Color.BLACK);
+			g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
+					x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
+			break;
+		case TRANSIT:
+			int index = port.getTransitZone().getIndex(ship);
+			System.out.println(transitWidth);
+			x = (int) (panelLocation.getX() + transitWidth
+					+ (TRANSITION_WIDTH * index) + TRANSITION_WIDTH/2 - BOAT_WIDTH/2);
+			y = seaHeight + transitHeight/2 - BOAT_HEIGHT/2;
+			g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
+			g.setColor(Color.BLACK);
+			g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
+					x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
+			break;
+		case SEA:
+			Point pointSea = checkBoatLocation(ship);
+			g.fillOval((int)pointSea.getX(), (int)pointSea.getY(), BOAT_WIDTH, BOAT_HEIGHT);
+			g.setColor(Color.BLACK);
+			g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
+					(int) (pointSea.getX() + BOAT_WIDTH/2 - 4),
+					(int) (pointSea.getY() + BOAT_HEIGHT / 2 + 3));
+			break;
 		}
 	}
 
@@ -118,8 +118,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		for (int i = 0; i < port.getDock().getMoorings().size(); i++) {
 			if (port.getDock().getMoorings().get(i).getShip() != null
 					&& port.getDock().getMoorings().get(i).getShip().getId().equals(ship.getId())) {
-				return (i < Math.round(port.getDock().getMoorings().size() / 2)) ?
-						i - Math.round(port.getDock().getMoorings().size() / 2) : i/2;
+				return i - Math.round(port.getDock().getMoorings().size() / 2);
 			}
 		}
 		return -1;
@@ -161,7 +160,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 			}else {
 				g.setColor(new Color(77, 244, 65));
 			}
- 			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(i*PARKING_WIDTH), panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
+			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(i*PARKING_WIDTH), panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
 			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(i+Math.round(port.getDock().getMoorings().size()/2)).getId(), 2)), (panelLocation.x+(panelDimension.width/2))+(i*PARKING_WIDTH), panelDimension.height-PARKING_HEIGHT-2);
 		}
 		if(port.getDock().getMoorings().size() % 2 != 0) {
