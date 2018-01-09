@@ -3,7 +3,7 @@ package ui.log;
 import javax.swing.*;
 import java.awt.*;
 
-public class LogAdapter implements ListCellRenderer<String> {
+public class LogListCellRenderer implements ListCellRenderer<String> {
 	
 	@Override
 	public Component getListCellRendererComponent(JList<? extends String> list, String text, int index,

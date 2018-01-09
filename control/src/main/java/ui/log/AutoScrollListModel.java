@@ -6,12 +6,11 @@ import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LogModel implements ListModel<String> {
-
+public class AutoScrollListModel implements ListModel<String> {
 	private static List<String> messageList;
 	private static List<ListDataListener> listenerList;
 	
-	public LogModel() {
+	public AutoScrollListModel() {
 		messageList = new ArrayList<>();
 		listenerList = new ArrayList<>();
 	}
@@ -39,16 +38,16 @@ public class LogModel implements ListModel<String> {
 	public static void add(String text) {
 		messageList.add(text);
 		for (ListDataListener listener : listenerList) {
-			listener.contentsChanged(new ListDataEvent(
-					messageList, ListDataEvent.CONTENTS_CHANGED, 0, messageList.size()));
+			listener.intervalAdded(
+					new ListDataEvent(messageList, ListDataEvent.INTERVAL_ADDED, 0, messageList.size()));
 		}
 	}
 
 	public static void remove(int index) {
 		messageList.remove(index);
 		for (ListDataListener listener : listenerList) {
-			listener.contentsChanged(new ListDataEvent(
-					messageList, ListDataEvent.CONTENTS_CHANGED, index, index));
+			listener.intervalRemoved(
+					new ListDataEvent(messageList, ListDataEvent.CONTENTS_CHANGED, index, index));
 		}
 	}
 }

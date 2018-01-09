@@ -15,7 +15,7 @@ import ui.panels.MainPanel;
 
 public class Main {
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		Status status = new Status(StatusType.SEA.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
 		Ship ship = new Ship("00000110", status);
 		Status newStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString());
