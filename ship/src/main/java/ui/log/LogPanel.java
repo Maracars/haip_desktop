@@ -1,5 +1,8 @@
 package ui.log;
 
+import ui.log.LogAdapter;
+import ui.log.LogModel;
+
 import javax.swing.*;
 import java.awt.*;
 

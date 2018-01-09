@@ -1,5 +1,44 @@
 package ui.panels;
 
+import static ui.panels.ActionMessages.CONNECTION_CLOSED;
+import static ui.panels.ActionMessages.CONNECTION_ESTABLISHED;
+import static ui.panels.ActionMessages.ERROR_READING_LOGO;
+import static ui.panels.ActionMessages.LOGIC_INITIALIZED;
+import static ui.panels.ActionMessages.LOGIC_STOPPED;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+
 import helpers.Helpers;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
@@ -16,23 +55,7 @@ import ui.dialogs.SimulationDialog;
 import ui.log.LogModel;
 import ui.log.LogPanel;
 
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.util.Observable;
-import java.util.Observer;
-
-import static ui.panels.ActionMessages.*;
-
-public class MainPanel implements ListSelectionListener, Observer{
+public class MainPanel implements Observer{
 	// Swing Elements
 	private JFrame window;
 	private LogModel logModel;
@@ -40,7 +63,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 	private AbstractAction exitAction, connectAction, logicAction, decisionAction, simulationAction;
 	private JLabel permissionLabel, statusLabel;
 	private JList<String> statusList, decisionList;
-	private StatusListRenderer statusRenderer;
+	StatusListRenderer statusRenderer;
 
 	// Serial Communication
 	private Serial serial;
@@ -54,6 +77,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 
 	// System Initialized
 	private boolean shipDiscovered;
+	
 
 	public MainPanel(Serial serial, Ship ship, ShipLogic shipLogic, SimulationShipLogic simulationShipLogic) {
 		this.createFrame();
@@ -134,7 +158,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 		try {
 			logoPanel = new ImagePanel("ship/src/main/resources/HAIP_logo.png");
 		} catch (IOException e) {
-			this.logModel.add(ERROR_READING_LOGO);
+			LogModel.add(ERROR_READING_LOGO);
 		}
 		logoPanel.scaleImage(this.window.getWidth() / 7, this.window.getWidth() / 7);
 
@@ -203,8 +227,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 
 	private Component createDecisionList() {
 		decisionList = new JList<String>(Helpers.getNames(ActionType.class));
-		decisionList.addListSelectionListener(this);
-		DecisionListRenderer decisionRenderer = new DecisionListRenderer(statusList);
+		DecisionListRenderer decisionRenderer = new DecisionListRenderer(statusRenderer);
 		decisionList.setCellRenderer(decisionRenderer);
 		decisionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		decisionList.setLayoutOrientation(JList.VERTICAL);
@@ -214,11 +237,9 @@ public class MainPanel implements ListSelectionListener, Observer{
 
 	private Component createStatusList() {
 		statusList = new JList<String>(Helpers.getNames(StatusType.class));
-		statusList.setSelectedValue(StatusType.getName(ship.getStatus().getStatus()).name(), true);
-		statusList.addListSelectionListener(this);
-		statusRenderer = new StatusListRenderer(StatusType.getName(ship.getStatus().getStatus()).name());
+		String shipStatus = StatusType.getName(ship.getStatus().getStatus()).name();
+		statusRenderer = new StatusListRenderer(shipStatus);
 		statusList.setCellRenderer(statusRenderer);
-		statusList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		statusList.setLayoutOrientation(JList.VERTICAL);
 		statusList.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 3, Color.darkGray));
 		return statusList;
@@ -271,16 +292,10 @@ public class MainPanel implements ListSelectionListener, Observer{
 		return statusLabel;
 	}
 
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		repaintElements();
-	}
-
 	public void repaintElements() {
-		decisionList.repaint();
 		statusRenderer.setStatusType(StatusType.getName(ship.getStatus().getStatus()).name());
-		statusList.setSelectedValue(StatusType.getName(ship.getStatus().getStatus()).name(), true);
 		statusList.repaint();
+		decisionList.repaint();
 		repaintLabels();
 	}
 
@@ -331,10 +346,10 @@ public class MainPanel implements ListSelectionListener, Observer{
 					connectButton.setText("Disconnect from board");
 					logicButton.setEnabled(true);
 					simulationAction.setEnabled(true);
-					logModel.add(CONNECTION_ESTABLISHED);
+					LogModel.add(CONNECTION_ESTABLISHED);
 				}
 				catch (Exception e) {
-					logModel.add(e.getMessage());
+					LogModel.add(e.getMessage());
 				}
 			}
 			else {
@@ -343,10 +358,10 @@ public class MainPanel implements ListSelectionListener, Observer{
 					simulationAction.setEnabled(false);
 					connectButton.setText("Connect to board");
 					logicButton.setEnabled(false);
-					logModel.add(CONNECTION_CLOSED);
+					LogModel.add(CONNECTION_CLOSED);
 				}
 				catch (Exception e) {
-					logModel.add(e.getMessage());
+					LogModel.add(e.getMessage());
 				}
 			}
 		}
@@ -375,7 +390,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 				logicButton.setText("Reject communications");
 				connectButton.setEnabled(false);
 				actionButton.setEnabled(true);
-				logModel.add(LOGIC_INITIALIZED);
+				LogModel.add(LOGIC_INITIALIZED);
 			}
 			else {
 				// Reject communications
@@ -384,7 +399,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 				logicButton.setText("Wait for discovery");
 				connectButton.setEnabled(true);
 				actionButton.setEnabled(false);
-				logModel.add(LOGIC_STOPPED);
+				LogModel.add(LOGIC_STOPPED);
 			}
 		}
 	}
@@ -486,7 +501,7 @@ public class MainPanel implements ListSelectionListener, Observer{
 				try {
 					this.serial.closeConnection();
 				} catch (Exception e) {
-					this.logModel.add(e.getMessage());
+					LogModel.add(e.getMessage());
 				}
 				this.exitProgram();
 			}

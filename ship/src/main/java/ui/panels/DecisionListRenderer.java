@@ -12,11 +12,11 @@ import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.StatusType;
 
 public class DecisionListRenderer implements ListCellRenderer<String>{
-	
-	JList<String> statusList;
-	
-	public DecisionListRenderer(JList<String> statusList) {
-		this.statusList = statusList;
+
+	StatusListRenderer statusRenderer;
+
+	public DecisionListRenderer(StatusListRenderer statusRenderer) {
+		this.statusRenderer = statusRenderer;
 	}
 
 	@Override
@@ -26,8 +26,7 @@ public class DecisionListRenderer implements ListCellRenderer<String>{
 		label.setText(value);
 		label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 20));
 		label.setHorizontalAlignment(JLabel.CENTER);
-		if(statusList.getSelectedIndex() != -1)
-			checkAvailableOptions(label, value);
+		checkAvailableOptions(label, value);
 		if(isSelected && label.isEnabled()) {
 			label.setOpaque(true);
 			label.setBackground(Color.LIGHT_GRAY);
@@ -36,28 +35,29 @@ public class DecisionListRenderer implements ListCellRenderer<String>{
 	}
 
 	private void checkAvailableOptions(JLabel label, String text) {
-		if(statusList.getSelectedValue().equals(StatusType.TRANSIT.name())){
+
+		if(statusRenderer.getStatusType().equals(StatusType.TRANSIT.name())){
 			if(text.equals(ActionType.IDLE.name())) {
 				label.setEnabled(false);
 			}else {
 				label.setEnabled(true);
 			}		
 		}
-		if(statusList.getSelectedValue().equals(StatusType.PARKING.name())) {
+		if(statusRenderer.getStatusType().equals(StatusType.PARKING.name())) {
 			if(text.equals(ActionType.ENTER.name())) {
 				label.setEnabled(false);
 			}else {
 				label.setEnabled(true);
 			}
 		}
-		if(statusList.getSelectedValue().equals(StatusType.SEA.name())) {
+		if(statusRenderer.getStatusType().equals(StatusType.SEA.name())) {
 			if(text.equals(ActionType.LEAVE.name())) {
 				label.setEnabled(false);
 			}else {
 				label.setEnabled(true);
 			}
 		}
-		
+
 	}
 
 }
