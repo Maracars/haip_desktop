@@ -15,9 +15,11 @@ import ui.panels.MainPanel;
 
 public class Main {
 	
+	private static final String SHIP_ID = "00000001";
+	
 	public static void main(String[] args) {
 		Status status = new Status(StatusType.SEA.toString(), ActionType.ENTER.toString(), PermissionType.ASK.toString());
-		Ship ship = new Ship("00000110", status);
+		Ship ship = new Ship(SHIP_ID, status);
 		Status newStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString());
 		ship.addAction(newStatus);
 		Serial serial = new Serial();

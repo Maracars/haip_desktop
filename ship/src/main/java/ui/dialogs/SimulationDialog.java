@@ -124,8 +124,7 @@ public class SimulationDialog extends JDialog implements ActionListener{
 
 			simShipLogic.getShipLogic().setSimulationStopped();
 			simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic);
-			simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic.getShipLogic());
-		}
+			}
 
 	}
 
