@@ -6,11 +6,11 @@ import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AutoScrollListModel implements ListModel<String> {
+public class LogListModel implements ListModel<String> {
 	private static List<String> messageList;
 	private static List<ListDataListener> listenerList;
 	
-	public AutoScrollListModel() {
+	public LogListModel() {
 		messageList = new ArrayList<>();
 		listenerList = new ArrayList<>();
 	}

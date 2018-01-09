@@ -11,8 +11,8 @@ import protocol.SerialObserver;
 import serial.Serial;
 import settings.Settings;
 import ui.dialogs.SettingsDialog;
-import ui.log.AutoScrollListModel;
-import ui.log.LogPanel;
+import ui.log.LogListModel;
+import ui.log.AutoScrollLogPanel;
 import ui.tables.CellRenderer;
 import ui.tables.ColumnModel;
 import ui.tables.TableModel;
@@ -76,7 +76,7 @@ public class MainPanel {
 		try {
 			this.readSettings();
 		} catch (IOException e) {
-			AutoScrollListModel.add(ERROR_READING_SETTINGS);
+			LogListModel.add(ERROR_READING_SETTINGS);
 		}
 		this.initMoorings(port);
 
@@ -171,7 +171,7 @@ public class MainPanel {
 		try {
             logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
 		} catch (IOException e) {
-			AutoScrollListModel.add(ERROR_READING_LOGO);
+			LogListModel.add(ERROR_READING_LOGO);
 		}
         logoPanel.scaleImage(this.window.getWidth() / 7, this.window.getWidth() / 7);
 
@@ -179,7 +179,7 @@ public class MainPanel {
 	}
 
 	private Component createLogPanel() {
-		return new LogPanel(new AutoScrollListModel());
+		return new AutoScrollLogPanel(new LogListModel());
 	}
 
 	private Component createButtonsPanel() {
@@ -275,20 +275,20 @@ public class MainPanel {
 				try {
 					serial.openConnection();
 					connectButton.setText("Disconnect from board");
-					AutoScrollListModel.add(CONNECTION_ESTABLISHED);
+					LogListModel.add(CONNECTION_ESTABLISHED);
 					logicAction.setEnabled(true);
 				} catch (Exception e) {
-					AutoScrollListModel.add(e.getMessage());
+					LogListModel.add(e.getMessage());
 				}
 			}
 			else {
 				try {
 					serial.closeConnection();
 					connectButton.setText("Connect to board");
-					AutoScrollListModel.add(CONNECTION_CLOSED);
+					LogListModel.add(CONNECTION_CLOSED);
 					logicAction.setEnabled(false);
 				} catch (Exception e) {
-					AutoScrollListModel.add(e.getMessage());
+					LogListModel.add(e.getMessage());
 				}
 			}
 		}
@@ -312,7 +312,7 @@ public class MainPanel {
 			if (!controllerLogic.isRunning()) {
 				logicButton.setText("Stop system");
 				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
-				AutoScrollListModel.add(SYSTEM_INITIALIZED);
+				LogListModel.add(SYSTEM_INITIALIZED);
 				connectAction.setEnabled(false);
 				settingsAction.setEnabled(false);
 
@@ -320,7 +320,7 @@ public class MainPanel {
 			} else {
 				logicButton.setText("Initialize system");
 				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
-				AutoScrollListModel.add(SYSTEM_STOPPED);
+				LogListModel.add(SYSTEM_STOPPED);
 				connectAction.setEnabled(true);
 				settingsAction.setEnabled(true);
 
@@ -353,7 +353,7 @@ public class MainPanel {
 				try {
 					properties.store(new FileWriter(FILE_NAME), null);
 				} catch (IOException e) {
-					AutoScrollListModel.add(ERROR_WRITING_SETTINGS);
+					LogListModel.add(ERROR_WRITING_SETTINGS);
 				}
 				fieldList.get(i).setText(settings.get(i));
 			}
@@ -400,11 +400,11 @@ public class MainPanel {
 					"Warning", JOptionPane.YES_NO_OPTION);
 
 			if (dialogResult == JOptionPane.YES_OPTION) {
-				this.controllerLogic.stopLogic();
+				if (this.controllerLogic.isRunning()) this.controllerLogic.stopLogic();
 				try {
 					this.serial.closeConnection();
 				} catch (Exception e) {
-					AutoScrollListModel.add(e.getMessage());
+					LogListModel.add(e.getMessage());
 				}
 				this.exitProgram();
 			}

@@ -4,7 +4,7 @@ import helpers.Helpers;
 import models.*;
 import protocol.ProtocolProperties.*;
 import serial.Serial;
-import ui.log.AutoScrollListModel;
+import ui.log.LogListModel;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -44,7 +44,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		try {
 			this.thread.join();
 		} catch (InterruptedException e) {
-			AutoScrollListModel.add("Couldn't stop system");
+			LogListModel.add("Couldn't stop system");
 		}
 	}
 
@@ -70,7 +70,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			if (serial != null && serial.isConnected()) {
 				Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
 			}
-			AutoScrollListModel.add("Discovery is sent to boats");
+			LogListModel.add("Discovery is sent to boats");
 
 			try {
 				//TODO I have no fucking idea how big the delay should be
@@ -169,10 +169,10 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			nextStatus.setStatus(StatusType.TRANSIT.toString());
 			nextStatus.setAction(ActionType.LEAVE.toString());
 			nextStatus.setPermission(PermissionType.ALLOW.toString());
-			AutoScrollListModel.add("Ship " + shipID + " leaving dock");
+			LogListModel.add("Ship " + shipID + " leaving dock");
 		} else {
 			nextStatus.setPermission(PermissionType.DENY.toString());
-			AutoScrollListModel.add("Not enough space in transit for ship " + shipID);
+			LogListModel.add("Not enough space in transit for ship " + shipID);
 		}
 	}
 
@@ -180,11 +180,11 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		if (actionStr.equals(ActionType.LEAVE.toString())) {
 			nextStatus.setStatus(StatusType.SEA.toString());
 			nextStatus.setPermission(PermissionType.ALLOW.toString());
-			AutoScrollListModel.add("Ship " + shipID + " leaving to the sea");
+			LogListModel.add("Ship " + shipID + " leaving to the sea");
 		} else {
 			nextStatus.setStatus(StatusType.PARKING.toString());
 			nextStatus.setPermission(PermissionType.ALLOW.toString());
-			AutoScrollListModel.add("Ship " + shipID + " entering dock");
+			LogListModel.add("Ship " + shipID + " entering dock");
 		}
 		port.removeFromTransitZone(ship);
 	}
@@ -195,29 +195,29 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 		if (freeMooring != null) {
 			parking = freeMooring.getId();
-			AutoScrollListModel.add("Assigned mooring " + Integer.parseInt(parking, 2));
+			LogListModel.add("Assigned mooring " + Integer.parseInt(parking, 2));
 			boolean freeTransit = port.addToTransitionZone(ship, actionStr);
 
 			if (freeTransit) {
 				nextStatus.setStatus(StatusType.TRANSIT.toString());
 				nextStatus.setAction(ActionType.ENTER.toString());
 				nextStatus.setPermission(PermissionType.ALLOW.toString());
-				AutoScrollListModel.add("Ship " + shipID + " entering transit zone");
+				LogListModel.add("Ship " + shipID + " entering transit zone");
 			} else {
 				nextStatus.setPermission(PermissionType.DENY.toString());
-				AutoScrollListModel.add("Not enough space in transit for ship " + shipID);
+				LogListModel.add("Not enough space in transit for ship " + shipID);
 			}
 		}
 		else {
 			nextStatus.setPermission(PermissionType.DENY.toString());
-			AutoScrollListModel.add("Ship " + shipID + " access denied, no free mooring");
+			LogListModel.add("Ship " + shipID + " access denied, no free mooring");
 		}
 		return parking;
 	}
 
 	private void checkInvalidRequest(Status nextStatus, int shipID) {
 		nextStatus.setPermission(PermissionType.INVALID.toString());
-		AutoScrollListModel.add("Ship " + shipID + " is in an invalid state");
+		LogListModel.add("Ship " + shipID + " is in an invalid state");
 	}
 	
 	private void sendFrame(Frame frame) {

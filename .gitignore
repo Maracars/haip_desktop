@@ -2,7 +2,7 @@
 *.class
 
 # Log file
-*.autoScrollListModel
+*.logListModel
 
 # BlueJ files
 *.ctxt
@@ -35,5 +35,5 @@ hs_err_pid*
 .DS_Store
 
 # Maven
-autoScrollListModel/
+logListModel/
 target/
