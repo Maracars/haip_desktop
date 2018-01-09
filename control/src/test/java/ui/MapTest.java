@@ -138,7 +138,7 @@ public class MapTest {
 	}
 
 	private void addContentToJFrame() {
-		this.mapPanel = new MapPanel(port);
+		this.mapPanel = new MapPanel(port, null);
 		this.window.getContentPane().add(mapPanel, BorderLayout.CENTER);
 		this.window.setVisible(true);
 	}

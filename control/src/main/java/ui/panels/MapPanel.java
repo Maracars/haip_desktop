@@ -2,6 +2,7 @@ package ui.panels;
 
 import models.Port;
 import models.Ship;
+import protocol.ControllerLogic;
 import protocol.ProtocolProperties;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
@@ -32,12 +33,20 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 
 	private int seaHeight, transitHeight, parkingHeight, seaWidth, transitWidth, parkingWidth;
 
-	public MapPanel(Port port) {
+	public MapPanel(Port port, ControllerLogic controllerLogic) {
 		this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		this.setLayout(new BorderLayout());
 		this.addComponentListener(this);
 		this.shipList = new ArrayList<>();
 		this.port = port;
+		controllerLogic.addObserver(this);
+	}
+
+	public void resetPort(Port port, ControllerLogic controllerLogic) {
+		this.shipList = new ArrayList<>();
+		this.port = port;
+		controllerLogic.addObserver(this);
+		this.repaintAllElements();
 	}
 
 	private void displayDivision() {

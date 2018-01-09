@@ -7,7 +7,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.awt.*;
 
-public class AutoScrollLogPanel extends JPanel {
+public class AutoScrollListPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private JList<String> jList;
@@ -15,7 +15,7 @@ public class AutoScrollLogPanel extends JPanel {
 
 	private LogListModel logListModel;
 	
-	public AutoScrollLogPanel(LogListModel logListModel) {
+	public AutoScrollListPanel(LogListModel logListModel) {
 		this.setLayout(new BorderLayout(10, 10));
 
 		JScrollPane scrollPane = new JScrollPane();

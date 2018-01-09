@@ -53,7 +53,7 @@ import protocol.SimulationShipLogic;
 import serial.Serial;
 import ui.dialogs.SimulationDialog;
 import ui.log.LogListModel;
-import ui.log.AutoScrollLogPanel;
+import ui.log.AutoScrollListPanel;
 
 public class MainPanel implements Observer{
 	// Swing Elements
@@ -167,7 +167,7 @@ public class MainPanel implements Observer{
 
 	private Component createLogPanel() {
 		this.logListModel = new LogListModel();
-		return new AutoScrollLogPanel(logListModel);
+		return new AutoScrollListPanel(logListModel);
 	}
 
 	private Component createButtonsPanel() {

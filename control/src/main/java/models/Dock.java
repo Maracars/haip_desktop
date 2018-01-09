@@ -1,18 +1,23 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Dock {
-
 	private String id;
-	private ArrayList<Mooring> moorings;
+	private List<Mooring> moorings;
 
-	public Dock(String id, ArrayList<Mooring> moorings) {
+	public Dock(String id, List<Mooring> moorings) {
 		this.id = id;
 		this.moorings = moorings;
 	}
 
-	public ArrayList<Mooring> getMoorings() {
+	public Dock(String id) {
+		this.id = id;
+		this.moorings = new ArrayList<>();
+	}
+
+	public List<Mooring> getMoorings() {
 		return moorings;
 	}
 

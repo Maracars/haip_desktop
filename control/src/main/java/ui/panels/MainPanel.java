@@ -3,6 +3,7 @@ package ui.panels;
 import helpers.Helpers;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
+import models.Dock;
 import models.Mooring;
 import models.Port;
 import models.Ship;
@@ -12,7 +13,7 @@ import serial.Serial;
 import settings.Settings;
 import ui.dialogs.SettingsDialog;
 import ui.log.LogListModel;
-import ui.log.AutoScrollLogPanel;
+import ui.log.AutoScrollListPanel;
 import ui.tables.CellRenderer;
 import ui.tables.ColumnModel;
 import ui.tables.TableModel;
@@ -35,12 +36,13 @@ import static settings.Settings.*;
 import static ui.panels.ActionMessages.*;
 
 public class MainPanel {
-	// Swing Elements
+	// UI Elements
 	private JFrame window;
+	private MapPanel mapPanel;
 	private JTable table;
 	private TableModel tableModel;
 	private JButton connectButton, logicButton;
-	private AbstractAction connectAction, logicAction, settingsAction, exitAction;
+	private AbstractAction connectAction, logicAction, settingsAction, resetAction, exitAction;
 
 	// Settings List
 	private Properties properties;
@@ -53,9 +55,12 @@ public class MainPanel {
 	// Controller Logic
 	private ControllerLogic controllerLogic;
 
-	public MainPanel(Serial serial, Port port) {
+	public MainPanel() {
 		this.createJFrame();
-		this.initThings(serial, port);
+		this.initActions();
+		this.initTable();
+		Port port = this.initPort();
+		this.createMapPanel(port);
 		this.addContentToJFrame();
 	}
 
@@ -66,27 +71,7 @@ public class MainPanel {
 		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
 		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		this.window.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-	}
-
-	private void initThings(Serial serial, Port port) {
 		IconFontSwing.register(FontAwesome.getIconFont());
-		this.initActions();
-		this.initTable();
-
-		try {
-			this.readSettings();
-		} catch (IOException e) {
-			LogListModel.add(ERROR_READING_SETTINGS);
-		}
-		this.initMoorings(port);
-
-		this.serial = serial;
-		this.controllerLogic = new ControllerLogic(this.serial, port);
-		this.serialObserver = new SerialObserver(this.tableModel);
-
-		this.serial.addObserver(this.controllerLogic);
-		this.serial.addObserver(this.serialObserver);
-		this.controllerLogic.addObserver(this.serialObserver);
 	}
 
 	private void initActions() {
@@ -101,6 +86,10 @@ public class MainPanel {
 		settingsAction = new SettingsAction("Settings", IconFontSwing.buildIcon(FontAwesome.SLIDERS, 32),
 				"Change port properties", KeyEvent.VK_S);
 		settingsAction.setEnabled(true);
+
+		resetAction = new ResetAction("Reset", IconFontSwing.buildIcon(FontAwesome.REFRESH, 32),
+				"Reset Port", KeyEvent.VK_R);
+		resetAction.setEnabled(true);
 
 		exitAction = new ExitAction("Exit", IconFontSwing.buildIcon(FontAwesome.WINDOW_CLOSE, 32),
 				"Close program", KeyEvent.VK_X);
@@ -129,13 +118,35 @@ public class MainPanel {
 		Settings.setProperties(settings);
 	}
 
-	public void initMoorings(Port port) {
-		ArrayList<Mooring> moorings = new ArrayList<Mooring>();
+	private Port initPort() {
+		try {
+			this.readSettings();
+		} catch (IOException e) {
+			LogListModel.add(ERROR_READING_SETTINGS);
+		}
+		this.serial = new Serial();
+		Port port = new Port(new Dock("Albert Dock", this.initMoorings()));
+		this.controllerLogic = new ControllerLogic(this.serial, port);
+
+		this.serialObserver = new SerialObserver(this.tableModel);
+		this.serial.addObserver(this.controllerLogic);
+		this.serial.addObserver(this.serialObserver);
+		this.controllerLogic.addObserver(this.serialObserver);
+
+		return port;
+	}
+
+	public List<Mooring> initMoorings() {
+		List<Mooring> moorings = new ArrayList<>();
 		for (Integer i = 0; i < Settings.getProperties().get(0); i++) {
 			Ship ship = null;
 			moorings.add(new Mooring(Helpers.toNbitBinaryString(i.toString(), 8), ship));
 		}
-		port.getDock().setMoorings(moorings);
+		return moorings;
+	}
+
+	private void createMapPanel(Port port) {
+		this.mapPanel = new MapPanel(port, this.controllerLogic);
 	}
 
 	private void addContentToJFrame() {
@@ -179,7 +190,7 @@ public class MainPanel {
 	}
 
 	private Component createLogPanel() {
-		return new AutoScrollLogPanel(new LogListModel());
+		return new AutoScrollListPanel(new LogListModel());
 	}
 
 	private Component createButtonsPanel() {
@@ -218,21 +229,17 @@ public class MainPanel {
 	private Component createTabbedPane() {
         JTabbedPane tabbedPane = new JTabbedPane();
 
-		JComponent panel1 = (JComponent) createTab1();
-		tabbedPane.addTab("Port Map", null, panel1, "Shows port map");
+		tabbedPane.addTab("Port Map", null, createTab1(), "Shows port map");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
 
-		JComponent panel2 = (JComponent) createTab2();
-		tabbedPane.addTab("Ship Data Table", null, panel2, "Shows ship data in a table");
+		tabbedPane.addTab("Ship Data Table", null, createTab2(), "Shows ship data in a table");
 		tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
 
 		return tabbedPane;
 	}
 
 	private Component createTab1() {
-		MapPanel mapPanel = new MapPanel(controllerLogic.getPort());
-		controllerLogic.addObserver(mapPanel);
-		return mapPanel;
+		return this.mapPanel;
 	}
 
 	private Component createTab2() {
@@ -252,6 +259,7 @@ public class MainPanel {
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic(KeyEvent.VK_F);
 		fileMenu.add(settingsAction);
+		fileMenu.add(resetAction);
 		fileMenu.add(exitAction);
 		return fileMenu;
 	}
@@ -315,6 +323,7 @@ public class MainPanel {
 				LogListModel.add(SYSTEM_INITIALIZED);
 				connectAction.setEnabled(false);
 				settingsAction.setEnabled(false);
+				resetAction.setEnabled(false);
 
 				controllerLogic.startLogic();
 			} else {
@@ -323,6 +332,7 @@ public class MainPanel {
 				LogListModel.add(SYSTEM_STOPPED);
 				connectAction.setEnabled(true);
 				settingsAction.setEnabled(true);
+				resetAction.setEnabled(true);
 
 				controllerLogic.stopLogic();
 			}
@@ -356,6 +366,46 @@ public class MainPanel {
 					LogListModel.add(ERROR_WRITING_SETTINGS);
 				}
 				fieldList.get(i).setText(settings.get(i));
+				// TODO repaint map
+			}
+		}
+	}
+
+	private class ResetAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		public ResetAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+		// TODO Update buttons, reset table
+
+		@Override
+		public void actionPerformed(ActionEvent actionEvent) {
+			if (serial != null && !serial.isConnected() && !controllerLogic.isRunning()) {
+				Port port = initPort();
+				mapPanel.resetPort(port, controllerLogic);
+			} else {
+				int dialogResult = JOptionPane.showConfirmDialog(window, (controllerLogic.isRunning() ?
+								"System is initialized.\n" : "Serial connection is established.\n")
+								+ "Do you really want to reset the port?",
+						"Warning", JOptionPane.YES_NO_OPTION);
+
+				if (dialogResult == JOptionPane.YES_OPTION) {
+					if (controllerLogic.isRunning()) controllerLogic.stopLogic();
+					try {
+						serial.closeConnection();
+					} catch (Exception e) {
+						LogListModel.add(e.getMessage());
+					}
+					Port port = initPort();
+					mapPanel.resetPort(port, controllerLogic);
+				}
 			}
 		}
 	}
@@ -391,10 +441,10 @@ public class MainPanel {
 	private void onWindowClosing() {
 		/* Before closing window, check if communication and system are disabled
 		 * If not, disable and close them before exiting */
-		if (!this.serial.isConnected() && !this.controllerLogic.isRunning()) {
+		if (serial != null && !this.serial.isConnected() && !this.controllerLogic.isRunning()) {
 			this.exitProgram();
 		} else {
-			int dialogResult = JOptionPane.showConfirmDialog(this.window, ((this.controllerLogic.isRunning()) ?
+			int dialogResult = JOptionPane.showConfirmDialog(this.window, (this.controllerLogic.isRunning() ?
 							"System is initialized.\n" : "Serial connection is established.\n")
 							+ "Do you really want to exit?",
 					"Warning", JOptionPane.YES_NO_OPTION);

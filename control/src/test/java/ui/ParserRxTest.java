@@ -39,30 +39,7 @@ public class ParserRxTest extends Observable {
 	MainPanel mainPanel;
 
 	public ParserRxTest() {
-		this.moorings = new ArrayList<>();
-		this.initMoorings(moorings);
-
-		this.dock = new Dock("Albert Dock", moorings);
-		this.port = new Port(this.dock);
-
-		this.serial = new Serial();
-		this.controllerLogic = new ControllerLogic(this.serial, this.port);
-
-		this.mainPanel = new MainPanel(this.serial, this.port);
-
-		Thread thread = new Thread(this.controllerLogic);
-		this.addObserver(this.controllerLogic);
-		thread.start();
-	}
-
-	public void initMoorings(ArrayList<Mooring> moorings) {
-		for (Integer i = 0; i < 10; i++) {
-			Ship ship = null;
-			if (i == 2 ) {
-				ship = new Ship("00000010");
-			}
-			moorings.add(new Mooring(i.toString(), ship));
-		}
+		this.mainPanel = new MainPanel();
 	}
 
 	public void receiveFrames() {
