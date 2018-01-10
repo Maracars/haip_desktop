@@ -51,7 +51,6 @@ public class MainPanel {
 
 	// Serial Communication
 	private Serial serial;
-	private SerialObserver serialObserver;
 
 	// Controller Logic
 	private ControllerLogic controllerLogic;
@@ -108,7 +107,7 @@ public class MainPanel {
 		this.tableModel = new TableModel(this.columnModel);
 		this.table = new JTable(this.tableModel, this.columnModel);
 
-		this.table.setRowHeight(this.window.getHeight() / 20);
+		this.table.setRowHeight(50);
 		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		this.table.getTableHeader().setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
 	}
@@ -131,10 +130,10 @@ public class MainPanel {
 		Port port = new Port(new Dock("Albert Dock", this.initMoorings()));
 		this.controllerLogic = new ControllerLogic(this.serial, port);
 
-		this.serialObserver = new SerialObserver(this.tableModel);
+		SerialObserver serialObserver = new SerialObserver(this.tableModel);
 		this.serial.addObserver(this.controllerLogic);
-		this.serial.addObserver(this.serialObserver);
-		this.controllerLogic.addObserver(this.serialObserver);
+		this.serial.addObserver(serialObserver);
+		this.controllerLogic.addObserver(serialObserver);
 
 		return port;
 	}
@@ -142,8 +141,7 @@ public class MainPanel {
 	public List<Mooring> initMoorings() {
 		List<Mooring> moorings = new ArrayList<>();
 		for (Integer i = 0; i < Settings.getProperties().get(0); i++) {
-			Ship ship = null;
-			moorings.add(new Mooring(Helpers.toNbitBinaryString(i.toString(), 8), ship));
+			moorings.add(new Mooring(Helpers.toNbitBinaryString(i.toString(), 8), null));
 		}
 		return moorings;
 	}
@@ -163,7 +161,7 @@ public class MainPanel {
 	private Component createSplitPane() {
 		JSplitPane splitPane = new JSplitPane();
 
-		splitPane.setDividerLocation(this.window.getWidth() / 6);
+		splitPane.setDividerLocation(320);
 		splitPane.setLeftComponent(createLeftPanel());
 		splitPane.setRightComponent(createTabbedPane());
 
@@ -186,16 +184,19 @@ public class MainPanel {
 
 	private Component createHaipPanel() throws IOException {
         ImagePanel logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
-        logoPanel.scaleImage(this.window.getWidth() / 16, this.window.getWidth() / 16);
+        logoPanel.scaleImage(96, 96);
 
 		JLabel title = new JLabel("Haip");
 		title.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 32));
 		JLabel subtitle = new JLabel("Haip Ain't an Infor Project");
 		subtitle.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
 
-		JPanel textPanel = new JPanel(new GridLayout(0, 1, 10, 10));
+		JPanel textPanel = new JPanel();
+		textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+		textPanel.add(Box.createVerticalGlue());
 		textPanel.add(title);
 		textPanel.add(subtitle);
+		textPanel.add(Box.createVerticalGlue());
 
 		JPanel haipPanel = new JPanel(new BorderLayout());
 		haipPanel.add(textPanel, BorderLayout.CENTER);
@@ -213,11 +214,10 @@ public class MainPanel {
 		panel.setBorder(new EmptyBorder(0, 10, 10, 10));
 
 		this.connectButton = new JButton(this.connectAction);
-		this.connectButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
+		this.connectButton.setPreferredSize(new Dimension(panel.getWidth(), 72));
 
 		this.logicButton = new JButton(this.logicAction);
-		this.logicButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
-		//this.logicButton.setEnabled(false);
+		this.logicButton.setPreferredSize(new Dimension(panel.getWidth(), 72));
 
 		panel.add(createSizesPanel());
 		panel.add(connectButton);

@@ -8,21 +8,16 @@ import java.awt.event.ActionListener;
 public class COMPortChooser extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
-	String[] portStrings;
-	JComboBox<String> comboBox;
-	JButton bOk;
-	JFrame window;
+	private String[] portStrings;
+	private JComboBox<String> comboBox;
+	private JButton bOk;
 
 	public COMPortChooser(JFrame window, String[] portStrings) {
 		super(window, "Choose a serial port", true);
-		this.window = window;
 		this.portStrings = portStrings;
 
-		this.setSize((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 6),
-				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 5);
-
-		this.setLocation((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 15),
-				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 2 * this.getHeight());
+		this.setSize(320, 220);
+		this.setLocation(130,	640);
 
 		this.setContentPane(createWindowPanel());
 
@@ -50,7 +45,7 @@ public class COMPortChooser extends JDialog implements ActionListener {
 
 		bOk = new JButton("Ok");
 		bOk.addActionListener(this);
-		bOk.setPreferredSize(new Dimension(this.getWidth() / 3, this.getHeight() / 6));
+		bOk.setPreferredSize(new Dimension(100, 50));
 
 		panel.add(bOk);
 		return panel;

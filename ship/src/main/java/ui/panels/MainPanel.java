@@ -2,15 +2,10 @@ package ui.panels;
 
 import static ui.panels.ActionMessages.CONNECTION_CLOSED;
 import static ui.panels.ActionMessages.CONNECTION_ESTABLISHED;
-import static ui.panels.ActionMessages.ERROR_READING_LOGO;
 import static ui.panels.ActionMessages.LOGIC_INITIALIZED;
 import static ui.panels.ActionMessages.LOGIC_STOPPED;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -19,23 +14,7 @@ import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
@@ -136,7 +115,7 @@ public class MainPanel implements Observer{
 	private Component createSplitPane() {
 		JSplitPane splitPane = new JSplitPane();
 
-		splitPane.setDividerLocation(this.window.getWidth() / 6);
+		splitPane.setDividerLocation(320);
 		splitPane.setLeftComponent(createLeftPanel());
 		splitPane.setRightComponent(createShipPanel());
 
@@ -146,23 +125,38 @@ public class MainPanel implements Observer{
 	private Component createLeftPanel() {
 		JPanel leftPanel = new JPanel(new BorderLayout(10, 10));
 
-		leftPanel.add(createLogoPanel(), BorderLayout.NORTH);
+		try {
+			leftPanel.add(createHaipPanel(), BorderLayout.NORTH);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		leftPanel.add(createLogPanel(), BorderLayout.CENTER);
 		leftPanel.add(createButtonsPanel(), BorderLayout.SOUTH);
 
 		return leftPanel;
 	}
 
-	private Component createLogoPanel() {
-		ImagePanel logoPanel = null;
-		try {
-			logoPanel = new ImagePanel("ship/src/main/resources/HAIP_logo.png");
-		} catch (IOException e) {
-			LogListModel.add(ERROR_READING_LOGO);
-		}
-		logoPanel.scaleImage(this.window.getWidth() / 7, this.window.getWidth() / 7);
+	private Component createHaipPanel() throws IOException {
+		ImagePanel logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
+		logoPanel.scaleImage(96, 96);
 
-		return logoPanel;
+		JLabel title = new JLabel("Haip");
+		title.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 32));
+		JLabel subtitle = new JLabel("Haip Ain't an Infor Project");
+		subtitle.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
+
+		JPanel textPanel = new JPanel();
+		textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+		textPanel.add(Box.createVerticalGlue());
+		textPanel.add(title);
+		textPanel.add(subtitle);
+		textPanel.add(Box.createVerticalGlue());
+
+		JPanel haipPanel = new JPanel(new BorderLayout());
+		haipPanel.add(textPanel, BorderLayout.CENTER);
+		haipPanel.add(logoPanel, BorderLayout.WEST);
+
+		return haipPanel;
 	}
 
 	private Component createLogPanel() {
@@ -175,10 +169,10 @@ public class MainPanel implements Observer{
 		panel.setBorder(new EmptyBorder(0, 10, 10, 10));
 
 		this.connectButton = new JButton(this.connectAction);
-		this.connectButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
+		this.connectButton.setPreferredSize(new Dimension(panel.getWidth(), 72));
 
 		this.logicButton = new JButton(this.logicAction);
-		this.logicButton.setPreferredSize(new Dimension(panel.getWidth(), this.window.getHeight() / 15));
+		this.logicButton.setPreferredSize(new Dimension(panel.getWidth(), 72));
 		this.logicButton.setEnabled(false);
 
 		panel.add(connectButton);
@@ -200,8 +194,7 @@ public class MainPanel implements Observer{
 		panel.setBorder(new EmptyBorder(0, 10, 10, 10));
 
 		this.actionButton = new JButton(this.decisionAction);
-		this.actionButton.setPreferredSize(new Dimension(this.window.getHeight() / 3,
-				this.window.getHeight() / 10));
+		this.actionButton.setPreferredSize(new Dimension(360, 110));
 		this.actionButton.setEnabled(false);
 		panel.add(actionButton);
 		checkActionButton();
@@ -226,7 +219,7 @@ public class MainPanel implements Observer{
 	}
 
 	private Component createDecisionList() {
-		decisionList = new JList<String>(Helpers.getNames(ActionType.class));
+		decisionList = new JList<>(Helpers.getNames(ActionType.class));
 		DecisionListRenderer decisionRenderer = new DecisionListRenderer(statusRenderer);
 		decisionList.setCellRenderer(decisionRenderer);
 		decisionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -236,7 +229,7 @@ public class MainPanel implements Observer{
 	}
 
 	private Component createStatusList() {
-		statusList = new JList<String>(Helpers.getNames(StatusType.class));
+		statusList = new JList<>(Helpers.getNames(StatusType.class));
 		String shipStatus = StatusType.getName(ship.getStatus().getStatus()).name();
 		statusRenderer = new StatusListRenderer(shipStatus);
 		statusList.setCellRenderer(statusRenderer);
@@ -249,7 +242,7 @@ public class MainPanel implements Observer{
 		JPanel infoPanel = new JPanel(new GridLayout(1,2));
 		infoPanel.setPreferredSize(new Dimension(this.window.getWidth(), this.window.getHeight()/3));
 		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
-		infoPanel.add(crateStatusLabel(statusBorder));
+		infoPanel.add(createStatusLabel(statusBorder));
 		infoPanel.add(createPermissionsLabel(statusBorder));
 		return infoPanel;
 
@@ -265,25 +258,25 @@ public class MainPanel implements Observer{
 	}
 
 	private void checkStatusLabel() {
-		statusLabel.setText("Your status is: " + StatusType.getName(ship.getStatus().getStatus()).name()+
-				"\nYou are asking for: " + ActionType.getName(ship.getStatus().getAction()).name());
+		statusLabel.setText("<html>Your status is: " + StatusType.getName(ship.getStatus().getStatus()).name()+
+				"<br>You are asking for: " + ActionType.getName(ship.getStatus().getAction()).name() + "</html>");
 	}
 
 	private void checkPermissionsLabel() {
 		permissionLabel.setText(PermissionType.getName(ship.getStatus().getPermission()).name());
-		if(ship.getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
+		if (ship.getStatus().getPermission().equals(PermissionType.ALLOW.toString())) {
 			permissionLabel.setBackground(new Color(74, 237, 49));
 			permissionLabel.setOpaque(true);
-		}else if (ship.getStatus().getPermission().equals(PermissionType.DENY.toString())) {
+		} else if (ship.getStatus().getPermission().equals(PermissionType.DENY.toString())) {
 			permissionLabel.setBackground(new Color(255, 22, 73));
 			permissionLabel.setOpaque(true);
-		}else{
+		} else {
 			permissionLabel.setBackground(new Color(244, 185, 66));
 			permissionLabel.setOpaque(true);
 		}
 	}
 
-	private Component crateStatusLabel(Border statusBorder) {
+	private Component createStatusLabel(Border statusBorder) {
 		statusLabel = new JLabel();
 		checkStatusLabel();
 		statusLabel.setBorder(statusBorder);
@@ -340,30 +333,34 @@ public class MainPanel implements Observer{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (!serial.isConnected()) {
-				try {
-					serial.openConnection();
-					connectButton.setText("Disconnect from board");
-					logicButton.setEnabled(true);
-					simulationAction.setEnabled(true);
-					LogListModel.add(CONNECTION_ESTABLISHED);
-				}
-				catch (Exception e) {
-					LogListModel.add(e.getMessage());
-				}
-			}
-			else {
-				try {
-					serial.closeConnection();
-					simulationAction.setEnabled(false);
-					connectButton.setText("Connect to board");
-					logicButton.setEnabled(false);
-					LogListModel.add(CONNECTION_CLOSED);
-				}
-				catch (Exception e) {
-					LogListModel.add(e.getMessage());
-				}
-			}
+			if (!serial.isConnected()) connect();
+			else disconnect();
+		}
+	}
+
+	private void connect() {
+		try {
+			this.serial.openConnection();
+			this.connectButton.setText("Disconnect from board");
+			this.logicButton.setEnabled(true);
+			this.simulationAction.setEnabled(true);
+			LogListModel.add(CONNECTION_ESTABLISHED);
+		}
+		catch (Exception e) {
+			LogListModel.add(e.getMessage());
+		}
+	}
+
+	private void disconnect() {
+		try {
+			this.serial.closeConnection();
+			this.simulationAction.setEnabled(false);
+			this.connectButton.setText("Connect to board");
+			this.logicButton.setEnabled(false);
+			LogListModel.add(CONNECTION_CLOSED);
+		}
+		catch (Exception e) {
+			LogListModel.add(e.getMessage());
 		}
 	}
 
@@ -382,36 +379,29 @@ public class MainPanel implements Observer{
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (!shipDiscovered) {
-				// Wait for discovery
-				waitForDiscovery();
-				
-
-				logicButton.setText("Reject communications");
-				connectButton.setEnabled(false);
-				actionButton.setEnabled(true);
-				LogListModel.add(LOGIC_INITIALIZED);
-			}
-			else {
-				// Reject communications
-				rejectCommunications();
-
-				logicButton.setText("Wait for discovery");
-				connectButton.setEnabled(true);
-				actionButton.setEnabled(false);
-				LogListModel.add(LOGIC_STOPPED);
-			}
+			if (!shipDiscovered) waitForDiscovery();
+			else rejectCommunications();
 		}
 	}
 
 	public void waitForDiscovery() {
-		shipDiscovered = true;
-		serial.addObserver(shipLogic);
+		this.shipDiscovered = true;
+		this.serial.addObserver(this.shipLogic);
+
+		this.logicButton.setText("Reject communications");
+		this.connectButton.setEnabled(false);
+		this.actionButton.setEnabled(true);
+		LogListModel.add(LOGIC_INITIALIZED);
 	}
 
 	public void rejectCommunications() {
-		shipDiscovered = false;
-		serial.deleteObserver(shipLogic);
+		this.shipDiscovered = false;
+		this.serial.deleteObserver(shipLogic);
+
+		this.logicButton.setText("Wait for discovery");
+		this.connectButton.setEnabled(true);
+		this.actionButton.setEnabled(false);
+		LogListModel.add(LOGIC_STOPPED);
 	}
 
 	public class DecisionAction extends AbstractAction {
@@ -429,13 +419,17 @@ public class MainPanel implements Observer{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			ActionType at = ActionType.valueOf(decisionList.getSelectedValue());
-			Status newStatus = DecisionMaker.getNewPossibleAction(at);
-			ship.addAction(newStatus);
-			ship.getStatus().setAction(at.toString());
-			ship.getStatus().setPermission(PermissionType.ASK.toString());
-			actionButton.setEnabled(false);
+			decide();
 		}
+	}
+
+	private void decide() {
+		ActionType at = ActionType.valueOf(this.decisionList.getSelectedValue());
+		Status newStatus = DecisionMaker.getNewPossibleAction(at);
+		this.ship.addAction(newStatus);
+		this.ship.getStatus().setAction(at.toString());
+		this.ship.getStatus().setPermission(PermissionType.ASK.toString());
+		this.actionButton.setEnabled(false);
 	}
 
 	public class SimulationAction extends AbstractAction {
@@ -488,21 +482,15 @@ public class MainPanel implements Observer{
 	private void onWindowClosing() {
 		/* Before closing window, check if communication and system are disabled
 		 * If not, disable and close them before exiting */
-		if (!this.serial.isConnected() && !shipDiscovered) {
+		if (!this.serial.isConnected()) {
 			this.exitProgram();
 		} else {
-			int dialogResult = JOptionPane.showConfirmDialog(this.window, ((this.shipDiscovered) ?
-							"System is initialized.\n" : "Serial connection is established.\n")
+			if (JOptionPane.showConfirmDialog(this.window, ((this.shipDiscovered) ?
+							"The ship is communicating.\n" : "Serial connection is established.\n")
 							+ "Do you really want to exit?",
-					"Warning", JOptionPane.YES_NO_OPTION);
-
-			if (dialogResult == JOptionPane.YES_OPTION) {
-				rejectCommunications();
-				try {
-					this.serial.closeConnection();
-				} catch (Exception e) {
-					LogListModel.add(e.getMessage());
-				}
+					"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+				if (this.shipDiscovered) rejectCommunications();
+				this.disconnect();
 				this.exitProgram();
 			}
 		}

@@ -21,19 +21,14 @@ public class SettingsDialog extends JDialog implements ActionListener {
 
 	public SettingsDialog() {
 		super(new JFrame(), "Settings Menu", true);
+		this.settingsChanged = false;
 
-		this.setSize((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 6),
-				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 4);
-
-		this.setLocation((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 12),
-				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 8);
+		this.setSize(320, 270);
+		this.setLocation(160, 135);
 
 		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-
 		this.setContentPane(createMainPanel());
 		this.setVisible(true);
-
-		this.settingsChanged = false;
 	}
 
 	private JPanel createMainPanel() {
@@ -71,12 +66,12 @@ public class SettingsDialog extends JDialog implements ActionListener {
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.setActionCommand("Cancel");
 		cancelButton.addActionListener(this);
-		cancelButton.setPreferredSize(new Dimension(this.getWidth() / 3, this.getHeight() / 6));
+		cancelButton.setPreferredSize(new Dimension(100, 50));
 
 		JButton acceptButton = new JButton("Accept");
 		acceptButton.setActionCommand("Accept");
 		acceptButton.addActionListener(this);
-		acceptButton.setPreferredSize(new Dimension(this.getWidth() / 3, this.getHeight() / 6));
+		acceptButton.setPreferredSize(new Dimension(100, 50));
 
 		panel.add(cancelButton);
 		panel.add(acceptButton);
