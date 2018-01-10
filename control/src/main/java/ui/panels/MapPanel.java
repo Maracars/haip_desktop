@@ -161,25 +161,26 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 	}
 
 	private void paintParkings(Graphics g) {
-		parkingWidth = panelDimension.width / port.getDock().getMoorings().size();
+		int parkingSize = Settings.getProperties().get(0);
+		parkingWidth = panelDimension.width / parkingSize;
 		g.setColor(Color.black);
-		for(int i = -Math.round(port.getDock().getMoorings().size()/2); i < Math.round(port.getDock().getMoorings().size()/2); i++) {
-			if(port.getDock().getMoorings().get(i+Math.round(port.getDock().getMoorings().size()/2)).getShip() != null){
+		for (int i = -Math.round(parkingSize/2); i < Math.round(parkingSize/2); i++) {
+			if (port.getDock().getMoorings().get(i+Math.round(parkingSize/2)).getShip() != null) {
 				g.setColor(new Color(244, 77, 65));
-			}else {
+			} else {
 				g.setColor(new Color(77, 244, 65));
 			}
- 			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(i*PARKING_WIDTH), panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
-			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(i+Math.round(port.getDock().getMoorings().size()/2)).getId(), 2)), (panelLocation.x+(panelDimension.width/2))+(i*PARKING_WIDTH), panelDimension.height-PARKING_HEIGHT-2);
+ 			g.drawRect((panelLocation.x + (panelDimension.width/2) - PARKING_WIDTH/2) + (i*PARKING_WIDTH), panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
+			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(i + Math.round(parkingSize/2)).getId(), 2)), (panelLocation.x + (panelDimension.width/2)) + (i*PARKING_WIDTH), panelDimension.height - PARKING_HEIGHT-2);
 		}
-		if(port.getDock().getMoorings().size() % 2 != 0) {
-			if(port.getDock().getMoorings().get(port.getDock().getMoorings().size()-1).getShip() != null){
+		if (port.getDock().getMoorings().size() % 2 != 0) {
+			if (port.getDock().getMoorings().get(parkingSize - 1).getShip() != null) {
 				g.setColor(new Color(244, 77, 65));
-			}else {
+			} else {
 				g.setColor(new Color(77, 244, 65));
 			}
-			g.drawRect((panelLocation.x+(panelDimension.width/2)-PARKING_WIDTH/2)+(Math.round(port.getDock().getMoorings().size()/2))*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
-			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(port.getDock().getMoorings().size()-1).getId(), 2)), (panelLocation.x+(panelDimension.width/2))+((Math.round(port.getDock().getMoorings().size()/2)))*PARKING_WIDTH, panelDimension.height-PARKING_HEIGHT-2);
+			g.drawRect((panelLocation.x + (panelDimension.width/2) - PARKING_WIDTH/2) + (Math.round(port.getDock().getMoorings().size()/2))*PARKING_WIDTH, panelDimension.height - PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
+			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(parkingSize - 1).getId(), 2)), (panelLocation.x + (panelDimension.width/2)) + ((Math.round(parkingSize/2)))*PARKING_WIDTH, panelDimension.height - PARKING_HEIGHT-2);
 		}
 
 	}

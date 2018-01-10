@@ -1,5 +1,6 @@
 package ui.panels;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import helpers.Helpers;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
@@ -170,23 +171,35 @@ public class MainPanel {
 	private Component createLeftPanel() {
         JPanel leftPanel = new JPanel(new BorderLayout(10, 10));
 
-        leftPanel.add(createLogoPanel(), BorderLayout.NORTH);
-        leftPanel.add(createLogPanel(), BorderLayout.CENTER);
+		try {
+			leftPanel.add(createHaipPanel(), BorderLayout.NORTH);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		leftPanel.add(createLogPanel(), BorderLayout.CENTER);
         leftPanel.add(createButtonsPanel(), BorderLayout.SOUTH);
 
 		return leftPanel;
 	}
 
-	private Component createLogoPanel() {
-        ImagePanel logoPanel = null;
-		try {
-            logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
-		} catch (IOException e) {
-			LogListModel.add(ERROR_READING_LOGO);
-		}
-        logoPanel.scaleImage(this.window.getWidth() / 7, this.window.getWidth() / 7);
+	private Component createHaipPanel() throws IOException {
+        ImagePanel logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
+        logoPanel.scaleImage(this.window.getWidth() / 16, this.window.getWidth() / 16);
 
-		return logoPanel;
+		JLabel title = new JLabel("Haip");
+		title.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 32));
+		JLabel subtitle = new JLabel("Haip Ain't an Infor Project");
+		subtitle.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
+
+		JPanel textPanel = new JPanel(new GridLayout(0, 1, 10, 10));
+		textPanel.add(title);
+		textPanel.add(subtitle);
+
+		JPanel haipPanel = new JPanel(new BorderLayout());
+		haipPanel.add(textPanel, BorderLayout.CENTER);
+		haipPanel.add(logoPanel, BorderLayout.WEST);
+
+		return haipPanel;
 	}
 
 	private Component createLogPanel() {
@@ -279,26 +292,30 @@ public class MainPanel {
 
 		@Override
 			public void actionPerformed(ActionEvent arg0) {
-			if (!serial.isConnected()) {
-				try {
-					serial.openConnection();
-					connectButton.setText("Disconnect from board");
-					LogListModel.add(CONNECTION_ESTABLISHED);
-					logicAction.setEnabled(true);
-				} catch (Exception e) {
-					LogListModel.add(e.getMessage());
-				}
-			}
-			else {
-				try {
-					serial.closeConnection();
-					connectButton.setText("Connect to board");
-					LogListModel.add(CONNECTION_CLOSED);
-					logicAction.setEnabled(false);
-				} catch (Exception e) {
-					LogListModel.add(e.getMessage());
-				}
-			}
+			if (!serial.isConnected()) connect();
+			else disconnect();
+		}
+	}
+
+	private void connect() {
+		try {
+			serial.openConnection();
+			connectButton.setText("Disconnect from board");
+			LogListModel.add(CONNECTION_ESTABLISHED);
+			logicAction.setEnabled(true);
+		} catch (Exception e) {
+			LogListModel.add(e.getMessage());
+		}
+	}
+
+	private void disconnect() {
+		try {
+			serial.closeConnection();
+			connectButton.setText("Connect to board");
+			LogListModel.add(CONNECTION_CLOSED);
+			logicAction.setEnabled(false);
+		} catch (Exception e) {
+			LogListModel.add(e.getMessage());
 		}
 	}
 
@@ -317,26 +334,31 @@ public class MainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (!controllerLogic.isRunning()) {
-				logicButton.setText("Stop system");
-				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
-				LogListModel.add(SYSTEM_INITIALIZED);
-				connectAction.setEnabled(false);
-				settingsAction.setEnabled(false);
-				resetAction.setEnabled(false);
-
-				controllerLogic.startLogic();
-			} else {
-				logicButton.setText("Initialize system");
-				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
-				LogListModel.add(SYSTEM_STOPPED);
-				connectAction.setEnabled(true);
-				settingsAction.setEnabled(true);
-				resetAction.setEnabled(true);
-
-				controllerLogic.stopLogic();
-			}
+			if (!controllerLogic.isRunning()) startSystem();
+			else stopSystem();
 		}
+	}
+
+	private void startSystem() {
+		logicButton.setText("Stop system");
+		logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_ON, 32));
+		LogListModel.add(SYSTEM_INITIALIZED);
+		connectAction.setEnabled(false);
+		settingsAction.setEnabled(false);
+		resetAction.setEnabled(false);
+
+		controllerLogic.startLogic();
+	}
+
+	private void stopSystem() {
+		this.logicButton.setText("Initialize system");
+		this.logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
+		LogListModel.add(SYSTEM_STOPPED);
+		this.connectAction.setEnabled(true);
+		this.settingsAction.setEnabled(true);
+		this.resetAction.setEnabled(true);
+
+		this.controllerLogic.stopLogic();
 	}
 
 	private class SettingsAction extends AbstractAction {
@@ -368,6 +390,7 @@ public class MainPanel {
 				fieldList.get(i).setText(settings.get(i));
 				// TODO repaint map
 			}
+			mapPanel.repaintAllElements();
 		}
 	}
 
@@ -383,31 +406,26 @@ public class MainPanel {
 			this.putValue(Action.SHORT_DESCRIPTION, description);
 			this.putValue(Action.MNEMONIC_KEY, mnemonic);
 		}
-		// TODO Update buttons, reset table
 
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
-			if (serial != null && !serial.isConnected() && !controllerLogic.isRunning()) {
-				Port port = initPort();
-				mapPanel.resetPort(port, controllerLogic);
+			if (!serial.isConnected()) {
+				resetPort();
 			} else {
-				int dialogResult = JOptionPane.showConfirmDialog(window, (controllerLogic.isRunning() ?
+				if (JOptionPane.showConfirmDialog(window, (controllerLogic.isRunning() ?
 								"System is initialized.\n" : "Serial connection is established.\n")
 								+ "Do you really want to reset the port?",
-						"Warning", JOptionPane.YES_NO_OPTION);
-
-				if (dialogResult == JOptionPane.YES_OPTION) {
-					if (controllerLogic.isRunning()) controllerLogic.stopLogic();
-					try {
-						serial.closeConnection();
-					} catch (Exception e) {
-						LogListModel.add(e.getMessage());
-					}
-					Port port = initPort();
-					mapPanel.resetPort(port, controllerLogic);
+						"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+					if (controllerLogic.isRunning()) stopSystem();
+					disconnect();
 				}
 			}
 		}
+	}
+
+	private void resetPort() {
+		Port port = initPort();
+		mapPanel.resetPort(port, controllerLogic);
 	}
 
 	private class ExitAction extends AbstractAction {
@@ -441,21 +459,15 @@ public class MainPanel {
 	private void onWindowClosing() {
 		/* Before closing window, check if communication and system are disabled
 		 * If not, disable and close them before exiting */
-		if (serial != null && !this.serial.isConnected() && !this.controllerLogic.isRunning()) {
+		if (!this.serial.isConnected()) {
 			this.exitProgram();
 		} else {
-			int dialogResult = JOptionPane.showConfirmDialog(this.window, (this.controllerLogic.isRunning() ?
+			if (JOptionPane.showConfirmDialog(this.window, (this.controllerLogic.isRunning() ?
 							"System is initialized.\n" : "Serial connection is established.\n")
 							+ "Do you really want to exit?",
-					"Warning", JOptionPane.YES_NO_OPTION);
-
-			if (dialogResult == JOptionPane.YES_OPTION) {
-				if (this.controllerLogic.isRunning()) this.controllerLogic.stopLogic();
-				try {
-					this.serial.closeConnection();
-				} catch (Exception e) {
-					LogListModel.add(e.getMessage());
-				}
+					"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+				if (this.controllerLogic.isRunning()) this.stopSystem();
+				this.disconnect();
 				this.exitProgram();
 			}
 		}
