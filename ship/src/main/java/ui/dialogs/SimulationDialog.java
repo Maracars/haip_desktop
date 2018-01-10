@@ -106,11 +106,7 @@ public class SimulationDialog extends JDialog implements ActionListener{
 					numBoats = Integer.parseInt(boatNumbers.getText());
 					initializeBoats(numBoats);
 				}
-				bStop.setEnabled(true);
-				bStart.setEnabled(false);
-				simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic.getShipLogic());
-				simShipLogic.getShipLogic().setSimulationStarted();
-				simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic);
+				startSimulation();
 			}catch (NumberFormatException ex) {
 				JOptionPane.showMessageDialog(window,
 						"Remember to insert a valid number, please",
@@ -119,17 +115,14 @@ public class SimulationDialog extends JDialog implements ActionListener{
 				boatNumbers.setText("");
 			}
 		}else if(e.getSource().equals(bStop)){
-			bStart.setEnabled(true);
-			bStop.setEnabled(false);
-
-			simShipLogic.getShipLogic().setSimulationStopped();
-			simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic);
-			}
+			stopSimulation();
+		}
 
 	}
 
 	private void initializeBoats(int numBoats) {
 		System.out.println("Num boats "+numBoats);
+		simShipLogic.resetSimulationShipList();
 		for(int i = 0; i < numBoats; i++) {
 			Status newStatus = DecisionMaker.getRandomAction(StatusType.SEA);
 			Status status = new Status(StatusType.SEA.toString(), newStatus.getAction(), PermissionType.ASK.toString());
@@ -138,6 +131,22 @@ public class SimulationDialog extends JDialog implements ActionListener{
 			simShipLogic.addShipToSimulation(ship);
 		}
 
+	}
+
+	private void startSimulation() {
+		bStop.setEnabled(true);
+		bStart.setEnabled(false);
+		simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic.getShipLogic());
+		simShipLogic.getShipLogic().setSimulationStarted();
+		simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic);
+	}
+
+	private void stopSimulation() {
+		bStart.setEnabled(true);
+		bStop.setEnabled(false);
+
+		simShipLogic.getShipLogic().setSimulationStopped();
+		simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic);
 	}
 
 }
