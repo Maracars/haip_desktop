@@ -72,6 +72,10 @@ public class SimulationShipLogic implements Observer{
 	public void addShipToSimulation(Ship ship) {
 		simulationShips.add(ship);
 	}
+	
+	public void resetSimulationShipList() {
+		simulationShips.clear();
+	}
 
 
 	public ShipLogic getShipLogic() {
