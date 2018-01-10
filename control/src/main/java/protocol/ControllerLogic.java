@@ -21,7 +21,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	private Serial serial;
 
 	private Thread thread;
-	private volatile boolean running;
+	private volatile boolean active;
 
 	@SuppressWarnings("unchecked")
 	public ControllerLogic(Serial serial, Port port) {
@@ -33,28 +33,24 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		this.serial = serial;
 	}
 
-	public void startLogic() {
-		this.running = true;
-		this.thread = new Thread(this);
-		this.thread.start();
+	public boolean isActive() {
+		return active;
 	}
 
-	public void stopLogic() {
-		this.running = false;
-		try {
-			this.thread.join();
-		} catch (InterruptedException e) {
-			LogListModel.add("Couldn't stop system");
+	public void setActive(boolean state) throws InterruptedException {
+		this.active = state;
+		if (active) {
+			this.thread = new Thread(this);
+			this.thread.start();
 		}
-	}
-
-	public boolean isRunning() {
-		return running;
+		else {
+			this.thread.join();
+		}
 	}
 
 	@Override
 	public void run() {
-		while (running) {
+		while (active) {
 			for (int k = 0; k < 5; k++) {
 				for (int i = 0; i < LOOP_IDLE_BOATS; i++) {
 					for (int j = 0; j < LOOP_CONNECTED_BOATS; j++) {

@@ -15,7 +15,7 @@ public class CellRenderer extends DefaultTableCellRenderer{
 		JLabel label = new JLabel();
 
 		if (value.getClass().equals(Boolean.class)) {
-			label.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+			label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
 			label.setText("" + value);
 
 			if ((Boolean) value == false) {
@@ -27,7 +27,7 @@ public class CellRenderer extends DefaultTableCellRenderer{
 			return label;
 		}
 		else {
-			this.setFont(new Font("Comic Sans MS", Font.PLAIN, 18));
+			this.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
 		}
 
 		this.setOpaque(true);

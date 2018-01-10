@@ -1,6 +1,5 @@
 package ui.panels;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import helpers.Helpers;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
@@ -42,6 +41,7 @@ public class MainPanel {
 	private MapPanel mapPanel;
 	private JTable table;
 	private TableModel tableModel;
+	private ColumnModel columnModel;
 	private JButton connectButton, logicButton;
 	private AbstractAction connectAction, logicAction, settingsAction, resetAction, exitAction;
 
@@ -60,8 +60,13 @@ public class MainPanel {
 		this.createJFrame();
 		this.initActions();
 		this.initTable();
-		Port port = this.initPort();
-		this.createMapPanel(port);
+		try {
+			Port port = this.initSystem();
+			this.createMapPanel(port);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 		this.addContentToJFrame();
 	}
 
@@ -99,13 +104,13 @@ public class MainPanel {
 
 	private void initTable() {
 		CellRenderer cellRenderer = new CellRenderer();
-		ColumnModel columnModel = new ColumnModel(cellRenderer);
-		this.tableModel = new TableModel(columnModel);
+		this.columnModel = new ColumnModel(cellRenderer);
+		this.tableModel = new TableModel(this.columnModel);
+		this.table = new JTable(this.tableModel, this.columnModel);
 
-		this.table = new JTable(tableModel, columnModel);
 		this.table.setRowHeight(this.window.getHeight() / 20);
 		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		this.table.getTableHeader().setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
+		this.table.getTableHeader().setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 24));
 	}
 
 	private void readSettings() throws IOException {
@@ -119,12 +124,9 @@ public class MainPanel {
 		Settings.setProperties(settings);
 	}
 
-	private Port initPort() {
-		try {
-			this.readSettings();
-		} catch (IOException e) {
-			LogListModel.add(ERROR_READING_SETTINGS);
-		}
+	private Port initSystem() throws IOException {
+		this.readSettings();
+
 		this.serial = new Serial();
 		Port port = new Port(new Dock("Albert Dock", this.initMoorings()));
 		this.controllerLogic = new ControllerLogic(this.serial, port);
@@ -334,7 +336,7 @@ public class MainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (!controllerLogic.isRunning()) startSystem();
+			if (!controllerLogic.isActive()) startSystem();
 			else stopSystem();
 		}
 	}
@@ -347,18 +349,37 @@ public class MainPanel {
 		settingsAction.setEnabled(false);
 		resetAction.setEnabled(false);
 
-		controllerLogic.startLogic();
+		try {
+			controllerLogic.setActive(true);
+		} catch (InterruptedException e) {
+			LogListModel.add(e.getMessage());
+		}
 	}
 
 	private void stopSystem() {
-		this.logicButton.setText("Initialize system");
-		this.logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
-		LogListModel.add(SYSTEM_STOPPED);
-		this.connectAction.setEnabled(true);
-		this.settingsAction.setEnabled(true);
-		this.resetAction.setEnabled(true);
+		Thread deactivator = new Thread(() -> {
+			try {
+				logicButton.setText("Stopping system...");
+				logicAction.setEnabled(false);
+				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.STOP_CIRCLE, 32));
 
-		this.controllerLogic.stopLogic();
+				controllerLogic.setActive(false);
+				LogListModel.add(SYSTEM_STOPPED);
+
+				logicButton.setText("Initialize system");
+				logicAction.setEnabled(true);
+				logicButton.setIcon(IconFontSwing.buildIcon(FontAwesome.TOGGLE_OFF, 32));
+
+				connectAction.setEnabled(true);
+				settingsAction.setEnabled(true);
+				resetAction.setEnabled(true);
+			}
+			catch (InterruptedException e) {
+				LogListModel.add(e.getMessage());
+			}
+		});
+		deactivator.setDaemon(true);
+		deactivator.start();
 	}
 
 	private class SettingsAction extends AbstractAction {
@@ -410,22 +431,32 @@ public class MainPanel {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
 			if (!serial.isConnected()) {
-				resetPort();
+				if (JOptionPane.showConfirmDialog(window, "Do you really want to reset the port?",
+						"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+					resetPort();
+				}
 			} else {
-				if (JOptionPane.showConfirmDialog(window, (controllerLogic.isRunning() ?
+				if (JOptionPane.showConfirmDialog(window, (controllerLogic.isActive() ?
 								"System is initialized.\n" : "Serial connection is established.\n")
 								+ "Do you really want to reset the port?",
 						"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-					if (controllerLogic.isRunning()) stopSystem();
+					if (controllerLogic.isActive()) stopSystem();
 					disconnect();
+					resetPort();
 				}
 			}
 		}
 	}
 
 	private void resetPort() {
-		Port port = initPort();
-		mapPanel.resetPort(port, controllerLogic);
+		this.table.setModel(new TableModel(this.columnModel));
+		try {
+			Port port = initSystem();
+			this.mapPanel.resetPort(port, this.controllerLogic);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private class ExitAction extends AbstractAction {
@@ -462,11 +493,11 @@ public class MainPanel {
 		if (!this.serial.isConnected()) {
 			this.exitProgram();
 		} else {
-			if (JOptionPane.showConfirmDialog(this.window, (this.controllerLogic.isRunning() ?
+			if (JOptionPane.showConfirmDialog(this.window, (this.controllerLogic.isActive() ?
 							"System is initialized.\n" : "Serial connection is established.\n")
 							+ "Do you really want to exit?",
 					"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-				if (this.controllerLogic.isRunning()) this.stopSystem();
+				if (this.controllerLogic.isActive()) this.stopSystem();
 				this.disconnect();
 				this.exitProgram();
 			}

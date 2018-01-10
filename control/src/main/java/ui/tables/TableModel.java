@@ -22,17 +22,19 @@ public class TableModel extends AbstractTableModel {
 		for (TableData t : tableDataList) {
 			if (t.getShipID() == tableData.getShipID()) {
 				index = this.tableDataList.indexOf(t);
+				break;
 			}
 		}
 		if (index != -1) {
 			// Update old ship
 			this.tableDataList.set(index, tableData);
+			this.fireTableRowsUpdated(index, index);
 		}
 		else {
 			// Add new ship
 			this.tableDataList.add(tableData);
+			this.fireTableRowsInserted(index, index);
 		}
-		this.fireTableDataChanged();
 	}
 
 	public void updatePermission(int shipID, boolean permission) {
@@ -41,21 +43,22 @@ public class TableModel extends AbstractTableModel {
 		for (TableData t : tableDataList) {
 			if (t.getShipID() == shipID) {
 				index = this.tableDataList.indexOf(t);
+				break;
 			}
 		}
 		if (index != -1) {
 			TableData tableData = tableDataList.get(index);
 			tableData.setPermission(permission);
 			this.tableDataList.set(index, tableData);
+			this.fireTableRowsUpdated(index, index);
 		}
-		this.fireTableDataChanged();
 	}
 	
 	public void remove(int index) {
 		this.tableDataList.remove(index);
-		this.fireTableDataChanged();
+		this.fireTableRowsDeleted(index, index);
 	}
-	
+
 	@Override
 	public int getRowCount() {
 		return tableDataList.size();
@@ -71,7 +74,7 @@ public class TableModel extends AbstractTableModel {
 		TableData data = tableDataList.get(rowIndex);
 		return data.getFieldAt(columnIndex);
 	}
-	
+
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
 		return getValueAt(0, columnIndex).getClass();
