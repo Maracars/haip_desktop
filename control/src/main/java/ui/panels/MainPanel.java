@@ -398,20 +398,22 @@ public class MainPanel {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
 			SettingsDialog settingsDialog = new SettingsDialog();
-			List<String> settings = settingsDialog.getSettings();
-			Settings.setProperties(settings);
+			if (settingsDialog.getSettingsChanged()) {
+				List<String> settings = settingsDialog.getSettings();
+				Settings.setProperties(settings);
 
-			for (int i = 0; i < settings.size(); i++) {
-				properties.setProperty(PROPERTY_NAMES[i], settings.get(i));
-				try {
-					properties.store(new FileWriter(FILE_NAME), null);
-				} catch (IOException e) {
-					LogListModel.add(ERROR_WRITING_SETTINGS);
+				for (int i = 0; i < settings.size(); i++) {
+					properties.setProperty(PROPERTY_NAMES[i], settings.get(i));
+					try {
+						properties.store(new FileWriter(FILE_NAME), null);
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+					fieldList.get(i).setText(settings.get(i));
 				}
-				fieldList.get(i).setText(settings.get(i));
-				// TODO repaint map
+				resetPort();
 			}
-			mapPanel.repaintAllElements();
 		}
 	}
 

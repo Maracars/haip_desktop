@@ -17,6 +17,7 @@ public class SettingsDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	private List<TextFieldPanel> fieldList;
+	private boolean settingsChanged;
 
 	public SettingsDialog() {
 		super(new JFrame(), "Settings Menu", true);
@@ -27,10 +28,12 @@ public class SettingsDialog extends JDialog implements ActionListener {
 		this.setLocation((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 12),
 				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 8);
 
-		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
 		this.setContentPane(createMainPanel());
 		this.setVisible(true);
+
+		this.settingsChanged = false;
 	}
 
 	private JPanel createMainPanel() {
@@ -85,9 +88,11 @@ public class SettingsDialog extends JDialog implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("Accept")) {
 			if (checkFields()) {
+				this.settingsChanged = true;
 				this.dispose();
 			}
 		} else if (e.getActionCommand().equals("Cancel")) {
+			this.settingsChanged = false;
 			this.dispose();
 		}
 	}
@@ -123,5 +128,9 @@ public class SettingsDialog extends JDialog implements ActionListener {
 			return false;
 		}
 		return true;
+	}
+
+	public boolean getSettingsChanged() {
+		return this.settingsChanged;
 	}
 }
