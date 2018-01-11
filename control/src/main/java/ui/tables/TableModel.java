@@ -6,10 +6,10 @@ import java.util.List;
 
 public class TableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
-	
-	List<TableData> tableDataList;
-	ColumnModel columnModel;
-	
+
+	private List<TableData> tableDataList;
+	private ColumnModel columnModel;
+
 	public TableModel(ColumnModel columnModel) {
 		this.tableDataList = new ArrayList<>();
 		this.columnModel = columnModel;
@@ -46,7 +46,7 @@ public class TableModel extends AbstractTableModel {
 			this.fireTableRowsUpdated(index, index);
 		}
 	}
-	
+
 	public void remove(int index) {
 		this.tableDataList.remove(index);
 		this.fireTableRowsDeleted(index, index);

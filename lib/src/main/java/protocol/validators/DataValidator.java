@@ -39,20 +39,17 @@ public class DataValidator implements Validator {
 					return false;
 				}
 			}
-			
-			if(frame.getData().getType().equals(DataType.RESPONSE.toString()) && 
+
+			if (frame.getData().getType().equals(DataType.RESPONSE.toString()) &&
 					!frame.getOriginId().equals(MASTER_ID)) {
 				return false;
 			}
-			
-			if(frame.getData().getType().equals(DataType.REQUEST.toString()) && 
+
+			if (frame.getData().getType().equals(DataType.REQUEST.toString()) &&
 					frame.getOriginId().equals(MASTER_ID)) {
 				return false;
 			}
 		}
 		return true;
-
 	}
-
-
 }

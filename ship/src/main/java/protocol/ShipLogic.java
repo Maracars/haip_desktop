@@ -1,37 +1,32 @@
 package protocol;
 
-import static protocol.ProtocolProperties.MASTER_ID;
+import helpers.Helpers;
+import models.Frame;
+import models.Ship;
+import models.Status;
+import protocol.ProtocolProperties.*;
+import serial.Serial;
+import ui.log.LogListModel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import helpers.Helpers;
-import models.Frame;
-import models.Ship;
-import models.Status;
-import protocol.ProtocolProperties.ActionType;
-import protocol.ProtocolProperties.DataType;
-import protocol.ProtocolProperties.PacketType;
-import protocol.ProtocolProperties.PermissionType;
-import protocol.ProtocolProperties.StatusType;
-import serial.Serial;
-import ui.log.LogListModel;
+import static protocol.ProtocolProperties.*;
 
-public class ShipLogic extends Observable implements Observer{
-
-	Serial serial;
-	Ship ship;
-	boolean simulation;
-	ArrayList<Ship> simulationShips;
-	List<String> actionList;
+public class ShipLogic extends Observable implements Observer {
+	private Serial serial;
+	private Ship ship;
+	private boolean simulation;
+	private ArrayList<Ship> simulationShips;
+	private List<String> actionList;
 
 	public ShipLogic(Serial serial, Ship ship) {
 		this.serial = serial;
 		this.ship = ship;
 		simulation = false;
-		actionList = new ArrayList<String>();
+		actionList = new ArrayList<>();
 		simulationShips = new ArrayList<>();
 	}
 
@@ -39,57 +34,57 @@ public class ShipLogic extends Observable implements Observer{
 	public void update(Observable o, Object arg) {
 		Frame frame = (Frame) arg;
 		PacketType pt = PacketType.getName(frame.getHeader().getPacketType());
-		Frame sendFrame = null;
-		System.out.println("Received frame "+frame.toString());
-		switch(pt) {
-		case DISCOVERY:
-			sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
-			if(serial == null) {
-				System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " trying to connect");
-				System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends ACK: " + frame.toString());
-			}else {
-				LogListModel.add("Ship number " + Integer.parseInt(ship.getId(),2) + " trying to connect");
-				if(serial.isConnected())
+		Frame sendFrame;
+		System.out.println("Received frame " + frame.toString());
+		switch (pt) {
+			case DISCOVERY:
+				sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
+				if (serial == null) {
+					System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " trying to connect");
+					System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends ACK: " + frame.toString());
+				} else {
+					LogListModel.add("Ship number " + Integer.parseInt(ship.getId(), 2) + " trying to connect");
+					if (serial.isConnected())
+						replyController(sendFrame);
+				}
+				break;
+			case DATA:
+				checkShipMovement(frame, ship);
+				notifyPanel();
+				break;
+			case TOKEN:
+				LogListModel.add("Permission to talk: " + Integer.parseInt(ship.getId(), 2));
+				sendFrame = checkToken(frame, ship);
+				if (serial != null) {
 					replyController(sendFrame);
-			}
-			break;
-		case DATA:
-			checkShipMovement(frame, ship);
-			notifyPanel();
-			break;
-		case TOKEN:
-			LogListModel.add("Permission to talk: " + Integer.parseInt(ship.getId(),2));
-			sendFrame = checkToken(frame, ship);
-			if(serial != null) {
-				replyController(sendFrame);
-			}
-			break;
-		default:
-			break;
+				}
+				break;
+			default:
+				break;
 		}
 	}
 
 	public Frame checkToken(Frame frame, Ship ship) {
 		Frame sendFrame = null;
 
-		if(simulation && ship.getStatus().getAction().equals(ActionType.IDLE.toString()) && ship.getIdleTime() >= 20) {
+		if (simulation && ship.getStatus().getAction().equals(ActionType.IDLE.toString()) && ship.getIdleTime() >= 20) {
 			Status newStatus = DecisionMaker.getRandomAction(StatusType.getName(ship.getStatus().getStatus()));
 			ship.setStatus(new Status(ship.getStatus().getStatus(), newStatus.getAction(), PermissionType.ASK.toString()));
 			ship.setActionList(new ArrayList<>());
 			ship.addAction(newStatus);
-		}else if (ship.getIdleTime() < 20 && simulation) {
+		} else if (ship.getIdleTime() < 20 && simulation) {
 			ship.addIdleTime(1);
 		}
-		
-		if(ship.getActionList().size() > 0) {
-			if(ship.getActionList().get(0).getAction().equals(ActionType.IDLE.toString())) {
+
+		if (ship.getActionList().size() > 0) {
+			if (ship.getActionList().get(0).getAction().equals(ActionType.IDLE.toString())) {
 				sendFrame = FrameCreator.createStatus(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
 				LogListModel.add("Ship number " + Integer.parseInt(ship.getId()) + " sends STATUS");
-			}else if (ship.getActionList().get(0).getAction().equals(ActionType.ENTER.toString()) || ship.getActionList().get(0).getAction().equals(ActionType.LEAVE.toString())) {
+			} else if (ship.getActionList().get(0).getAction().equals(ActionType.ENTER.toString()) || ship.getActionList().get(0).getAction().equals(ActionType.LEAVE.toString())) {
 				sendFrame = FrameCreator.createRequest(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
 				LogListModel.add("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends REQUEST");
 			}
-		}else{
+		} else {
 			sendFrame = FrameCreator.createStatus(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
 			LogListModel.add("Ship number " + Integer.parseInt(ship.getId()) + " sends STATUS");
 		}
@@ -110,42 +105,42 @@ public class ShipLogic extends Observable implements Observer{
 		String framePermission = frame.getData().getStatus().getPermission();
 		String shipAction = ActionType.getName(ship.getStatus().getAction()).name();
 		int shipId = Integer.parseInt(ship.getId(), 2);
-		
-		if(dataType.equals(DataType.RESPONSE.toString()) && permission.equals(PermissionType.ALLOW.toString())) {
-			LogListModel.add("Permission to ship: "+shipId+ ", "+shipAction);
-			if(frameStatus.equals(actionStatus)) {
-				LogListModel.add("Operation finish ship: "+shipId);
-				LogListModel.add("Ship "+shipId + " IDLE");
-				if(simulation) {
+
+		if (dataType.equals(DataType.RESPONSE.toString()) && permission.equals(PermissionType.ALLOW.toString())) {
+			LogListModel.add("Permission to ship: " + shipId + ", " + shipAction);
+			if (frameStatus.equals(actionStatus)) {
+				LogListModel.add("Operation finish ship: " + shipId);
+				LogListModel.add("Ship " + shipId + " IDLE");
+				if (simulation) {
 					Status newStatus = DecisionMaker.getRandomAction(StatusType.getName(frame.getData().getStatus().getStatus()));
-					ship.setStatus(new Status(frame.getData().getStatus().getStatus(),newStatus.getAction(), PermissionType.ASK.toString()));
+					ship.setStatus(new Status(frame.getData().getStatus().getStatus(), newStatus.getAction(), PermissionType.ASK.toString()));
 					ship.setActionList(new ArrayList<>());
 					ship.addAction(newStatus);
-				}else{
+				} else {
 					ship.setStatus(new Status(frame.getData().getStatus().getStatus(), ActionType.IDLE.toString(), PermissionType.ASK.toString()));
-					ship.setActionList(new ArrayList<Status>());
+					ship.setActionList(new ArrayList<>());
 				}
 
-			}else if (frameStatus.equals(StatusType.TRANSIT.toString())) {
-				LogListModel.add("Performing operation ship: "+shipId);
+			} else if (frameStatus.equals(StatusType.TRANSIT.toString())) {
+				LogListModel.add("Performing operation ship: " + shipId);
 				ship.setStatus(frame.getData().getStatus());
-			}else{
-				LogListModel.add("New status to ship: "+shipId+
-						", STATUS: "+StatusType.getName(frameStatus).name()+ 
-						", ACTION: "+ActionType.getName(frameAction).name()+ 
-						", PERMISSION: "+PermissionType.getName(framePermission).name());
-				if(frameAction.equals(ActionType.ENTER.toString())) {
-					LogListModel.add("Ship: "+shipId+", parking: "+frame.getData().getParking());
+			} else {
+				LogListModel.add("New status to ship: " + shipId +
+						", STATUS: " + StatusType.getName(frameStatus).name() +
+						", ACTION: " + ActionType.getName(frameAction).name() +
+						", PERMISSION: " + PermissionType.getName(framePermission).name());
+				if (frameAction.equals(ActionType.ENTER.toString())) {
+					LogListModel.add("Ship: " + shipId + ", parking: " + frame.getData().getParking());
 					ship.setParking(frame.getData().getParking());
 				}
 				ship.setStatus(frame.getData().getStatus());
 			}
 		}
 		if (dataType.equals(DataType.RESPONSE.toString()) && framePermission.equals(PermissionType.DENY.toString())) {
-			System.out.println("Ship number " +shipId+ " has NOT permission to perform the operation: " + ActionType.getName(frameAction).name());
-			System.out.println("Ship changes to new status, STATUS: "+StatusType.getName(frameStatus) + 
-					", ACTION: "+ActionType.getName(frameAction).name() + 
-					" PERMISSION: "+PermissionType.getName(framePermission).name());
+			System.out.println("Ship number " + shipId + " has NOT permission to perform the operation: " + ActionType.getName(frameAction).name());
+			System.out.println("Ship changes to new status, STATUS: " + StatusType.getName(frameStatus) +
+					", ACTION: " + ActionType.getName(frameAction).name() +
+					" PERMISSION: " + PermissionType.getName(framePermission).name());
 			ship.setStatus(frame.getData().getStatus());
 
 		}
@@ -163,7 +158,7 @@ public class ShipLogic extends Observable implements Observer{
 	public void setSimulationStarted() {
 		simulation = true;
 	}
-	
+
 	public void setSimulationStopped() {
 		simulation = false;
 	}

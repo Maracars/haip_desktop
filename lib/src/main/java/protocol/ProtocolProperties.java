@@ -20,13 +20,11 @@ public final class ProtocolProperties {
 
 	// TODO This has to be defined
 	public static final long TIMEOUT = 50000000;
-
-	public static final int LOOP_CONNECTED_BOATS = 3;
-	public static final int LOOP_IDLE_BOATS = 2;
-	public static final int TIMEOUTED_LOOP_LIMIT = 2;
-
 	public static final String MASTER_ID = "00000000";
-	public static final String BROADCAST = "11111111";
+	static final int LOOP_CONNECTED_BOATS = 3;
+	static final int LOOP_IDLE_BOATS = 2;
+	static final int TIMEOUTED_LOOP_LIMIT = 2;
+	static final String BROADCAST = "11111111";
 
 	public enum PacketType {
 		DISCOVERY("00"),
@@ -39,11 +37,6 @@ public final class ProtocolProperties {
 			string = name;
 		}
 
-		@Override
-		public String toString() {
-			return string;
-		}
-
 		public static PacketType getName(String value) {
 			for (PacketType pt : PacketType.values()) {
 				if (value.equals(pt.toString())) {
@@ -51,6 +44,11 @@ public final class ProtocolProperties {
 				}
 			}
 			return null;
+		}
+
+		@Override
+		public String toString() {
+			return string;
 		}
 	}
 
@@ -65,11 +63,6 @@ public final class ProtocolProperties {
 			string = name;
 		}
 
-		@Override
-		public String toString() {
-			return string;
-		}
-
 		public static DataType getName(String value) {
 			for (DataType dt : DataType.values()) {
 				if (value.equals(dt.toString())) {
@@ -77,6 +70,11 @@ public final class ProtocolProperties {
 				}
 			}
 			return null;
+		}
+
+		@Override
+		public String toString() {
+			return string;
 		}
 	}
 
@@ -90,11 +88,6 @@ public final class ProtocolProperties {
 			string = name;
 		}
 
-		@Override
-		public String toString() {
-			return string;
-		}
-
 		public static StatusType getName(String value) {
 			for (StatusType st : StatusType.values()) {
 				if (value.equals(st.toString())) {
@@ -102,6 +95,11 @@ public final class ProtocolProperties {
 				}
 			}
 			return null;
+		}
+
+		@Override
+		public String toString() {
+			return string;
 		}
 	}
 
@@ -115,11 +113,6 @@ public final class ProtocolProperties {
 			string = name;
 		}
 
-		@Override
-		public String toString() {
-			return string;
-		}
-
 		public static ActionType getName(String value) {
 			for (ActionType at : ActionType.values()) {
 				if (value.equals(at.toString())) {
@@ -127,6 +120,11 @@ public final class ProtocolProperties {
 				}
 			}
 			return null;
+		}
+
+		@Override
+		public String toString() {
+			return string;
 		}
 	}
 
@@ -142,11 +140,6 @@ public final class ProtocolProperties {
 			string = name;
 		}
 
-		@Override
-		public String toString() {
-			return string;
-		}
-
 		public static PermissionType getName(String value) {
 			for (PermissionType pt : PermissionType.values()) {
 				if (value.equals(pt.toString())) {
@@ -154,6 +147,11 @@ public final class ProtocolProperties {
 				}
 			}
 			return null;
+		}
+
+		@Override
+		public String toString() {
+			return string;
 		}
 
 	}

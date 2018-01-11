@@ -4,7 +4,6 @@ import helpers.IndexAwareSet;
 import settings.Settings;
 
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static protocol.ProtocolProperties.ActionType;
@@ -34,7 +33,7 @@ public class Port {
 	}
 
 
-	public boolean addToTransitionZone(Ship ship, String action) {	
+	public boolean addToTransitionZone(Ship ship, String action) {
 		if (!transitQueue.contains(ship)) {
 			transitQueue.add(ship);
 		}

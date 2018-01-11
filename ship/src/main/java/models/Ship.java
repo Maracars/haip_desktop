@@ -4,22 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Ship {
-	
+
+	private int idleTime;
 	private String id;
 	private Status status;
 	private String parking;
 	private List<Status> actionList;
-	int idleTime;
-	
+
 	public Ship(String id, Status status) {
 		this.id = id;
 		this.status = status;
 		idleTime = 0;
 		actionList = new ArrayList<>();
 	}
-	
-	public Ship() {}
-	
+
+	public Ship() {
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -35,7 +36,7 @@ public class Ship {
 	public void setStatus(Status status) {
 		this.status = status;
 	}
-	
+
 	public List<Status> getActionList() {
 		return actionList;
 	}
@@ -63,9 +64,9 @@ public class Ship {
 	public void setIdleTime(int idleTime) {
 		this.idleTime = idleTime;
 	}
-	
+
 	public void addIdleTime(int sumTime) {
 		idleTime += sumTime;
 	}
-	
+
 }

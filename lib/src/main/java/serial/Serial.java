@@ -46,8 +46,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 					serialPort.addEventListener(this);
 					serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 				}
-			}
-			catch (SerialPortException e) {
+			} catch (SerialPortException e) {
 				throw new Exception(SERIAL_PORT_NOT_WORKING);
 			}
 		}
@@ -58,8 +57,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 		if (serialPort != null && serialPort.isOpened()) {
 			if (serialPort.closePort()) {
 				serialPort = null;
-			}
-			else throw new Exception("Port could not be closed");
+			} else throw new Exception("Port could not be closed");
 		}
 	}
 
@@ -74,18 +72,17 @@ public class Serial extends Observable implements SerialPortEventListener {
 				int byteCount = event.getEventValue();
 				String byteStr = serialPort.readString(byteCount);
 				if (byteStr != null) sendToParser(byteStr);
-			}
-			catch (SerialPortException e) {
+			} catch (SerialPortException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
 	public void sendToParser(String string) {
-        boolean validFrame = FrameParser.parseRx(string);
-        if (validFrame) {
-            notifyFrame(FrameParser.getFrame());
-        }
+		boolean validFrame = FrameParser.parseRx(string);
+		if (validFrame) {
+			notifyFrame(FrameParser.getFrame());
+		}
 	}
 
 	public void writeStrings(List<String> stringList) throws SerialPortException {

@@ -42,8 +42,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		if (active) {
 			this.thread = new Thread(this);
 			this.thread.start();
-		}
-		else {
+		} else {
 			this.thread.join();
 		}
 	}
@@ -97,8 +96,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				addTimeout(boat_id);
 				updateMap(new Ship(receivedList.get(0).getOriginId(), receivedList.get(0).getData().getStatus()));
 				System.out.println("Asked for idle, and added timeout" + timeouts);
-			}
-			else {
+			} else {
 				//TODO Here we must send the response to the request.
 				if (idleBoats.contains(boat_id)) {
 					addConnectedBoat(boat_id);
@@ -106,8 +104,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				System.out.println("Ship number " + boat + " sent " + receivedList);
 				checkRequest(receivedList.get(0));
 			}
-		}
-		else {
+		} else {
 			if (!receivedList.isEmpty()) {
 				System.out.println("Invalid packet " + boat + " " + receivedList.get(0).getOriginId());
 			}
@@ -146,7 +143,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		}
 		// Invalid
 		else {
-			 checkInvalidRequest(nextStatus, shipID);
+			checkInvalidRequest(nextStatus, shipID);
 		}
 		Frame nextFrame = FrameCreator.createResponse(MASTER_ID, ship.getId(), nextStatus, parking);
 		System.out.println("Next frame to send: " + nextFrame.toString());
@@ -159,7 +156,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		updateMap(ship);
 	}
 
-	private void checkDockLeaveRequest(Ship ship, String actionStr, Status nextStatus, int shipID){
+	private void checkDockLeaveRequest(Ship ship, String actionStr, Status nextStatus, int shipID) {
 		boolean okay = port.addToTransitionZone(ship, actionStr);
 		if (okay) {
 			nextStatus.setStatus(StatusType.TRANSIT.toString());
@@ -185,7 +182,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		port.removeFromTransitZone(ship);
 	}
 
-	private String checkSeaEnterRequest(Ship ship, String actionStr, Status nextStatus, int shipID){
+	private String checkSeaEnterRequest(Ship ship, String actionStr, Status nextStatus, int shipID) {
 		Mooring freeMooring = port.getFreeMooring(ship);
 		String parking = null;
 
@@ -203,8 +200,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				nextStatus.setPermission(PermissionType.DENY.toString());
 				LogListModel.add("Not enough space in transit for ship " + shipID);
 			}
-		}
-		else {
+		} else {
 			nextStatus.setPermission(PermissionType.DENY.toString());
 			LogListModel.add("Ship " + shipID + " access denied, no free mooring");
 		}
@@ -215,7 +211,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		nextStatus.setPermission(PermissionType.INVALID.toString());
 		LogListModel.add("Ship " + shipID + " is in an invalid state");
 	}
-	
+
 	private void sendFrame(Frame frame) {
 		if (serial != null && serial.isConnected()) {
 			Helpers.sendParsedFrame(frame, serial);

@@ -13,8 +13,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class MapPanel extends JPanel implements ComponentListener, Observer {
 	private static final long serialVersionUID = 1L;
@@ -53,13 +55,13 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		int displayHeight = panelDimension.height;
 		int displayWidth = panelDimension.width;
 
-		seaHeight = displayHeight/2 - TRANSITION_HEIGHT/2;
+		seaHeight = displayHeight / 2 - TRANSITION_HEIGHT / 2;
 		seaWidth = displayWidth;
 
 		transitHeight = TRANSITION_HEIGHT;
 		transitWidth = TRANSITION_WIDTH;
 
-		parkingHeight = displayHeight/2 - TRANSITION_HEIGHT/2;
+		parkingHeight = displayHeight / 2 - TRANSITION_HEIGHT / 2;
 		parkingWidth = displayWidth;
 	}
 
@@ -79,8 +81,8 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 	}
 
 	private void paintBoats(Graphics g) {
-		for(Ship ship : shipList) {
-			if(ship.getStatus() != null) {
+		for (Ship ship : shipList) {
+			if (ship.getStatus() != null) {
 				checkBoatPositionAndDraw(g, ship);
 			}
 		}
@@ -91,7 +93,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		StatusType st = StatusType.getName(ship.getStatus().getStatus());
 		g.setColor(new Color(77, 244, 65));
 		checkBoatActionTypeAndPermissions(g, ship);
-		switch(st) {
+		switch (st) {
 			case PARKING:
 				int parkingIndex = checkBoatParking(ship);
 				x = (panelLocation.x + (panelDimension.width / 2)) + (parkingIndex) * PARKING_WIDTH;
@@ -99,25 +101,25 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
 				g.setColor(Color.BLACK);
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
-						x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
+						x + BOAT_WIDTH / 2 - 4, y + BOAT_HEIGHT / 2 + 3);
 				break;
 			case TRANSIT:
 				int index = port.getTransitZone().getIndex(ship);
 				System.out.println(transitWidth);
 				x = (int) (panelLocation.getX() + transitWidth
-						+ (TRANSITION_WIDTH * index) + TRANSITION_WIDTH/2 - BOAT_WIDTH/2);
-				y = seaHeight + transitHeight/2 - BOAT_HEIGHT/2;
+						+ (TRANSITION_WIDTH * index) + TRANSITION_WIDTH / 2 - BOAT_WIDTH / 2);
+				y = seaHeight + transitHeight / 2 - BOAT_HEIGHT / 2;
 				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
 				g.setColor(Color.BLACK);
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
-						x + BOAT_WIDTH/2 - 4, y + BOAT_HEIGHT / 2 + 3);
+						x + BOAT_WIDTH / 2 - 4, y + BOAT_HEIGHT / 2 + 3);
 				break;
 			case SEA:
 				Point pointSea = checkBoatLocation(ship);
-				g.fillOval((int)pointSea.getX(), (int)pointSea.getY(), BOAT_WIDTH, BOAT_HEIGHT);
+				g.fillOval((int) pointSea.getX(), (int) pointSea.getY(), BOAT_WIDTH, BOAT_HEIGHT);
 				g.setColor(Color.BLACK);
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
-						(int) (pointSea.getX() + BOAT_WIDTH/2 - 4),
+						(int) (pointSea.getX() + BOAT_WIDTH / 2 - 4),
 						(int) (pointSea.getY() + BOAT_HEIGHT / 2 + 3));
 				break;
 		}
@@ -137,14 +139,14 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		int x, y;
 		int maxBoats = (int) Math.pow(ProtocolProperties.ORIGIN_ID, 2);
 		int shipId = Integer.parseInt(ship.getId(), 2);
-		if(shipId < maxBoats/2) {
-			x = (int) (panelLocation.getX() + shipId*(seaWidth/(maxBoats/2)));
-			y = seaHeight/4;
+		if (shipId < maxBoats / 2) {
+			x = (int) (panelLocation.getX() + shipId * (seaWidth / (maxBoats / 2)));
+			y = seaHeight / 4;
 			return new Point(x, y);
 
-		}else{
-			x = (int) (panelLocation.getX() + shipId*(seaWidth/(maxBoats/2)));
-			y = seaHeight/2;
+		} else {
+			x = (int) (panelLocation.getX() + shipId * (seaWidth / (maxBoats / 2)));
+			y = seaHeight / 2;
 			return new Point(x, y);
 		}
 	}
@@ -155,7 +157,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		if (at.equals(ActionType.IDLE)) {
 			g.setColor(new Color(244, 160, 65));
 		}
-		if(pt.equals(PermissionType.DENY)) {
+		if (pt.equals(PermissionType.DENY)) {
 			g.setColor(new Color(244, 77, 65));
 		}
 	}
@@ -164,14 +166,14 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		int parkingSize = Settings.getProperties().get(0);
 		parkingWidth = panelDimension.width / parkingSize;
 		g.setColor(Color.black);
-		for (int i = -Math.round(parkingSize/2); i < Math.round(parkingSize/2); i++) {
-			if (port.getDock().getMoorings().get(i+Math.round(parkingSize/2)).getShip() != null) {
+		for (int i = -Math.round(parkingSize / 2); i < Math.round(parkingSize / 2); i++) {
+			if (port.getDock().getMoorings().get(i + Math.round(parkingSize / 2)).getShip() != null) {
 				g.setColor(new Color(244, 77, 65));
 			} else {
 				g.setColor(new Color(77, 244, 65));
 			}
- 			g.drawRect((panelLocation.x + (panelDimension.width/2) - PARKING_WIDTH/2) + (i*PARKING_WIDTH), panelDimension.height-PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
-			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(i + Math.round(parkingSize/2)).getId(), 2)), (panelLocation.x + (panelDimension.width/2)) + (i*PARKING_WIDTH), panelDimension.height - PARKING_HEIGHT-2);
+			g.drawRect((panelLocation.x + (panelDimension.width / 2) - PARKING_WIDTH / 2) + (i * PARKING_WIDTH), panelDimension.height - PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
+			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(i + Math.round(parkingSize / 2)).getId(), 2)), (panelLocation.x + (panelDimension.width / 2)) + (i * PARKING_WIDTH), panelDimension.height - PARKING_HEIGHT - 2);
 		}
 		if (port.getDock().getMoorings().size() % 2 != 0) {
 			if (port.getDock().getMoorings().get(parkingSize - 1).getShip() != null) {
@@ -179,8 +181,8 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 			} else {
 				g.setColor(new Color(77, 244, 65));
 			}
-			g.drawRect((panelLocation.x + (panelDimension.width/2) - PARKING_WIDTH/2) + (Math.round(port.getDock().getMoorings().size()/2))*PARKING_WIDTH, panelDimension.height - PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
-			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(parkingSize - 1).getId(), 2)), (panelLocation.x + (panelDimension.width/2)) + ((Math.round(parkingSize/2)))*PARKING_WIDTH, panelDimension.height - PARKING_HEIGHT-2);
+			g.drawRect((panelLocation.x + (panelDimension.width / 2) - PARKING_WIDTH / 2) + (Math.round(port.getDock().getMoorings().size() / 2)) * PARKING_WIDTH, panelDimension.height - PARKING_HEIGHT, PARKING_WIDTH, PARKING_HEIGHT);
+			g.drawString(String.valueOf(Integer.parseInt(port.getDock().getMoorings().get(parkingSize - 1).getId(), 2)), (panelLocation.x + (panelDimension.width / 2)) + ((Math.round(parkingSize / 2))) * PARKING_WIDTH, panelDimension.height - PARKING_HEIGHT - 2);
 		}
 
 	}
@@ -191,13 +193,13 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		g.setColor(Color.gray);
 		transitWidth = panelDimension.width / 2;
 		int leftWall = 0, rightWall = 0;
-		for(int i = 0; i < MAX_TRANSIT; i++) {
-			leftWall = transitWidth - ((i+1)*50);
-			rightWall = transitWidth - ((i+1)*50);
+		for (int i = 0; i < MAX_TRANSIT; i++) {
+			leftWall = transitWidth - ((i + 1) * 50);
+			rightWall = transitWidth - ((i + 1) * 50);
 		}
 		transitWidth = leftWall;
 		g.fillRect(0, seaHeight, leftWall, transitHeight);
-		g.fillRect(leftWall+MAX_TRANSIT*100, seaHeight, rightWall, transitHeight);
+		g.fillRect(leftWall + MAX_TRANSIT * 100, seaHeight, rightWall, transitHeight);
 
 	}
 
@@ -238,8 +240,8 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 	}
 
 	public void addShipToTheList(Ship ship) {
-		for(Ship s: shipList) {
-			if(s.equals(ship)) {
+		for (Ship s : shipList) {
+			if (s.equals(ship)) {
 				s.setStatus(ship.getStatus());
 				return;
 			}

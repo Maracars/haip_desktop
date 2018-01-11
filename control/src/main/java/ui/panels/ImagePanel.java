@@ -11,10 +11,10 @@ import java.io.IOException;
 
 public class ImagePanel extends JPanel {
 	private static final long serialVersionUID = 1L;
-	
+
 	private BufferedImage image, scaledImage;
 
-	public ImagePanel(String imagePath) throws IOException {
+	ImagePanel(String imagePath) throws IOException {
 		this.image = scaledImage = null;
 		image = ImageIO.read(new File(imagePath));
 	}

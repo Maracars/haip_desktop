@@ -1,13 +1,11 @@
 package protocol.parsers;
 
-import java.util.List;
-
 import models.Frame;
 
-public interface Parser {
-	
-	public Frame parseRx(Frame frame, String byteString);
-	
-	public List<String> parseTx(Frame frame, List<String> byteList);
+import java.util.List;
 
+public interface Parser {
+	Frame parseRx(Frame frame, String byteString);
+
+	List<String> parseTx(Frame frame, List<String> byteList);
 }

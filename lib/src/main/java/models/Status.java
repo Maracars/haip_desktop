@@ -11,11 +11,14 @@ public class Status {
 		this.action = action;
 		this.permission = permission;
 	}
+
 	public Status(String status, String action) {
 		this.status = status;
 		this.action = action;
 	}
-	public Status() {}
+
+	public Status() {
+	}
 
 	public String getAction() {
 		return action;

@@ -17,7 +17,7 @@ public class COMPortChooser extends JDialog implements ActionListener {
 		this.portStrings = portStrings;
 
 		this.setSize(320, 220);
-		this.setLocation(130,	640);
+		this.setLocation(130, 640);
 
 		this.setContentPane(createWindowPanel());
 

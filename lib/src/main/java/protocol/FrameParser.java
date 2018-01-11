@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 import static protocol.ProtocolProperties.*;
 
 public class FrameParser extends Observable {
+	private static boolean validFrame;
 	private static List<String> potentialPackets;
-	static boolean validFrame;
 	private static Frame frame;
 	private static List<Validator> validators;
 	private static List<Parser> parsers;

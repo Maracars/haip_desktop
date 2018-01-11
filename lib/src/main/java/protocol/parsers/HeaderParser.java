@@ -1,13 +1,13 @@
 package protocol.parsers;
 
-import java.util.List;
-
 import models.Frame;
 import models.Header;
 
+import java.util.List;
+
 import static protocol.ProtocolProperties.*;
 
-public class HeaderParser implements Parser{
+public class HeaderParser implements Parser {
 
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {

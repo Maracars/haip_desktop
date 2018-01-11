@@ -1,23 +1,5 @@
 package ui.panels;
 
-import static ui.panels.ActionMessages.CONNECTION_CLOSED;
-import static ui.panels.ActionMessages.CONNECTION_ESTABLISHED;
-import static ui.panels.ActionMessages.LOGIC_INITIALIZED;
-import static ui.panels.ActionMessages.LOGIC_STOPPED;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-
 import helpers.Helpers;
 import jiconfont.icons.FontAwesome;
 import jiconfont.swing.IconFontSwing;
@@ -31,10 +13,24 @@ import protocol.ShipLogic;
 import protocol.SimulationShipLogic;
 import serial.Serial;
 import ui.dialogs.SimulationDialog;
-import ui.log.LogListModel;
 import ui.log.AutoScrollListPanel;
+import ui.log.LogListModel;
 
-public class MainPanel implements Observer{
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.Observable;
+import java.util.Observer;
+
+import static ui.panels.ActionMessages.*;
+
+public class MainPanel implements Observer {
 	// Swing Elements
 	private JFrame window;
 	private LogListModel logListModel;
@@ -42,7 +38,7 @@ public class MainPanel implements Observer{
 	private AbstractAction exitAction, connectAction, logicAction, decisionAction, simulationAction;
 	private JLabel permissionLabel, statusLabel;
 	private JList<String> statusList, decisionList;
-	StatusListRenderer statusRenderer;
+	private StatusListRenderer statusRenderer;
 
 	// Serial Communication
 	private Serial serial;
@@ -56,7 +52,7 @@ public class MainPanel implements Observer{
 
 	// System Initialized
 	private boolean shipDiscovered;
-	
+
 
 	public MainPanel(Serial serial, Ship ship, ShipLogic shipLogic, SimulationShipLogic simulationShipLogic) {
 		this.createFrame();
@@ -202,15 +198,15 @@ public class MainPanel implements Observer{
 	}
 
 	private void checkActionButton() {
-		if(ship.getActionList().size() == 0 ) {
+		if (ship.getActionList().size() == 0) {
 			actionButton.setEnabled(true);
-		}else {
+		} else {
 			actionButton.setEnabled(false);
 		}
 	}
 
 	private Component createDecisionInfoPanel() {
-		JPanel decisionPanel = new JPanel(new GridLayout(1,2));
+		JPanel decisionPanel = new JPanel(new GridLayout(1, 2));
 		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
 		decisionPanel.add(createStatusList());
 		decisionPanel.add(createDecisionList());
@@ -224,7 +220,7 @@ public class MainPanel implements Observer{
 		decisionList.setCellRenderer(decisionRenderer);
 		decisionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		decisionList.setLayoutOrientation(JList.VERTICAL);
-		decisionList.setBorder(BorderFactory.createMatteBorder(0,3,0,0, Color.darkGray));
+		decisionList.setBorder(BorderFactory.createMatteBorder(0, 3, 0, 0, Color.darkGray));
 		return decisionList;
 	}
 
@@ -239,8 +235,8 @@ public class MainPanel implements Observer{
 	}
 
 	private Component createInfoPanel() {
-		JPanel infoPanel = new JPanel(new GridLayout(1,2));
-		infoPanel.setPreferredSize(new Dimension(this.window.getWidth(), this.window.getHeight()/3));
+		JPanel infoPanel = new JPanel(new GridLayout(1, 2));
+		infoPanel.setPreferredSize(new Dimension(this.window.getWidth(), this.window.getHeight() / 3));
 		Border statusBorder = BorderFactory.createLineBorder(Color.darkGray, 3);
 		infoPanel.add(createStatusLabel(statusBorder));
 		infoPanel.add(createPermissionsLabel(statusBorder));
@@ -258,7 +254,7 @@ public class MainPanel implements Observer{
 	}
 
 	private void checkStatusLabel() {
-		statusLabel.setText("<html>Your status is: " + StatusType.getName(ship.getStatus().getStatus()).name()+
+		statusLabel.setText("<html>Your status is: " + StatusType.getName(ship.getStatus().getStatus()).name() +
 				"<br>You are asking for: " + ActionType.getName(ship.getStatus().getAction()).name() + "</html>");
 	}
 
@@ -285,7 +281,7 @@ public class MainPanel implements Observer{
 		return statusLabel;
 	}
 
-	public void repaintElements() {
+	private void repaintElements() {
 		statusRenderer.setStatusType(StatusType.getName(ship.getStatus().getStatus()).name());
 		statusList.repaint();
 		decisionList.repaint();
@@ -318,26 +314,6 @@ public class MainPanel implements Observer{
 		return fileMenu;
 	}
 
-	public class ConnectAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public ConnectAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			if (!serial.isConnected()) connect();
-			else disconnect();
-		}
-	}
-
 	private void connect() {
 		try {
 			this.serial.openConnection();
@@ -345,8 +321,7 @@ public class MainPanel implements Observer{
 			this.logicButton.setEnabled(true);
 			this.simulationAction.setEnabled(true);
 			LogListModel.add(CONNECTION_ESTABLISHED);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LogListModel.add(e.getMessage());
 		}
 	}
@@ -358,33 +333,12 @@ public class MainPanel implements Observer{
 			this.connectButton.setText("Connect to board");
 			this.logicButton.setEnabled(false);
 			LogListModel.add(CONNECTION_CLOSED);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LogListModel.add(e.getMessage());
 		}
 	}
 
-	public class WaitForDiscoveryAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public WaitForDiscoveryAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			if (!shipDiscovered) waitForDiscovery();
-			else rejectCommunications();
-		}
-	}
-
-	public void waitForDiscovery() {
+	private void waitForDiscovery() {
 		this.shipDiscovered = true;
 		this.serial.addObserver(this.shipLogic);
 
@@ -394,7 +348,7 @@ public class MainPanel implements Observer{
 		LogListModel.add(LOGIC_INITIALIZED);
 	}
 
-	public void rejectCommunications() {
+	private void rejectCommunications() {
 		this.shipDiscovered = false;
 		this.serial.deleteObserver(shipLogic);
 
@@ -404,25 +358,6 @@ public class MainPanel implements Observer{
 		LogListModel.add(LOGIC_STOPPED);
 	}
 
-	public class DecisionAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public DecisionAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			decide();
-		}
-	}
-
 	private void decide() {
 		ActionType at = ActionType.valueOf(this.decisionList.getSelectedValue());
 		Status newStatus = DecisionMaker.getNewPossibleAction(at);
@@ -430,44 +365,6 @@ public class MainPanel implements Observer{
 		this.ship.getStatus().setAction(at.toString());
 		this.ship.getStatus().setPermission(PermissionType.ASK.toString());
 		this.actionButton.setEnabled(false);
-	}
-
-	public class SimulationAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public SimulationAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			new SimulationDialog(window, simulationShipLogic);
-		}
-	}
-
-	public class ExitAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public ExitAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent actionEvent) {
-			onWindowClosing();
-		}
 	}
 
 	private WindowAdapter createWindowClosingAdapter() {
@@ -499,6 +396,103 @@ public class MainPanel implements Observer{
 	private void exitProgram() {
 		this.window.dispose();
 		System.exit(0);
+	}
+
+	public class ConnectAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		ConnectAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if (!serial.isConnected()) connect();
+			else disconnect();
+		}
+	}
+
+	public class WaitForDiscoveryAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		WaitForDiscoveryAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if (!shipDiscovered) waitForDiscovery();
+			else rejectCommunications();
+		}
+	}
+
+	public class DecisionAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		DecisionAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			decide();
+		}
+	}
+
+	public class SimulationAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		SimulationAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			new SimulationDialog(window, simulationShipLogic);
+		}
+	}
+
+	public class ExitAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		ExitAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent actionEvent) {
+			onWindowClosing();
+		}
 	}
 
 }

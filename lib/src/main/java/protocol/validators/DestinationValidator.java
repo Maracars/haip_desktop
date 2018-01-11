@@ -4,7 +4,7 @@ import models.Frame;
 
 import static protocol.ProtocolProperties.MASTER_ID;
 
-public class DestinationValidator implements Validator{
+public class DestinationValidator implements Validator {
 
 	@Override
 	public boolean validate(Frame frame) {
@@ -12,9 +12,6 @@ public class DestinationValidator implements Validator{
 		if (frame.getOriginId().equals(frame.getDestinationId()))
 			return false;
 		//Check if origin or destination is from master
-		if(!frame.getOriginId().equals(MASTER_ID) && !frame.getDestinationId().equals(MASTER_ID))
-			return false;
-		return true;
+		return (!frame.getOriginId().equals(MASTER_ID) && !frame.getDestinationId().equals(MASTER_ID));
 	}
-
 }

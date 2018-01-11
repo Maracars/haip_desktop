@@ -1,7 +1,6 @@
 package protocol;
 
 import models.Frame;
-import serial.Serial;
 import ui.tables.TableData;
 import ui.tables.TableModel;
 
@@ -33,8 +32,7 @@ public class SerialObserver implements Observer {
 
 					TableData tableData = new TableData(shipID, status, action, false);
 					this.tableModel.add(tableData);
-				}
-				else {
+				} else {
 					int shipID = Integer.parseInt(this.frame.getDestinationId(), 2);
 					boolean permission = this.frame.getData().getStatus().getPermission()
 							.equals(ProtocolProperties.PermissionType.ALLOW.toString());

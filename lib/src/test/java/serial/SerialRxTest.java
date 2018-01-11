@@ -5,14 +5,10 @@ import org.junit.Test;
 import java.util.Scanner;
 
 public class SerialRxTest {
-
-	Serial serial;
-	Scanner scanner;
-
 	@Test
 	public void testComm() {
-		serial = new Serial();
-		scanner = new Scanner(System.in);
+		Serial serial = new Serial();
+		Scanner scanner = new Scanner(System.in);
 
 		try {
 			serial.openConnection();
@@ -21,8 +17,7 @@ public class SerialRxTest {
 			scanner.nextLine();
 
 			serial.closeConnection();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

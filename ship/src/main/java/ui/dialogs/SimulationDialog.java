@@ -1,20 +1,5 @@
 package ui.dialogs;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
 import helpers.Helpers;
 import models.Ship;
 import models.Status;
@@ -24,16 +9,21 @@ import protocol.ProtocolProperties.StatusType;
 import protocol.SimulationShipLogic;
 import ui.panels.TextFieldPanel;
 
-public class SimulationDialog extends JDialog implements ActionListener{
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class SimulationDialog extends JDialog implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 
-	JFrame window;
-	JButton bStart;
-	JButton bStop;
-	SimulationShipLogic simShipLogic;
-	TextFieldPanel boatNumbers;
-	int numBoats;
+	private JFrame window;
+	private JButton bStart;
+	private JButton bStop;
+	private SimulationShipLogic simShipLogic;
+	private TextFieldPanel boatNumbers;
+	private int numBoats;
 
 	public SimulationDialog(JFrame window, SimulationShipLogic simShipLogic) {
 		super(window, "Haip Simulation", true);
@@ -45,7 +35,7 @@ public class SimulationDialog extends JDialog implements ActionListener{
 		simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic);
 
 		this.setSize((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() - 500),
-				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight()/4);
+				(int) java.awt.Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 4);
 
 
 		this.setLocation((int) Math.round(java.awt.Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 5),
@@ -58,7 +48,7 @@ public class SimulationDialog extends JDialog implements ActionListener{
 	}
 
 	private Container createWindowPanel() {
-		JPanel panel = new JPanel(new BorderLayout(10,10));
+		JPanel panel = new JPanel(new BorderLayout(10, 10));
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		panel.add(createText(), BorderLayout.NORTH);
@@ -100,33 +90,33 @@ public class SimulationDialog extends JDialog implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource().equals(bStart)) {
+		if (e.getSource().equals(bStart)) {
 			try {
-				if(numBoats != Integer.parseInt(boatNumbers.getText()) || numBoats == 0) {
+				if (numBoats != Integer.parseInt(boatNumbers.getText()) || numBoats == 0) {
 					numBoats = Integer.parseInt(boatNumbers.getText());
 					initializeBoats(numBoats);
 				}
 				startSimulation();
-			}catch (NumberFormatException ex) {
+			} catch (NumberFormatException ex) {
 				JOptionPane.showMessageDialog(window,
 						"Remember to insert a valid number, please",
 						"Number of boats Error",
 						JOptionPane.ERROR_MESSAGE);
 				boatNumbers.setText("");
 			}
-		}else if(e.getSource().equals(bStop)){
+		} else if (e.getSource().equals(bStop)) {
 			stopSimulation();
 		}
 
 	}
 
 	private void initializeBoats(int numBoats) {
-		System.out.println("Num boats "+numBoats);
+		System.out.println("Num boats " + numBoats);
 		simShipLogic.resetSimulationShipList();
-		for(int i = 0; i < numBoats; i++) {
+		for (int i = 0; i < numBoats; i++) {
 			Status newStatus = DecisionMaker.getRandomAction(StatusType.SEA);
 			Status status = new Status(StatusType.SEA.toString(), newStatus.getAction(), PermissionType.ASK.toString());
-			Ship ship = new Ship(Helpers.toNbitBinaryString(String.valueOf(i+1), 8), status);
+			Ship ship = new Ship(Helpers.toNbitBinaryString(String.valueOf(i + 1), 8), status);
 			ship.addAction(newStatus);
 			simShipLogic.addShipToSimulation(ship);
 		}

@@ -14,7 +14,7 @@ public class AutoScrollListPanel extends JPanel {
 	private CheckBoxWithTextPanel autoScrollCheckBox;
 
 	private LogListModel logListModel;
-	
+
 	public AutoScrollListPanel(LogListModel logListModel) {
 		this.setLayout(new BorderLayout(10, 10));
 

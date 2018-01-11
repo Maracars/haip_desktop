@@ -6,14 +6,13 @@ import jiconfont.swing.IconFontSwing;
 import models.Dock;
 import models.Mooring;
 import models.Port;
-import models.Ship;
 import protocol.ControllerLogic;
 import protocol.SerialObserver;
 import serial.Serial;
 import settings.Settings;
 import ui.dialogs.SettingsDialog;
-import ui.log.LogListModel;
 import ui.log.AutoScrollListPanel;
+import ui.log.LogListModel;
 import ui.tables.CellRenderer;
 import ui.tables.ColumnModel;
 import ui.tables.TableModel;
@@ -62,8 +61,7 @@ public class MainPanel {
 		try {
 			Port port = this.initSystem();
 			this.createMapPanel(port);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		this.addContentToJFrame();
@@ -138,7 +136,7 @@ public class MainPanel {
 		return port;
 	}
 
-	public List<Mooring> initMoorings() {
+	private List<Mooring> initMoorings() {
 		List<Mooring> moorings = new ArrayList<>();
 		for (Integer i = 0; i < Settings.getProperties().get(0); i++) {
 			moorings.add(new Mooring(Helpers.toNbitBinaryString(i.toString(), 8), null));
@@ -169,7 +167,7 @@ public class MainPanel {
 	}
 
 	private Component createLeftPanel() {
-        JPanel leftPanel = new JPanel(new BorderLayout(10, 10));
+		JPanel leftPanel = new JPanel(new BorderLayout(10, 10));
 
 		try {
 			leftPanel.add(createHaipPanel(), BorderLayout.NORTH);
@@ -177,14 +175,14 @@ public class MainPanel {
 			e.printStackTrace();
 		}
 		leftPanel.add(createLogPanel(), BorderLayout.CENTER);
-        leftPanel.add(createButtonsPanel(), BorderLayout.SOUTH);
+		leftPanel.add(createButtonsPanel(), BorderLayout.SOUTH);
 
 		return leftPanel;
 	}
 
 	private Component createHaipPanel() throws IOException {
-        ImagePanel logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
-        logoPanel.scaleImage(96, 96);
+		ImagePanel logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
+		logoPanel.scaleImage(96, 96);
 
 		JLabel title = new JLabel("Haip");
 		title.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 32));
@@ -242,7 +240,7 @@ public class MainPanel {
 	}
 
 	private Component createTabbedPane() {
-        JTabbedPane tabbedPane = new JTabbedPane();
+		JTabbedPane tabbedPane = new JTabbedPane();
 
 		tabbedPane.addTab("Port Map", null, createTab1(), "Shows port map");
 		tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
@@ -265,7 +263,7 @@ public class MainPanel {
 	}
 
 	private JMenuBar createMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
+		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(createFileMenu());
 		return menuBar;
 	}
@@ -277,26 +275,6 @@ public class MainPanel {
 		fileMenu.add(resetAction);
 		fileMenu.add(exitAction);
 		return fileMenu;
-	}
-
-	public class ConnectAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public ConnectAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-			public void actionPerformed(ActionEvent arg0) {
-			if (!serial.isConnected()) connect();
-			else disconnect();
-		}
 	}
 
 	private void connect() {
@@ -318,26 +296,6 @@ public class MainPanel {
 			logicAction.setEnabled(false);
 		} catch (Exception e) {
 			LogListModel.add(e.getMessage());
-		}
-	}
-
-	public class LogicAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public LogicAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			if (!controllerLogic.isActive()) startSystem();
-			else stopSystem();
 		}
 	}
 
@@ -373,8 +331,7 @@ public class MainPanel {
 				connectAction.setEnabled(true);
 				settingsAction.setEnabled(true);
 				resetAction.setEnabled(true);
-			}
-			catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				LogListModel.add(e.getMessage());
 			}
 		});
@@ -382,101 +339,13 @@ public class MainPanel {
 		deactivator.start();
 	}
 
-	private class SettingsAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public SettingsAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent actionEvent) {
-			SettingsDialog settingsDialog = new SettingsDialog();
-			if (settingsDialog.getSettingsChanged()) {
-				List<String> settings = settingsDialog.getSettings();
-				Settings.setProperties(settings);
-
-				for (int i = 0; i < settings.size(); i++) {
-					properties.setProperty(PROPERTY_NAMES[i], settings.get(i));
-					try {
-						properties.store(new FileWriter(FILE_NAME), null);
-					}
-					catch (IOException e) {
-						e.printStackTrace();
-					}
-					fieldList.get(i).setText(settings.get(i));
-				}
-				resetPort();
-			}
-		}
-	}
-
-	private class ResetAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public ResetAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent actionEvent) {
-			if (!serial.isConnected()) {
-				if (JOptionPane.showConfirmDialog(window, "Do you really want to reset the port?",
-						"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-					resetPort();
-				}
-			} else {
-				if (JOptionPane.showConfirmDialog(window, (controllerLogic.isActive() ?
-								"System is initialized.\n" : "Serial connection is established.\n")
-								+ "Do you really want to reset the port?",
-						"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-					if (controllerLogic.isActive()) stopSystem();
-					disconnect();
-					resetPort();
-				}
-			}
-		}
-	}
-
 	private void resetPort() {
 		this.table.setModel(new TableModel(this.columnModel));
 		try {
 			Port port = initSystem();
 			this.mapPanel.resetPort(port, this.controllerLogic);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	private class ExitAction extends AbstractAction {
-		private static final long serialVersionUID = 1L;
-		String text;
-		Icon icon;
-
-		public ExitAction(String text, Icon icon, String description, Integer mnemonic) {
-			super(text, icon);
-			this.text = text;
-			this.icon = icon;
-			this.putValue(Action.SHORT_DESCRIPTION, description);
-			this.putValue(Action.MNEMONIC_KEY, mnemonic);
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent actionEvent) {
-			onWindowClosing();
 		}
 	}
 
@@ -509,5 +378,131 @@ public class MainPanel {
 	private void exitProgram() {
 		this.window.dispose();
 		System.exit(0);
+	}
+
+	public class ConnectAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		ConnectAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if (!serial.isConnected()) connect();
+			else disconnect();
+		}
+	}
+
+	public class LogicAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		LogicAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			if (!controllerLogic.isActive()) startSystem();
+			else stopSystem();
+		}
+	}
+
+	private class SettingsAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		SettingsAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent actionEvent) {
+			SettingsDialog settingsDialog = new SettingsDialog();
+			if (settingsDialog.getSettingsChanged()) {
+				List<String> settings = settingsDialog.getSettings();
+				Settings.setProperties(settings);
+
+				for (int i = 0; i < settings.size(); i++) {
+					properties.setProperty(PROPERTY_NAMES[i], settings.get(i));
+					try {
+						properties.store(new FileWriter(FILE_NAME), null);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					fieldList.get(i).setText(settings.get(i));
+				}
+				resetPort();
+			}
+		}
+	}
+
+	private class ResetAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		ResetAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent actionEvent) {
+			if (!serial.isConnected()) {
+				if (JOptionPane.showConfirmDialog(window, "Do you really want to reset the port?",
+						"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+					resetPort();
+				}
+			} else {
+				if (JOptionPane.showConfirmDialog(window, (controllerLogic.isActive() ?
+								"System is initialized.\n" : "Serial connection is established.\n")
+								+ "Do you really want to reset the port?",
+						"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+					if (controllerLogic.isActive()) stopSystem();
+					disconnect();
+					resetPort();
+				}
+			}
+		}
+	}
+
+	private class ExitAction extends AbstractAction {
+		private static final long serialVersionUID = 1L;
+		String text;
+		Icon icon;
+
+		ExitAction(String text, Icon icon, String description, Integer mnemonic) {
+			super(text, icon);
+			this.text = text;
+			this.icon = icon;
+			this.putValue(Action.SHORT_DESCRIPTION, description);
+			this.putValue(Action.MNEMONIC_KEY, mnemonic);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent actionEvent) {
+			onWindowClosing();
+		}
 	}
 }

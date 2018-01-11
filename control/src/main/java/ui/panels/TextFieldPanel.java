@@ -1,11 +1,7 @@
 package ui.panels;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
+import java.awt.*;
 
 public class TextFieldPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -21,13 +17,13 @@ public class TextFieldPanel extends JPanel {
 		this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), title));
 
 	}
-	
-	public void setText(String text) {
-		this.textField.setText(text);
-	}
-	
+
 	public String getText() {
 		return this.textField.getText();
+	}
+
+	public void setText(String text) {
+		this.textField.setText(text);
 	}
 
 	public void setEditable(boolean editable) {

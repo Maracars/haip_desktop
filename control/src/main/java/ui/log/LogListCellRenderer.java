@@ -4,11 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 
 public class LogListCellRenderer implements ListCellRenderer<String> {
-	
+
 	@Override
 	public Component getListCellRendererComponent(JList<? extends String> list, String text, int index,
-			boolean selected, boolean focus) {
-		
+												  boolean selected, boolean focus) {
+
 		JLabel label = new JLabel();
 		label.setText(text);
 

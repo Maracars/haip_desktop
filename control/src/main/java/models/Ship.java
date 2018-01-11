@@ -8,12 +8,12 @@ public class Ship {
 	public Ship(String id) {
 		this.id = id;
 	}
-	
+
 	public Ship(String id, Status status) {
 		this.id = id;
 		this.status = status;
 	}
-	
+
 	public Status getStatus() {
 		return status;
 	}
@@ -32,7 +32,10 @@ public class Ship {
 
 	@Override
 	public boolean equals(Object obj) {
-		Ship ship = (Ship) obj;
-		return ship != null && this.id.equals(ship.getId());
+		if (obj instanceof Ship) {
+			Ship ship = (Ship) obj;
+			return (this.id.equals(ship.getId()));
+		}
+		return false;
 	}
 }

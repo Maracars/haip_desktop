@@ -22,7 +22,6 @@ import static settings.Settings.*;
 import static ui.panels.ActionMessages.ERROR_READING_SETTINGS;
 
 public class MapTest {
-	private ArrayList<Mooring> moorings;
 	private Dock dock;
 	private Port port;
 	private Ship[] ships;
@@ -36,18 +35,8 @@ public class MapTest {
 	// Settings List
 	private Properties properties;
 
-	@Test
-	public static void main(String[] args) {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}
-		new MapTest();
-	}
-
 	public MapTest() {
-		this.moorings = new ArrayList<>();
+		List<Mooring> moorings = new ArrayList<>();
 		this.dock = new Dock("Albert Dock", moorings);
 		this.port = new Port(this.dock);
 		this.serial = new Serial();
@@ -66,6 +55,16 @@ public class MapTest {
 			e.printStackTrace();
 		}
 		this.moveThreeShipsToTransit();
+	}
+
+	@Test
+	public static void main(String[] args) {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+		new MapTest();
 	}
 
 	private void addShipsToSea() {
@@ -129,10 +128,9 @@ public class MapTest {
 	}
 
 	private void initMoorings(Port port) {
-		ArrayList<Mooring> moorings = new ArrayList<Mooring>();
+		ArrayList<Mooring> moorings = new ArrayList<>();
 		for (Integer i = 0; i < Settings.getProperties().get(0); i++) {
-			Ship ship = null;
-			moorings.add(new Mooring(Helpers.toNbitBinaryString(i.toString(), 8), ship));
+			moorings.add(new Mooring(Helpers.toNbitBinaryString(i.toString(), 8), null));
 		}
 		port.getDock().setMoorings(moorings);
 	}

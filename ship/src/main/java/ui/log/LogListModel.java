@@ -9,12 +9,28 @@ import java.util.List;
 public class LogListModel implements ListModel<String> {
 	private static List<String> messageList;
 	private static List<ListDataListener> listenerList;
-	
+
 	public LogListModel() {
 		messageList = new ArrayList<>();
 		listenerList = new ArrayList<>();
 	}
-	
+
+	public static void add(String text) {
+		messageList.add(text);
+		for (ListDataListener listener : listenerList) {
+			listener.intervalAdded(
+					new ListDataEvent(messageList, ListDataEvent.INTERVAL_ADDED, 0, messageList.size()));
+		}
+	}
+
+	public static void remove(int index) {
+		messageList.remove(index);
+		for (ListDataListener listener : listenerList) {
+			listener.intervalRemoved(
+					new ListDataEvent(messageList, ListDataEvent.INTERVAL_REMOVED, index, index));
+		}
+	}
+
 	@Override
 	public void addListDataListener(ListDataListener listener) {
 		listenerList.add(listener);
@@ -33,21 +49,5 @@ public class LogListModel implements ListModel<String> {
 	@Override
 	public void removeListDataListener(ListDataListener listener) {
 		listenerList.remove(listener);
-	}
-
-	public static void add(String text) {
-		messageList.add(text);
-		for (ListDataListener listener : listenerList) {
-			listener.intervalAdded(
-					new ListDataEvent(messageList, ListDataEvent.INTERVAL_ADDED, 0, messageList.size()));
-		}
-	}
-
-	public static void remove(int index) {
-		messageList.remove(index);
-		for (ListDataListener listener : listenerList) {
-			listener.intervalRemoved(
-					new ListDataEvent(messageList, ListDataEvent.INTERVAL_REMOVED, index, index));
-		}
 	}
 }

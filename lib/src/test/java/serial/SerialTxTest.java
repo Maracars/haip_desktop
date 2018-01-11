@@ -4,7 +4,11 @@ import org.junit.Test;
 
 public class SerialTxTest {
 
-	Serial serialTx;
+	private Serial serialTx;
+
+	public static void main(String[] args) {
+		new SerialTxTest().testComm();
+	}
 
 	@Test
 	public void testComm() {
@@ -17,10 +21,6 @@ public class SerialTxTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public static void main(String[] args) {
-		new SerialTxTest().testComm();
 	}
 
 }
