@@ -83,20 +83,25 @@ public class MainPanel implements Observer {
 	}
 
 	private void initActions() {
-		exitAction = new ExitAction("Exit",
-				IconFontSwing.buildIcon(FontAwesome.WINDOW_CLOSE, 32),
+		this.exitAction = new ExitAction("Exit", IconFontSwing.buildIcon(FontAwesome.WINDOW_CLOSE, 32),
 				"Exit", KeyEvent.VK_X);
-		connectAction = new ConnectAction("Connect to board",
-				IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
+		this.exitAction.setEnabled(true);
+
+		this.connectAction = new ConnectAction("Connect to board", IconFontSwing.buildIcon(FontAwesome.PLUG, 32),
 				"Connection", KeyEvent.VK_C);
-		logicAction = new WaitForDiscoveryAction("Wait for discovery",
-				IconFontSwing.buildIcon(FontAwesome.WIFI, 32),
-				"Wait for the ship to be discovered by the port controller", KeyEvent.VK_W);
-		decisionAction = new DecisionAction("Save Action",
-				IconFontSwing.buildIcon(FontAwesome.CHECK, 32),
+		this.connectAction.setEnabled(true);
+
+		this.logicAction = new WaitForDiscoveryAction("Wait for discovery", IconFontSwing.buildIcon(FontAwesome.WIFI, 32),
+				"Wait for the ship to be discovered by the port controller", KeyEvent.VK_I);
+		this.logicAction.setEnabled(false);
+
+		this.decisionAction = new DecisionAction("Save Action", IconFontSwing.buildIcon(FontAwesome.CHECK, 32),
 				"Save Action", KeyEvent.VK_ACCEPT);
-		simulationAction = new SimulationAction("Init Simulation",
-				IconFontSwing.buildIcon(FontAwesome.ROCKET, 32), "Init Simulation", null);
+		this.decisionAction.setEnabled(false);
+
+		simulationAction = new SimulationAction("Init Simulation", IconFontSwing.buildIcon(FontAwesome.ROCKET, 32),
+				"Init Simulation", KeyEvent.VK_S);
+		this.simulationAction.setEnabled(false);
 	}
 
 	private void addContentToJFrame() {
@@ -169,7 +174,6 @@ public class MainPanel implements Observer {
 
 		this.logicButton = new JButton(this.logicAction);
 		this.logicButton.setPreferredSize(new Dimension(panel.getWidth(), 72));
-		this.logicButton.setEnabled(false);
 
 		panel.add(connectButton);
 		panel.add(logicButton);
@@ -308,7 +312,6 @@ public class MainPanel implements Observer {
 	private JMenu createFileMenu() {
 		JMenu fileMenu = new JMenu("File");
 		fileMenu.setMnemonic(KeyEvent.VK_F);
-		simulationAction.setEnabled(false);
 		fileMenu.add(simulationAction);
 		fileMenu.add(exitAction);
 		return fileMenu;

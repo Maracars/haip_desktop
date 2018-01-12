@@ -18,13 +18,11 @@ public class OriginValidator implements Validator {
 				!frame.getOriginId().equals(MASTER_ID)) {
 			return false;
 		}
-		return !(frame.getHeader().getPacketType().equals(PacketType.ACK.toString()) &&
-				frame.getOriginId().equals(MASTER_ID));
-		/*if (frame.getHeader().getPacketType().equals(PacketType.ACK.toString()) &&
+		if (frame.getHeader().getPacketType().equals(PacketType.ACK.toString()) &&
 				frame.getOriginId().equals(MASTER_ID)) {
 			return false;
 		}
-		return true;*/
+		return true;
 	}
 
 }
