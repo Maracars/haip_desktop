@@ -12,6 +12,6 @@ public class DestinationValidator implements Validator {
 		if (frame.getOriginId().equals(frame.getDestinationId()))
 			return false;
 		//Check if origin or destination is from master
-		return (!frame.getOriginId().equals(MASTER_ID) && !frame.getDestinationId().equals(MASTER_ID));
+		return !(!frame.getOriginId().equals(MASTER_ID) && !frame.getDestinationId().equals(MASTER_ID));
 	}
 }
