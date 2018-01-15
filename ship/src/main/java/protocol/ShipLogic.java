@@ -19,15 +19,11 @@ public class ShipLogic extends Observable implements Observer {
 	private Serial serial;
 	private Ship ship;
 	private boolean simulation;
-	private ArrayList<Ship> simulationShips;
-	private List<String> actionList;
 
 	public ShipLogic(Serial serial, Ship ship) {
 		this.serial = serial;
 		this.ship = ship;
 		simulation = false;
-		actionList = new ArrayList<>();
-		simulationShips = new ArrayList<>();
 	}
 
 	@Override
@@ -35,33 +31,33 @@ public class ShipLogic extends Observable implements Observer {
 		Frame frame = (Frame) arg;
 		PacketType pt = PacketType.getName(frame.getHeader().getPacketType());
 		Frame sendFrame;
-		System.out.println("Received frame " + frame.toString());
 		switch (pt) {
-			case DISCOVERY:
-				sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
-				if (serial == null) {
-					System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " trying to connect");
-					System.out.println("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends ACK: " + frame.toString());
-				} else {
-					LogListModel.add("Ship number " + Integer.parseInt(ship.getId(), 2) + " trying to connect");
-					if (serial.isConnected())
-						replyController(sendFrame);
-				}
-				break;
-			case DATA:
-				checkShipMovement(frame, ship);
-				notifyPanel();
-				break;
-			case TOKEN:
-				LogListModel.add("Permission to talk: " + Integer.parseInt(ship.getId(), 2));
-				sendFrame = checkToken(frame, ship);
-				if (serial != null) {
-					replyController(sendFrame);
-				}
-				break;
-			default:
-				break;
+		case DISCOVERY:
+			if(ship.checkDiscovery()) {
+				sendFrame = checkDiscovery(ship);
+				replyController(sendFrame);
+			}
+			break;
+		case DATA:
+			ship.addDiscoveryCounter();
+			checkShipMovement(frame, ship);
+			notifyPanel();
+			break;
+		case TOKEN:
+			LogListModel.add("Permission to talk: " + Integer.parseInt(ship.getId(), 2));
+			ship.addDiscoveryCounter();
+			sendFrame = checkToken(frame, ship);
+			replyController(sendFrame);
+			break;
+		default:
+			break;
 		}
+	}
+	
+	public Frame checkDiscovery(Ship ship) {
+		Frame sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
+		ship.resetDiscoveryCounter();
+		return sendFrame;
 	}
 
 	public Frame checkToken(Frame frame, Ship ship) {

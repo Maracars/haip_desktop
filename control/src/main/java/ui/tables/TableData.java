@@ -80,4 +80,7 @@ public class TableData {
 	public void setPermission(boolean permission) {
 		this.permission = permission;
 	}
+
+	
+	
 }

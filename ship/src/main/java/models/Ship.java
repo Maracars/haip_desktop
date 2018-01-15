@@ -5,10 +5,12 @@ import java.util.List;
 
 public class Ship {
 
+	private static final int MAX_CYCLES_DISCOVERY = 10;
 	private int idleTime;
 	private String id;
 	private Status status;
 	private String parking;
+	private int discoveryCounter;
 	private List<Status> actionList;
 
 	public Ship(String id, Status status) {
@@ -16,6 +18,7 @@ public class Ship {
 		this.status = status;
 		idleTime = 0;
 		actionList = new ArrayList<>();
+		this.discoveryCounter = 0;
 	}
 
 	public Ship() {
@@ -68,5 +71,21 @@ public class Ship {
 	public void addIdleTime(int sumTime) {
 		idleTime += sumTime;
 	}
+
+	public void addDiscoveryCounter() {
+		this.discoveryCounter++;
+	}
+	
+	public void resetDiscoveryCounter() {
+		this.discoveryCounter = 0;
+	}
+	
+	public boolean checkDiscovery() {
+		if(discoveryCounter == MAX_CYCLES_DISCOVERY) {
+			return true;
+		}
+		return false;
+	}
+	
 
 }
