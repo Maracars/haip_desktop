@@ -26,10 +26,10 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	@SuppressWarnings("unchecked")
 	public ControllerLogic(Serial serial, Port port) {
 		this.port = port;
-		receivedList = Collections.synchronizedList(new ArrayList());
-		connectedBoats = new CopyOnWriteArraySet<>();
-		idleBoats = new CopyOnWriteArraySet<>();
-		timeouts = new HashMap<>();
+		this.receivedList = Collections.synchronizedList(new ArrayList());
+		this.connectedBoats = new CopyOnWriteArraySet<>();
+		this.idleBoats = new CopyOnWriteArraySet<>();
+		this.timeouts = new HashMap<>();
 		this.serial = serial;
 	}
 
@@ -50,28 +50,25 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	@Override
 	public void run() {
 		while (active) {
-			for (int k = 0; k < 5; k++) {
-				for (int i = 0; i < LOOP_IDLE_BOATS; i++) {
-					for (int j = 0; j < LOOP_CONNECTED_BOATS; j++) {
-						for (Integer boat : connectedBoats) {
-							control(boat.toString());
-						}
-					}
-					for (Integer boat : idleBoats) {
-						control(boat.toString());
-					}
-				}
-			}
 			if (serial != null && serial.isConnected()) {
 				Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
 			}
 			LogListModel.add("Discovery is sent to boats");
 
 			try {
-				//TODO I have no fucking idea how big the delay should be
-				Thread.sleep(5000);
+				Thread.sleep(DISCOVERY_WAIT);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			}
+			for (int i = 0; i < LOOP_IDLE_BOATS; i++) {
+				for (int j = 0; j < LOOP_CONNECTED_BOATS; j++) {
+					for (Integer boat : connectedBoats) {
+						control(boat.toString());
+					}
+				}
+				for (Integer boat : idleBoats) {
+					control(boat.toString());
+				}
 			}
 		}
 	}
@@ -85,9 +82,11 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		}
 		System.out.println("Sent token to boat number " + boat_id);
 
-		long count = 0;
-		//noinspection StatementWithEmptyBody
-		while (count++ < ProtocolProperties.TIMEOUT && receivedList.isEmpty()) ;
+		long startingTime = System.currentTimeMillis();
+		long elapsedTime = 0;
+		while (receivedList.isEmpty() && elapsedTime < TOKEN_TIMEOUT) {
+			elapsedTime = System.currentTimeMillis() - startingTime;
+		}
 
 		// TODO Here we take the first packet received, dunno if we must ensure we have just one...
 		// Here we check that we have received something or has timed out, and that the boat that has sent is the one we want

@@ -51,7 +51,7 @@ public class MainPanel implements Observer {
 	private SimulationShipLogic simulationShipLogic;
 
 	// System Initialized
-	private boolean shipDiscovered;
+	private boolean waitingForDiscovery;
 
 
 	public MainPanel(Serial serial, Ship ship, ShipLogic shipLogic, SimulationShipLogic simulationShipLogic) {
@@ -79,7 +79,7 @@ public class MainPanel implements Observer {
 		this.shipLogic = shipLogic;
 		this.simulationShipLogic = simulationShipLogic;
 
-		this.shipDiscovered = false;
+		this.waitingForDiscovery = false;
 	}
 
 	private void initActions() {
@@ -342,7 +342,7 @@ public class MainPanel implements Observer {
 	}
 
 	private void waitForDiscovery() {
-		this.shipDiscovered = true;
+		this.waitingForDiscovery = true;
 		this.serial.addObserver(this.shipLogic);
 
 		this.logicButton.setText("Reject communications");
@@ -352,8 +352,8 @@ public class MainPanel implements Observer {
 	}
 
 	private void rejectCommunications() {
-		this.shipDiscovered = false;
-		this.serial.deleteObserver(shipLogic);
+		this.waitingForDiscovery = false;
+		this.serial.deleteObserver(this.shipLogic);
 
 		this.logicButton.setText("Wait for discovery");
 		this.connectButton.setEnabled(true);
@@ -385,11 +385,11 @@ public class MainPanel implements Observer {
 		if (!this.serial.isConnected()) {
 			this.exitProgram();
 		} else {
-			if (JOptionPane.showConfirmDialog(this.window, ((this.shipDiscovered) ?
+			if (JOptionPane.showConfirmDialog(this.window, ((this.waitingForDiscovery) ?
 							"The ship is communicating.\n" : "Serial connection is established.\n")
 							+ "Do you really want to exit?",
 					"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-				if (this.shipDiscovered) rejectCommunications();
+				if (this.waitingForDiscovery) rejectCommunications();
 				this.disconnect();
 				this.exitProgram();
 			}
@@ -436,7 +436,7 @@ public class MainPanel implements Observer {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (!shipDiscovered) waitForDiscovery();
+			if (!waitingForDiscovery) waitForDiscovery();
 			else rejectCommunications();
 		}
 	}

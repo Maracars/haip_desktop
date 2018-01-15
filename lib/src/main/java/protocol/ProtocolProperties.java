@@ -18,13 +18,15 @@ public final class ProtocolProperties {
 
 	public static final int CHECKSUM = 8;
 
-	// TODO This has to be defined
-	public static final long TIMEOUT = 50000000;
+	static final long TOKEN_TIMEOUT = 1000;
+	static final int DISCOVERY_WAIT = 500;
+
 	public static final String MASTER_ID = "00000000";
-	static final int LOOP_CONNECTED_BOATS = 3;
-	static final int LOOP_IDLE_BOATS = 2;
-	static final int TIMEOUTED_LOOP_LIMIT = 2;
 	static final String BROADCAST = "11111111";
+
+	static final int LOOP_CONNECTED_BOATS = 5;
+	static final int LOOP_IDLE_BOATS = 10;
+	static final int TIMEOUTED_LOOP_LIMIT = 2;
 
 	public enum PacketType {
 		DISCOVERY("00"),
