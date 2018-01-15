@@ -66,7 +66,7 @@ public class ShipLogic extends Observable implements Observer {
 		int timeWindow = Integer.parseInt(frame.getData().getTimeWindow(), 2);
 		Random interval = new Random();
 		System.out.println("Time Window from controller: "+timeWindow);
-		int sleep = interval.nextInt(timeWindow);
+		int sleep = interval.nextInt(timeWindow*1000) + 1;
 		System.out.println("Random interval: "+sleep);
 		System.out.println("Waiting to the interval");
 		waitForDiscoveryDelay(sleep);
@@ -77,10 +77,10 @@ public class ShipLogic extends Observable implements Observer {
 	}
 	
 	public void waitForDiscoveryDelay(long sleep) {
-		long startingTime = System.currentTimeMillis()*1000;
+		long startingTime = System.currentTimeMillis();
 		long elapsedTime = 0;
 		do {
-			elapsedTime = System.currentTimeMillis()*1000 - startingTime;
+			elapsedTime = System.currentTimeMillis() - startingTime;
 		} while (elapsedTime < sleep);
 		
 	}
