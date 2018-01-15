@@ -33,19 +33,22 @@ public class ShipLogic extends Observable implements Observer {
 		Frame sendFrame;
 		switch (pt) {
 		case DISCOVERY:
+			System.out.println("Discoveryyy");
 			if(ship.checkDiscovery()) {
+				System.out.println("ACK");
+				LogListModel.add("Ship number " + Integer.parseInt(ship.getId()) + " sends ACK to connect");
 				sendFrame = checkDiscovery(ship);
 				replyController(sendFrame);
 			}
 			break;
 		case DATA:
-			ship.addDiscoveryCounter();
+			System.out.println("DATA");
 			checkShipMovement(frame, ship);
 			notifyPanel();
 			break;
 		case TOKEN:
+			System.out.println("TOKEN");
 			LogListModel.add("Permission to talk: " + Integer.parseInt(ship.getId(), 2));
-			ship.addDiscoveryCounter();
 			sendFrame = checkToken(frame, ship);
 			replyController(sendFrame);
 			break;
@@ -73,6 +76,7 @@ public class ShipLogic extends Observable implements Observer {
 		}
 
 		if (ship.getActionList().size() > 0) {
+			ship.addDiscoveryCounter();
 			if (ship.getActionList().get(0).getAction().equals(ActionType.IDLE.toString())) {
 				sendFrame = FrameCreator.createStatus(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
 				LogListModel.add("Ship number " + Integer.parseInt(ship.getId()) + " sends STATUS");

@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class CheckBoxWithTextPanel extends JPanel {
+
+	private static final long serialVersionUID = 1L;
 	private JCheckBox checkBox;
 	private JLabel text;
 

@@ -49,6 +49,7 @@ public class Ship {
 	}
 
 	public void addAction(Status newStatus) {
+		this.resetDiscoveryCounter();
 		this.actionList.add(newStatus);
 	}
 
@@ -81,7 +82,8 @@ public class Ship {
 	}
 	
 	public boolean checkDiscovery() {
-		if(discoveryCounter == MAX_CYCLES_DISCOVERY) {
+		System.out.println("discovery counter: "+discoveryCounter);
+		if(discoveryCounter >= MAX_CYCLES_DISCOVERY || discoveryCounter == 0) {
 			return true;
 		}
 		return false;
