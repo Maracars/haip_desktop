@@ -15,8 +15,9 @@ public final class ProtocolProperties {
 	public static final int ACTION = 2;
 	public static final int PERMISSION = 2;
 	public static final int PARKING = 8;
-
 	public static final int CHECKSUM = 8;
+	public static final int TIME_WINDOW = 8;
+
 
 	static final long TOKEN_TIMEOUT = 1000;
 	static final int DISCOVERY_WAIT = 1000;

@@ -26,7 +26,7 @@ public class SimulationShipLogic implements Observer {
 		PacketType pt = PacketType.getName(frame.getHeader().getPacketType());
 		switch (pt) {
 			case DISCOVERY:
-				sendAckFromAllBoats();
+				sendAckFromAllBoats(frame);
 				break;
 			case DATA:
 				sendDataFromBoat(frame);
@@ -57,10 +57,10 @@ public class SimulationShipLogic implements Observer {
 		}
 	}
 
-	private void sendAckFromAllBoats() {
+	private void sendAckFromAllBoats(Frame receiveFrame) {
 		for (Ship ship : simulationShips) {
 			if(ship.checkDiscovery()) {
-				Frame frame = shipLogic.checkDiscovery(ship);
+				Frame frame = shipLogic.checkDiscovery(receiveFrame, ship);
 				shipLogic.replyController(frame);
 			}
 		}

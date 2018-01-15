@@ -6,6 +6,7 @@ import models.Frame;
 import models.Status;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.DataType;
+import protocol.ProtocolProperties.PacketType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
 
@@ -20,7 +21,7 @@ public class DataValidator implements Validator {
 	@Override
 	public boolean validate(Frame frame) {
 		//Check if length and real data length are equal
-		if (frame.getData() != null) {
+		if (frame.getData() != null && !frame.getHeader().getPacketType().equals(PacketType.DISCOVERY.toString())) {
 			Data data = frame.getData();
 			Status status = data.getStatus();
 
@@ -49,6 +50,8 @@ public class DataValidator implements Validator {
 					frame.getOriginId().equals(MASTER_ID)) {
 				return false;
 			}
+		}else if (frame.getHeader().getPacketType().equals(PacketType.DISCOVERY.toString())) {
+			return true;
 		}
 		return true;
 	}

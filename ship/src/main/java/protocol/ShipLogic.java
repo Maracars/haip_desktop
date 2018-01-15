@@ -1,18 +1,24 @@
 package protocol;
 
-import helpers.Helpers;
-import models.Frame;
-import models.Ship;
-import models.Status;
-import protocol.ProtocolProperties.*;
-import serial.Serial;
-import ui.log.LogListModel;
+import static protocol.ProtocolProperties.MASTER_ID;
+import static protocol.ProtocolProperties.TOKEN_TIMEOUT;
 
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Random;
 
-import static protocol.ProtocolProperties.*;
+import helpers.Helpers;
+import models.Frame;
+import models.Ship;
+import models.Status;
+import protocol.ProtocolProperties.ActionType;
+import protocol.ProtocolProperties.DataType;
+import protocol.ProtocolProperties.PacketType;
+import protocol.ProtocolProperties.PermissionType;
+import protocol.ProtocolProperties.StatusType;
+import serial.Serial;
+import ui.log.LogListModel;
 
 public class ShipLogic extends Observable implements Observer {
 	private Serial serial;
@@ -36,7 +42,7 @@ public class ShipLogic extends Observable implements Observer {
 			if(ship.checkDiscovery()) {
 				System.out.println("ACK");
 				LogListModel.add("Ship number " + Integer.parseInt(ship.getId()) + " sends ACK to connect");
-				sendFrame = checkDiscovery(ship);
+				sendFrame = checkDiscovery(frame, ship);
 				replyController(sendFrame);
 			}
 			break;
@@ -56,10 +62,27 @@ public class ShipLogic extends Observable implements Observer {
 		}
 	}
 	
-	public Frame checkDiscovery(Ship ship) {
+	public Frame checkDiscovery(Frame frame, Ship ship) {
+		int timeWindow = Integer.parseInt(frame.getData().getTimeWindow(), 2);
+		Random interval = new Random();
+		System.out.println("Time Window from controller: "+timeWindow);
+		int sleep = interval.nextInt(timeWindow);
+		System.out.println("Random interval: "+sleep);
+		System.out.println("Waiting to the interval");
+		waitForDiscoveryDelay(sleep);
+		System.out.println("Wait finish");
 		Frame sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
 		ship.resetDiscoveryCounter();
 		return sendFrame;
+	}
+	
+	public void waitForDiscoveryDelay(long sleep) {
+		long startingTime = System.currentTimeMillis()*1000;
+		long elapsedTime = 0;
+		do {
+			elapsedTime = System.currentTimeMillis()*1000 - startingTime;
+		} while (elapsedTime < sleep);
+		
 	}
 
 	public Frame checkToken(Frame frame, Ship ship) {

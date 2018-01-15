@@ -14,10 +14,28 @@ public class DataParser implements Parser {
 	@Override
 	public Frame parseRx(Frame frame, String byteString) {
 		if (Integer.parseInt(frame.getHeader().getLength(), 2) > 0) {
-			frame = parseDataFirstByte(frame, byteString);
-			frame = parseDataSecondByte(frame, byteString);
+			if(frame.getHeader().getPacketType().equals(PacketType.DISCOVERY.toString())) {
+				frame = parseDiscoveryData(frame, byteString);
+			}else {
+				frame = parseDataFirstByte(frame, byteString);
+				frame = parseDataSecondByte(frame, byteString);
+			}
+
 
 		} else {
+			frame.setData(null);
+		}
+		return frame;
+	}
+
+
+	private Frame parseDiscoveryData(Frame frame, String byteString) {
+		try {
+			String timeWindow =  byteString.substring(HEADER + ORIGIN_ID + DESTINATION_ID,
+					HEADER + ORIGIN_ID + DESTINATION_ID + TIME_WINDOW);
+			Data data = new Data(timeWindow);
+			frame.setData(data);
+		} catch (StringIndexOutOfBoundsException | NumberFormatException e) {
 			frame.setData(null);
 		}
 		return frame;
