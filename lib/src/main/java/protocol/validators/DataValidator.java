@@ -25,7 +25,7 @@ public class DataValidator implements Validator {
 			Status status = data.getStatus();
 
 			Map<Class, String> validator = new HashMap<Class, String>() {{
-				put(DataType.class, data.getType());
+				put(DataType.class, data.getDataType());
 				put(ActionType.class, status.getAction());
 				put(StatusType.class, status.getStatus());
 				put(PermissionType.class, status.getPermission());
@@ -40,12 +40,12 @@ public class DataValidator implements Validator {
 				}
 			}
 
-			if (frame.getData().getType().equals(DataType.RESPONSE.toString()) &&
+			if (frame.getData().getDataType().equals(DataType.RESPONSE.toString()) &&
 					!frame.getOriginId().equals(MASTER_ID)) {
 				return false;
 			}
 
-			if (frame.getData().getType().equals(DataType.REQUEST.toString()) &&
+			if (frame.getData().getDataType().equals(DataType.REQUEST.toString()) &&
 					frame.getOriginId().equals(MASTER_ID)) {
 				return false;
 			}

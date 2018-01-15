@@ -19,15 +19,16 @@ public final class ProtocolProperties {
 	public static final int CHECKSUM = 8;
 
 	static final long TOKEN_TIMEOUT = 1000;
-	static final int DISCOVERY_WAIT = 500;
+	static final int DISCOVERY_WAIT = 1000;
 
 	public static final String MASTER_ID = "00000000";
 	static final String BROADCAST = "11111111";
 
-	static final int LOOP_CONNECTED_BOATS = 5;
-	static final int LOOP_IDLE_BOATS = 10;
+	static final int LOOP_CONNECTED_BOATS = 10;
+	static final int LOOP_IDLE_BOATS = 20;
 	static final int IDLE_TIMEOUT = 2;
 	static final int DISCONNECT_TIMEOUT = 10;
+	static final int ACK_TIME_SLOT = 5;
 
 	public enum PacketType {
 		DISCOVERY("00"),

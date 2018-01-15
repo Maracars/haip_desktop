@@ -2,39 +2,39 @@ package models;
 
 public class Data {
 
-	private String type;
+	private String dataType;
 	private Status status;
 	private String parking;
-	private String timeWindow;
+	private String timeWindow;	// In seconds
 
 	public Data() {
 	}
 
 	public Data(String type, Status status) {
-		this.type = type;
+		this.dataType = type;
 		this.status = status;
 	}
 	
 	public Data(String timeWindow) {
 		this.timeWindow = timeWindow;
-		this.type = null;
+		this.dataType = null;
 		this.status = null;
 		this.parking = null;
 	}
 
 	public Data(String type, Status status, String parking) {
-		this.type = type;
+		this.dataType = type;
 		this.status = status;
 		this.parking = parking;
 		this.timeWindow = null;
 	}
 
-	public String getType() {
-		return type;
+	public String getDataType() {
+		return dataType;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
 	}
 
 	public Status getStatus() {
@@ -65,7 +65,7 @@ public class Data {
 	public String toString() {
 		if(timeWindow != null)
 			return timeWindow;
-		return type + status.toString() + ((parking) == null ? "" : parking);
+		return dataType + status.toString() + ((parking) == null ? "" : parking);
 	}
 
 

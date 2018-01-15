@@ -14,13 +14,15 @@ import static protocol.ProtocolProperties.*;
 public class ControllerLogic extends Observable implements Observer, Runnable {
 	private Port port;
 	private List<Frame> receivedList;
+
 	private Set<Integer> connectedBoats;
 	private Set<Integer> idleBoats;
+	private Set<Integer> disconnectedBoats;
+
 	private HashMap<Integer, Integer> idleTimeouts;
 	private HashMap<Integer, Integer> disconnectTimeouts;
 
 	private Serial serial;
-
 	private Thread thread;
 	private volatile boolean active;
 
@@ -28,11 +30,16 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	public ControllerLogic(Serial serial, Port port) {
 		this.port = port;
 		this.receivedList = Collections.synchronizedList(new ArrayList());
+
 		this.connectedBoats = new CopyOnWriteArraySet<>();
 		this.idleBoats = new CopyOnWriteArraySet<>();
+		this.disconnectedBoats = new CopyOnWriteArraySet<>();
+
 		this.idleTimeouts = new HashMap<>();
 		this.disconnectTimeouts = new HashMap<>();
+
 		this.serial = serial;
+		this.active = false;
 	}
 
 	public boolean isActive() {
@@ -95,13 +102,12 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				&& receivedList.get(0).getOriginId().equals(Helpers.toNbitBinaryString(boat, 8))) {
 			// If asked for idle
 			if (receivedList.get(0).getData().getStatus().getAction().equals(ActionType.IDLE.toString())) {
+				LogListModel.add("Boat number " + shipId + " asked for idle");
 				// If wasn't idle, set idle
 				if (!idleBoats.contains(shipId)) fromConnectedToIdle(shipId);
 				// If was idle and wants to stay idle, count for the disconnect timeout
 				else countForDisconnectTimeout(shipId);
 				updateMap(new Ship(receivedList.get(0).getOriginId(), receivedList.get(0).getData().getStatus()));
-
-				System.out.println("Asked for idle, and added timeout" + idleTimeouts);
 			}
 			// If wants to do something
 			else {
@@ -119,32 +125,45 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		receivedList.clear();
 	}
 
-	private void countForIdleTimeout(Integer boat_id) {
-		this.idleTimeouts.put(boat_id, this.idleTimeouts.getOrDefault(boat_id, 0) + 1);
-		if (this.idleTimeouts.get(boat_id) >= ProtocolProperties.IDLE_TIMEOUT) fromConnectedToIdle(boat_id);
+	private void countForIdleTimeout(Integer shipId) {
+		this.idleTimeouts.put(shipId, this.idleTimeouts.getOrDefault(shipId, 0) + 1);
+		if (this.idleTimeouts.get(shipId) >= ProtocolProperties.IDLE_TIMEOUT) {
+			fromConnectedToIdle(shipId);
+		}
 	}
 
-	private void fromConnectedToIdle(Integer boat_id) {
-		this.connectedBoats.remove(boat_id);
-		this.idleBoats.add(boat_id);
-		this.idleTimeouts.put(boat_id, 0);
-		System.out.println("Idle boat added: " + boat_id + " these are the idle boats: " + idleBoats);
+	private void fromConnectedToIdle(Integer shipId) {
+		this.connectedBoats.remove(shipId);
+		this.idleBoats.add(shipId);
+
+		this.idleTimeouts.put(shipId, 0);
+		LogListModel.add("These are the idle boats: " + idleBoats);
 	}
 
-	private void fromIdleToConnected(Integer boat_id) {
-		this.idleBoats.remove(boat_id);
-		this.connectedBoats.add(boat_id);
+	private void fromIdleToConnected(Integer shipId) {
+		this.idleBoats.remove(shipId);
+		this.connectedBoats.add(shipId);
 	}
 
-	private void countForDisconnectTimeout(Integer boat_id) {
-		this.disconnectTimeouts.put(boat_id, this.disconnectTimeouts.getOrDefault(boat_id, 0) + 1);
-		if (this.disconnectTimeouts.get(boat_id) >= ProtocolProperties.DISCONNECT_TIMEOUT) fromIdleToDisconnected(boat_id);
+	private void countForDisconnectTimeout(Integer shipId) {
+		this.disconnectTimeouts.put(shipId, this.disconnectTimeouts.getOrDefault(shipId, 0) + 1);
+		if (this.disconnectTimeouts.get(shipId) >= ProtocolProperties.DISCONNECT_TIMEOUT) {
+			fromIdleToDisconnected(shipId);
+		}
 	}
 
-	private void fromIdleToDisconnected(Integer boat_id) {
-		this.idleBoats.remove(boat_id);
-		this.disconnectTimeouts.put(boat_id, 0);
-		System.out.println("Boat " + boat_id + " disconnected");
+	private void fromIdleToDisconnected(Integer shipId) {
+		this.idleBoats.remove(shipId);
+		this.disconnectedBoats.add(shipId);
+
+		this.disconnectTimeouts.put(shipId, 0);
+		LogListModel.add("Boat " + shipId + " disconnected");
+	}
+
+	private void fromDisconnectedToIdle(Integer shipId) {
+		this.disconnectedBoats.remove(shipId);
+		this.idleBoats.add(shipId);
+		LogListModel.add("Boat " + shipId + " reconnected");
 	}
 
 	private void checkRequest(Frame frame) {
@@ -262,7 +281,12 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	public void update(Observable o, Object arg) {
 		Frame frame = (Frame) arg;
 		if (frame.getHeader().getPacketType().equals(PacketType.ACK.toString())) {
-			connectedBoats.add(Integer.parseInt(frame.getOriginId(), 2));
+			int shipId = Integer.parseInt(frame.getOriginId(), 2);
+			if (disconnectedBoats.contains(shipId)) {
+				fromDisconnectedToIdle(shipId);
+			} else {
+				connectedBoats.add(shipId);
+			}
 			System.out.println(connectedBoats);
 		} else {
 			receivedList.add(frame);
@@ -272,9 +296,5 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	private void updateMap(Ship ship) {
 		setChanged();
 		notifyObservers(ship);
-	}
-
-	public Port getPort() {
-		return port;
 	}
 }

@@ -9,7 +9,6 @@ import serial.Serial;
 import ui.log.LogListModel;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -97,7 +96,7 @@ public class ShipLogic extends Observable implements Observer {
 	}
 
 	public void checkShipMovement(Frame frame, Ship ship) {
-		String dataType = frame.getData().getType();
+		String dataType = frame.getData().getDataType();
 		String permission = frame.getData().getStatus().getPermission();
 		String frameStatus = frame.getData().getStatus().getStatus();
 		String actionStatus = ship.getActionList().get(0).getStatus();
