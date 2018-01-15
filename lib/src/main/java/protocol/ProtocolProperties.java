@@ -26,7 +26,8 @@ public final class ProtocolProperties {
 
 	static final int LOOP_CONNECTED_BOATS = 5;
 	static final int LOOP_IDLE_BOATS = 10;
-	static final int TIMEOUTED_LOOP_LIMIT = 2;
+	static final int IDLE_TIMEOUT = 2;
+	static final int DISCONNECT_TIMEOUT = 10;
 
 	public enum PacketType {
 		DISCOVERY("00"),

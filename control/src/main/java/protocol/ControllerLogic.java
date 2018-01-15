@@ -16,7 +16,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	private List<Frame> receivedList;
 	private Set<Integer> connectedBoats;
 	private Set<Integer> idleBoats;
-	private HashMap<Integer, Integer> timeouts;
+	private HashMap<Integer, Integer> idleTimeouts;
+	private HashMap<Integer, Integer> disconnectTimeouts;
 
 	private Serial serial;
 
@@ -29,7 +30,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		this.receivedList = Collections.synchronizedList(new ArrayList());
 		this.connectedBoats = new CopyOnWriteArraySet<>();
 		this.idleBoats = new CopyOnWriteArraySet<>();
-		this.timeouts = new HashMap<>();
+		this.idleTimeouts = new HashMap<>();
+		this.disconnectTimeouts = new HashMap<>();
 		this.serial = serial;
 	}
 
@@ -74,48 +76,75 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	}
 
 	private void control(String boat) {
-		Integer boat_id = Integer.parseInt(boat);
-
+		long startingTime, elapsedTime;
+		Integer shipId = Integer.parseInt(boat);
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toNbitBinaryString(boat, 8));
+
+		System.out.println("Sent token to boat number " + shipId);
 		if (serial != null && serial.isConnected()) {
 			Helpers.sendParsedFrame(fr, serial);
 		}
-		System.out.println("Sent token to boat number " + boat_id);
 
-		long startingTime = System.currentTimeMillis();
-		long elapsedTime = 0;
-		while (receivedList.isEmpty() && elapsedTime < TOKEN_TIMEOUT) {
+		startingTime = System.currentTimeMillis();
+		do {
 			elapsedTime = System.currentTimeMillis() - startingTime;
-		}
+		} while (receivedList.isEmpty() && elapsedTime < TOKEN_TIMEOUT);
 
-		// TODO Here we take the first packet received, dunno if we must ensure we have just one...
 		// Here we check that we have received something or has timed out, and that the boat that has sent is the one we want
-		if (!receivedList.isEmpty() && receivedList.get(0).getOriginId().equals(Helpers.toNbitBinaryString(boat, 8))) {
+		if (!receivedList.isEmpty()
+				&& receivedList.get(0).getOriginId().equals(Helpers.toNbitBinaryString(boat, 8))) {
+			// If asked for idle
 			if (receivedList.get(0).getData().getStatus().getAction().equals(ActionType.IDLE.toString())) {
-				addTimeout(boat_id);
+				// If wasn't idle, set idle
+				if (!idleBoats.contains(shipId)) fromConnectedToIdle(shipId);
+				// If was idle and wants to stay idle, count for the disconnect timeout
+				else countForDisconnectTimeout(shipId);
 				updateMap(new Ship(receivedList.get(0).getOriginId(), receivedList.get(0).getData().getStatus()));
-				System.out.println("Asked for idle, and added timeout" + timeouts);
-			} else {
-				//TODO Here we must send the response to the request.
-				if (idleBoats.contains(boat_id)) {
-					addConnectedBoat(boat_id);
-				}
-				System.out.println("Ship number " + boat + " sent " + receivedList);
+
+				System.out.println("Asked for idle, and added timeout" + idleTimeouts);
+			}
+			// If wants to do something
+			else {
+				// If was idle, set connected
+				if (idleBoats.contains(shipId)) fromIdleToConnected(shipId);
 				checkRequest(receivedList.get(0));
+
+				System.out.println("Ship number " + boat + " sent " + receivedList);
 			}
 		} else {
-			if (!receivedList.isEmpty()) {
-				System.out.println("Invalid packet " + boat + " " + receivedList.get(0).getOriginId());
-			}
-			addTimeout(boat_id);
+			countForIdleTimeout(shipId);
+
+			if (!receivedList.isEmpty()) System.out.println("Invalid packet " + boat + " " + receivedList.get(0).getOriginId());
 		}
 		receivedList.clear();
 	}
 
-	private void addTimeout(Integer boat_id) {
-		timeouts.put(boat_id, timeouts.getOrDefault(boat_id, 0) + 1);
+	private void countForIdleTimeout(Integer boat_id) {
+		this.idleTimeouts.put(boat_id, this.idleTimeouts.getOrDefault(boat_id, 0) + 1);
+		if (this.idleTimeouts.get(boat_id) >= ProtocolProperties.IDLE_TIMEOUT) fromConnectedToIdle(boat_id);
+	}
 
-		if (timeouts.get(boat_id) >= ProtocolProperties.TIMEOUTED_LOOP_LIMIT) addIdleBoat(boat_id);
+	private void fromConnectedToIdle(Integer boat_id) {
+		this.connectedBoats.remove(boat_id);
+		this.idleBoats.add(boat_id);
+		this.idleTimeouts.put(boat_id, 0);
+		System.out.println("Idle boat added: " + boat_id + " these are the idle boats: " + idleBoats);
+	}
+
+	private void fromIdleToConnected(Integer boat_id) {
+		this.idleBoats.remove(boat_id);
+		this.connectedBoats.add(boat_id);
+	}
+
+	private void countForDisconnectTimeout(Integer boat_id) {
+		this.disconnectTimeouts.put(boat_id, this.disconnectTimeouts.getOrDefault(boat_id, 0) + 1);
+		if (this.disconnectTimeouts.get(boat_id) >= ProtocolProperties.DISCONNECT_TIMEOUT) fromIdleToDisconnected(boat_id);
+	}
+
+	private void fromIdleToDisconnected(Integer boat_id) {
+		this.idleBoats.remove(boat_id);
+		this.disconnectTimeouts.put(boat_id, 0);
+		System.out.println("Boat " + boat_id + " disconnected");
 	}
 
 	private void checkRequest(Frame frame) {
@@ -222,18 +251,6 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		} else {
 			System.out.println("Sent frame");
 		}
-	}
-
-	private void addConnectedBoat(Integer boat) {
-		connectedBoats.add(boat);
-		idleBoats.remove(boat);
-		timeouts.put(boat, 0);
-	}
-
-	private void addIdleBoat(Integer boat) {
-		idleBoats.add(boat);
-		System.out.println("Idle boat added: " + boat + " these are the idle boats: " + idleBoats);
-		connectedBoats.remove(boat);
 	}
 
 	private void setSentRequest(Frame frame) {
