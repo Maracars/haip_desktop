@@ -5,6 +5,7 @@ public class Data {
 	private String type;
 	private Status status;
 	private String parking;
+	private String timeWindow;
 
 	public Data() {
 	}
@@ -13,11 +14,19 @@ public class Data {
 		this.type = type;
 		this.status = status;
 	}
+	
+	public Data(String timeWindow) {
+		this.timeWindow = timeWindow;
+		this.type = null;
+		this.status = null;
+		this.parking = null;
+	}
 
 	public Data(String type, Status status, String parking) {
 		this.type = type;
 		this.status = status;
 		this.parking = parking;
+		this.timeWindow = null;
 	}
 
 	public String getType() {
@@ -44,8 +53,18 @@ public class Data {
 		this.parking = parking;
 	}
 
+	public String getTimeWindow() {
+		return timeWindow;
+	}
+
+	public void setTimeWindow(String timeWindow) {
+		this.timeWindow = timeWindow;
+	}
+
 	@Override
 	public String toString() {
+		if(timeWindow != null)
+			return timeWindow;
 		return type + status.toString() + ((parking) == null ? "" : parking);
 	}
 
