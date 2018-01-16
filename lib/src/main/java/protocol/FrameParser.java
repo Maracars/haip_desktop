@@ -83,8 +83,13 @@ public class FrameParser extends Observable {
 	}
 
 	private static int getExpectedPacketLength(String packet) {
-		int dataLength = (8 * Integer.parseInt(packet.substring(0, LENGTH), 2));
-		return HEADER + ORIGIN_ID + DESTINATION_ID + dataLength + CHECKSUM;
+		try {
+			int dataLength = (8 * Integer.parseInt(packet.substring(0, LENGTH), 2));
+			return HEADER + ORIGIN_ID + DESTINATION_ID + dataLength + CHECKSUM;
+		}catch (NumberFormatException e) {
+			return 1000000;
+		}
+
 	}
 
 	private static Frame parseData(String byteString) {
@@ -110,8 +115,8 @@ public class FrameParser extends Observable {
 		potentialPackets.clear();
 	}
 
-	public static List<String> parseTx(Frame frame) {
-		List<String> byteList = new ArrayList<>();
+	public static List<Byte> parseTx(Frame frame) {
+		List<Byte> byteList = new ArrayList<>();
 		for (Parser parser : parsers) {
 			byteList = parser.parseTx(frame, byteList);
 		}

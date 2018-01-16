@@ -100,4 +100,10 @@ public class Serial extends Observable implements SerialPortEventListener {
 		notifyObservers(value);
 		FrameParser.resetCommunication();
 	}
+	
+	public void writeBytes(List<Byte> byteList) throws SerialPortException {
+		for(Byte b: byteList) {
+			serialPort.writeByte(b);
+		}
+	}
 }

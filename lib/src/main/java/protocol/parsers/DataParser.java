@@ -77,9 +77,9 @@ public class DataParser implements Parser {
 	}
 
 	@Override
-	public List<String> parseTx(Frame frame, List<String> byteList) {
+	public List<Byte> parseTx(Frame frame, List<Byte> byteList) {
 		if (frame.getData() != null)
-			byteList.add(frame.getData().toString());
+			byteList.add(Byte.parseByte(frame.getData().toString(), 2));
 		return byteList;
 	}
 

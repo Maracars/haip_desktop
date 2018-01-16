@@ -17,10 +17,10 @@ public class Helpers {
 	}
 
 	public static void sendParsedFrame(Frame frame, Serial serial) {
-		List<String> listBytes = FrameParser.parseTx(frame);
+		List<Byte> listBytes = FrameParser.parseTx(frame);
 		try {
 
-			serial.writeStrings(listBytes);
+			serial.writeBytes(listBytes);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

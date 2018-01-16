@@ -25,8 +25,8 @@ public class HeaderParser implements Parser {
 	}
 
 	@Override
-	public List<String> parseTx(Frame frame, List<String> byteList) {
-		byteList.add(frame.getHeader().toString());
+	public List<Byte> parseTx(Frame frame, List<Byte> byteList) {
+		byteList.add(Byte.parseByte(frame.getHeader().toString(), 2));
 		return byteList;
 	}
 

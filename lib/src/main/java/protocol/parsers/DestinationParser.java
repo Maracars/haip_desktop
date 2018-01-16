@@ -19,8 +19,8 @@ public class DestinationParser implements Parser {
 	}
 
 	@Override
-	public List<String> parseTx(Frame frame, List<String> byteList) {
-		byteList.add(frame.getDestinationId());
+	public List<Byte> parseTx(Frame frame, List<Byte> byteList) {
+		byteList.add(Byte.parseByte(frame.getDestinationId(), 2));
 		return byteList;
 	}
 

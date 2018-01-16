@@ -7,5 +7,5 @@ import java.util.List;
 public interface Parser {
 	Frame parseRx(Frame frame, String byteString);
 
-	List<String> parseTx(Frame frame, List<String> byteList);
+	List<Byte> parseTx(Frame frame, List<Byte> byteList);
 }

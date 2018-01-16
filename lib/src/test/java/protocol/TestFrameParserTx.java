@@ -31,7 +31,7 @@ public class TestFrameParserTx {
 		Frame frame = new Frame(header, "00000000", "11111111", null);
 		String checksum = CRC8.toCRC8(PACKET_OK_NO_CHECK_NO_DATA);
 		frame.setChecksum(checksum);
-		List<String> parserByteList = FrameParser.parseTx(frame);
+		List<Byte> parserByteList = FrameParser.parseTx(frame);
 		List<String> myByteList = createMyByteList(frame);
 		assertThat(parserByteList, is(myByteList));
 	}
@@ -44,7 +44,7 @@ public class TestFrameParserTx {
 		Frame frame = new Frame(header, "00000000", "11111111", data);
 		String checksum = CRC8.toCRC8(PACKET_OK_NO_CHECK_1_BYTE_DATA);
 		frame.setChecksum(checksum);
-		List<String> parserByteList = FrameParser.parseTx(frame);
+		List<Byte> parserByteList = FrameParser.parseTx(frame);
 		List<String> myByteList = createMyByteList(frame);
 		assertThat(parserByteList, is(myByteList));
 	}
@@ -57,7 +57,7 @@ public class TestFrameParserTx {
 		Frame frame = new Frame(header, "00000000", "11111111", data);
 		String checksum = CRC8.toCRC8(PACKET_OK_NO_CHECK_2_BYTE_DATA);
 		frame.setChecksum(checksum);
-		List<String> parserByteList = FrameParser.parseTx(frame);
+		List<Byte> parserByteList = FrameParser.parseTx(frame);
 		List<String> myByteList = createMyByteList(frame);
 		assertThat(parserByteList, is(myByteList));
 	}

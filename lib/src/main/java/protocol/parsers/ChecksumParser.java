@@ -23,8 +23,8 @@ public class ChecksumParser implements Parser {
 	}
 
 	@Override
-	public List<String> parseTx(Frame frame, List<String> byteList) {
-		byteList.add(frame.getChecksum());
+	public List<Byte> parseTx(Frame frame, List<Byte> byteList) {
+		byteList.add(Byte.parseByte(frame.getChecksum(), 2));
 		return byteList;
 	}
 
