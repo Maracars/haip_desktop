@@ -265,11 +265,11 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	private void sendFrame(Frame frame) {
 		if (serial != null && serial.isConnected()) {
 			Helpers.sendParsedFrame(frame, serial);
-			try {
+			/*try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}
+			}*/
 		} else {
 			System.out.println("Sent frame");
 		}
@@ -294,6 +294,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 				fromDisconnectedToIdle(shipId);
 			} else {
 				connectedShips.add(shipId);
+				LogListModel.add("New ship connected: "+shipId);
 			}
 			System.out.println(connectedShips);
 		} else {
