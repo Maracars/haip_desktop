@@ -8,6 +8,8 @@ import ui.dialogs.COMPortChooser;
 import java.util.List;
 import java.util.Observable;
 
+import helpers.Helpers;
+
 import static serial.SerialExceptionMessages.*;
 
 public class Serial extends Observable implements SerialPortEventListener {
@@ -73,7 +75,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 				byte[] byteStr = serialPort.readBytes(byteCount);
 				if (byteStr != null) {
 					for(byte b : byteStr) {
-						sendToParser(String.valueOf(b & 0xFF));
+						sendToParser(Helpers.toNbitBinaryString(String.valueOf(b & 0xFF), 8));
 					}
 				}
 			} catch (SerialPortException e) {
