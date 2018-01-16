@@ -172,7 +172,7 @@ public class MainPanel {
 		try {
 			leftPanel.add(createHaipPanel(), BorderLayout.NORTH);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LogListModel.add(ERROR_READING_LOGO);
 		}
 		leftPanel.add(createLogPanel(), BorderLayout.CENTER);
 		leftPanel.add(createButtonsPanel(), BorderLayout.SOUTH);

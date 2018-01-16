@@ -11,7 +11,7 @@ public class IndexAwareSet<T> implements Set {
 		this.set = set;
 	}
 
-	public int getIndex(T value) {
+	public int indexOf(T value) {
 		int result = 0;
 		for (T entry : set) {
 			if (entry.equals(value)) return result;

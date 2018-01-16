@@ -74,7 +74,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 				int byteCount = event.getEventValue();
 				byte[] byteStr = serialPort.readBytes(byteCount);
 				if (byteStr != null) {
-					for(byte b : byteStr) {
+					for (byte b : byteStr) {
 						sendToParser(Helpers.toNbitBinaryString(String.valueOf(b & 0xFF), 8));
 					}
 				}

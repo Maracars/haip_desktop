@@ -13,10 +13,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 public class MapPanel extends JPanel implements ComponentListener, Observer {
 	private static final long serialVersionUID = 1L;
@@ -30,8 +28,9 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 
 	private Dimension panelDimension;
 	private Point panelLocation;
-	private List<Ship> shipList;
 	private Port port;
+
+	private List<Ship> shipList;
 
 	private int seaHeight, transitHeight, parkingHeight, seaWidth, transitWidth, parkingWidth;
 
@@ -39,14 +38,16 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		this.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		this.setLayout(new BorderLayout());
 		this.addComponentListener(this);
+
 		this.shipList = new ArrayList<>();
 		this.port = port;
+
 		controllerLogic.addObserver(this);
 	}
 
 	public void resetPort(Port port, ControllerLogic controllerLogic) {
-		this.shipList = new ArrayList<>();
 		this.port = port;
+
 		controllerLogic.addObserver(this);
 		this.repaintAllElements();
 	}
@@ -74,10 +75,9 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 
 		g.setColor(new Color(52, 120, 229));
 		g.fillRect(0, seaHeight + transitHeight, parkingWidth, parkingHeight);
-		paintParkings(g);
+		paintMoorings(g);
 
 		paintBoats(g);
-
 	}
 
 	private void paintBoats(Graphics g) {
@@ -90,10 +90,10 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 
 	private void checkBoatPositionAndDraw(Graphics g, Ship ship) {
 		int x, y;
-		StatusType st = StatusType.getName(ship.getStatus().getStatus());
+		StatusType statusType = StatusType.getName(ship.getStatus().getStatus());
 		g.setColor(new Color(77, 244, 65));
 		checkBoatActionTypeAndPermissions(g, ship);
-		switch (st) {
+		switch (statusType) {
 			case PARKING:
 				int parkingIndex = checkBoatParking(ship);
 				x = (panelLocation.x + (panelDimension.width / 2)) + (parkingIndex) * PARKING_WIDTH;
@@ -104,7 +104,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 						x + BOAT_WIDTH / 2 - 4, y + BOAT_HEIGHT / 2 + 3);
 				break;
 			case TRANSIT:
-				int index = port.getTransitZone().getIndex(ship);
+				int index = port.getTransitZone().indexOf(ship);
 				System.out.println(transitWidth);
 				x = (int) (panelLocation.getX() + transitWidth
 						+ (TRANSITION_WIDTH * index) + TRANSITION_WIDTH / 2 - BOAT_WIDTH / 2);
@@ -152,9 +152,9 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 	}
 
 	private void checkBoatActionTypeAndPermissions(Graphics g, Ship ship) {
-		ActionType at = ActionType.getName(ship.getStatus().getAction());
+		ActionType actionType = ActionType.getName(ship.getStatus().getAction());
 		PermissionType pt = PermissionType.getName(ship.getStatus().getPermission());
-		if (at.equals(ActionType.IDLE)) {
+		if (actionType.equals(ActionType.IDLE)) {
 			g.setColor(new Color(244, 160, 65));
 		}
 		if (pt.equals(PermissionType.DENY)) {
@@ -162,7 +162,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		}
 	}
 
-	private void paintParkings(Graphics g) {
+	private void paintMoorings(Graphics g) {
 		int parkingSize = Settings.getProperties().get(0);
 		parkingWidth = panelDimension.width / parkingSize;
 		g.setColor(Color.black);
