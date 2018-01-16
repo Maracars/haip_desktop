@@ -1,7 +1,6 @@
 package protocol;
 
 import static protocol.ProtocolProperties.MASTER_ID;
-import static protocol.ProtocolProperties.TOKEN_TIMEOUT;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -42,8 +41,7 @@ public class ShipLogic extends Observable implements Observer {
 			if(ship.checkDiscovery()) {
 				System.out.println("ACK");
 				LogListModel.add("Ship number " + Integer.parseInt(ship.getId()) + " sends ACK to connect");
-				sendFrame = checkDiscovery(frame, ship);
-				replyController(sendFrame);
+				checkDiscovery(frame, ship);
 			}
 			break;
 		case DATA:
@@ -62,27 +60,22 @@ public class ShipLogic extends Observable implements Observer {
 		}
 	}
 	
-	public Frame checkDiscovery(Frame frame, Ship ship) {
+	public void checkDiscovery(Frame frame, Ship ship) {
 		int timeWindow = Integer.parseInt(frame.getData().getTimeWindow(), 2);
 		Random interval = new Random();
 		System.out.println("Time Window from controller: "+timeWindow);
 		int sleep = interval.nextInt(timeWindow*1000) + 1;
 		System.out.println("Random interval: "+sleep);
 		System.out.println("Waiting to the interval");
-		waitForDiscoveryDelay(sleep);
-		System.out.println("Wait finish");
 		Frame sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
+		waitForDiscoveryDelay(sleep, sendFrame);
 		ship.resetDiscoveryCounter();
-		return sendFrame;
 	}
 	
-	public void waitForDiscoveryDelay(long sleep) {
-		long startingTime = System.currentTimeMillis();
-		long elapsedTime = 0;
-		do {
-			elapsedTime = System.currentTimeMillis() - startingTime;
-		} while (elapsedTime < sleep);
-		
+	public void waitForDiscoveryDelay(long sleep, Frame frame) {
+		WaitForDiscovery waitDiscovery = new WaitForDiscovery(sleep, serial, frame);
+		Thread thread = new Thread(waitDiscovery);
+		thread.start();
 	}
 
 	public Frame checkToken(Frame frame, Ship ship) {

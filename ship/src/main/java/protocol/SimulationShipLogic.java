@@ -60,8 +60,7 @@ public class SimulationShipLogic implements Observer {
 	private void sendAckFromAllBoats(Frame receiveFrame) {
 		for (Ship ship : simulationShips) {
 			if(ship.checkDiscovery()) {
-				Frame frame = shipLogic.checkDiscovery(receiveFrame, ship);
-				shipLogic.replyController(frame);
+				shipLogic.checkDiscovery(receiveFrame, ship);
 			}
 		}
 	}
