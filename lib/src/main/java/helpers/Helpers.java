@@ -34,4 +34,8 @@ public class Helpers {
 	public static String[] getNames(Class<? extends Enum<?>> e) {
 		return Arrays.stream(e.getEnumConstants()).map(Enum::name).toArray(String[]::new);
 	}
+	
+	public static byte getUnsignedByte(String binaryString) {
+		return (byte) (Integer.parseInt(binaryString, 2) & 0xFF);
+	}
 }

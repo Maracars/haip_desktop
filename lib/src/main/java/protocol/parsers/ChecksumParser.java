@@ -1,10 +1,14 @@
 package protocol.parsers;
 
-import models.Frame;
+import static protocol.ProtocolProperties.CHECKSUM;
+import static protocol.ProtocolProperties.DESTINATION_ID;
+import static protocol.ProtocolProperties.HEADER;
+import static protocol.ProtocolProperties.ORIGIN_ID;
 
 import java.util.List;
 
-import static protocol.ProtocolProperties.*;
+import helpers.Helpers;
+import models.Frame;
 
 public class ChecksumParser implements Parser {
 
@@ -24,7 +28,7 @@ public class ChecksumParser implements Parser {
 
 	@Override
 	public List<Byte> parseTx(Frame frame, List<Byte> byteList) {
-		byteList.add(Byte.parseByte(frame.getChecksum(), 2));
+		byteList.add(Helpers.getUnsignedByte(frame.getChecksum()));
 		return byteList;
 	}
 

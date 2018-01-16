@@ -6,6 +6,8 @@ import models.Status;
 
 import java.util.List;
 
+import helpers.Helpers;
+
 import static protocol.ProtocolProperties.*;
 
 public class DataParser implements Parser {
@@ -78,8 +80,17 @@ public class DataParser implements Parser {
 
 	@Override
 	public List<Byte> parseTx(Frame frame, List<Byte> byteList) {
-		if (frame.getData() != null)
-			byteList.add(Byte.parseByte(frame.getData().toString(), 2));
+		if (frame.getData() != null) {
+			if(frame.getData().getTimeWindow() != null) {
+				byteList.add(Helpers.getUnsignedByte(frame.getData().getTimeWindow()));
+			}else {
+				byteList.add(Helpers.getUnsignedByte(frame.getData().getDataType() + frame.getData().getStatus().toString()));
+				if(frame.getData().getParking() != null) {
+					byteList.add(Helpers.getUnsignedByte(frame.getData().getParking()));
+				}
+			}
+		}
+
 		return byteList;
 	}
 

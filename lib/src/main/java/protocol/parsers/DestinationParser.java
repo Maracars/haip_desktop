@@ -4,6 +4,8 @@ import models.Frame;
 
 import java.util.List;
 
+import helpers.Helpers;
+
 import static protocol.ProtocolProperties.*;
 
 public class DestinationParser implements Parser {
@@ -20,7 +22,7 @@ public class DestinationParser implements Parser {
 
 	@Override
 	public List<Byte> parseTx(Frame frame, List<Byte> byteList) {
-		byteList.add(Byte.parseByte(frame.getDestinationId(), 2));
+		byteList.add(Helpers.getUnsignedByte(frame.getDestinationId()));
 		return byteList;
 	}
 

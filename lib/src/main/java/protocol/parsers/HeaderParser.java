@@ -5,6 +5,8 @@ import models.Header;
 
 import java.util.List;
 
+import helpers.Helpers;
+
 import static protocol.ProtocolProperties.*;
 
 public class HeaderParser implements Parser {
@@ -26,7 +28,7 @@ public class HeaderParser implements Parser {
 
 	@Override
 	public List<Byte> parseTx(Frame frame, List<Byte> byteList) {
-		byteList.add(Byte.parseByte(frame.getHeader().toString(), 2));
+		byteList.add(Helpers.getUnsignedByte(frame.getHeader().toString()));
 		return byteList;
 	}
 

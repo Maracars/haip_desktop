@@ -4,6 +4,8 @@ import models.Frame;
 
 import java.util.List;
 
+import helpers.Helpers;
+
 import static protocol.ProtocolProperties.HEADER;
 import static protocol.ProtocolProperties.ORIGIN_ID;
 
@@ -21,7 +23,7 @@ public class OriginParser implements Parser {
 
 	@Override
 	public List<Byte> parseTx(Frame frame, List<Byte> byteList) {
-		byteList.add(Byte.parseByte(frame.getOriginId(), 2));
+		byteList.add(Helpers.getUnsignedByte(frame.getOriginId()));
 		return byteList;
 	}
 
