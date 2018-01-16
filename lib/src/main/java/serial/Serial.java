@@ -70,8 +70,12 @@ public class Serial extends Observable implements SerialPortEventListener {
 		if (event.isRXCHAR() && event.getEventValue() > 0) { // If data is available && there are more than 0 bytes
 			try {
 				int byteCount = event.getEventValue();
-				String byteStr = serialPort.readString(byteCount);
-				if (byteStr != null) sendToParser(byteStr);
+				byte[] byteStr = serialPort.readBytes(byteCount);
+				if (byteStr != null) {
+					for(byte b : byteStr) {
+						sendToParser(String.valueOf(b & 0xFF));
+					}
+				}
 			} catch (SerialPortException e) {
 				e.printStackTrace();
 			}
