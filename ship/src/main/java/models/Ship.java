@@ -3,6 +3,10 @@ package models;
 import java.util.ArrayList;
 import java.util.List;
 
+import helpers.Helpers;
+import protocol.ShipLogic;
+import serial.Serial;
+
 public class Ship {
 
 	private static final int MAX_CYCLES_DISCOVERY = 10;
@@ -88,6 +92,5 @@ public class Ship {
 		}
 		return false;
 	}
-	
 
 }

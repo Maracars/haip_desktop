@@ -3,6 +3,7 @@ package protocol;
 import models.Frame;
 import models.Ship;
 import protocol.ProtocolProperties.PacketType;
+import ui.log.LogListModel;
 
 import java.util.ArrayList;
 import java.util.Observable;
@@ -26,6 +27,7 @@ public class SimulationShipLogic implements Observer {
 		PacketType pt = PacketType.getName(frame.getHeader().getPacketType());
 		switch (pt) {
 			case DISCOVERY:
+				LogListModel.add("Discovery received");
 				sendAckFromAllBoats(frame);
 				break;
 			case DATA:

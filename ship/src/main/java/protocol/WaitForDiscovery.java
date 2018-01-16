@@ -3,6 +3,7 @@ package protocol;
 import helpers.Helpers;
 import models.Frame;
 import serial.Serial;
+import ui.log.LogListModel;
 
 public class WaitForDiscovery implements Runnable{
 	long sleep;
@@ -23,5 +24,6 @@ public class WaitForDiscovery implements Runnable{
 			elapsedTime = System.currentTimeMillis() - startingTime;
 		} while (elapsedTime < sleep);
 		Helpers.sendParsedFrame(frame, serial);
+		LogListModel.add("Ship number " + Integer.parseInt(frame.getOriginId(),2) + " sends ACK to connect");
 	}
 }

@@ -37,10 +37,8 @@ public class ShipLogic extends Observable implements Observer {
 		Frame sendFrame;
 		switch (pt) {
 		case DISCOVERY:
-			System.out.println("Discoveryyy");
+			LogListModel.add("Discovery received");
 			if(ship.checkDiscovery()) {
-				System.out.println("ACK");
-				LogListModel.add("Ship number " + Integer.parseInt(ship.getId()) + " sends ACK to connect");
 				checkDiscovery(frame, ship);
 			}
 			break;
@@ -63,10 +61,7 @@ public class ShipLogic extends Observable implements Observer {
 	public void checkDiscovery(Frame frame, Ship ship) {
 		int timeWindow = Integer.parseInt(frame.getData().getTimeWindow(), 2);
 		Random interval = new Random();
-		System.out.println("Time Window from controller: "+timeWindow);
 		int sleep = interval.nextInt(timeWindow*1000) + 1;
-		System.out.println("Random interval: "+sleep);
-		System.out.println("Waiting to the interval");
 		Frame sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
 		waitForDiscoveryDelay(sleep, sendFrame);
 		ship.resetDiscoveryCounter();
@@ -152,10 +147,11 @@ public class ShipLogic extends Observable implements Observer {
 			}
 		}
 		if (dataType.equals(DataType.RESPONSE.toString()) && framePermission.equals(PermissionType.DENY.toString())) {
-			System.out.println("Ship number " + shipId + " has NOT permission to perform the operation: " + ActionType.getName(frameAction).name());
-			System.out.println("Ship changes to new status, STATUS: " + StatusType.getName(frameStatus) +
+			LogListModel.add("Ship: "+shipId +" NOT permission to: " +ActionType.getName(frameAction).name());
+			LogListModel.add("New status to ship: "+ shipId + 
+					", STATUS: " + StatusType.getName(frameStatus).name() + 
 					", ACTION: " + ActionType.getName(frameAction).name() +
-					" PERMISSION: " + PermissionType.getName(framePermission).name());
+					", PERMISSION: " + PermissionType.getName(framePermission).name());
 			ship.setStatus(frame.getData().getStatus());
 
 		}
