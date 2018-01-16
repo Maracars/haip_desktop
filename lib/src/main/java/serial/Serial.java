@@ -85,6 +85,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 	}
 
 	public void sendToParser(String string) {
+		System.out.println(string);
 		boolean validFrame = FrameParser.parseRx(string);
 		if (validFrame) {
 			notifyFrame(FrameParser.getFrame());
