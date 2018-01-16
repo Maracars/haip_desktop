@@ -35,17 +35,13 @@ public class FrameCreator {
 		return createFrame(PacketType.DATA, origin, dest, DataType.STATUS, status);
 	}
 
-	public static Frame createResponse(String origin, String dest, Status status) {
-		return createFrame(PacketType.DATA, origin, dest, DataType.RESPONSE, status);
-	}
-
 	public static Frame createResponse(String origin, String dest, Status status, String parking) {
 		return createFrame(PacketType.DATA, origin, dest, DataType.RESPONSE, status, parking);
 	}
 
 	// Empty data
 	private static Frame createFrame(PacketType packetType, String origin, String dest) {
-		return createFrame(packetType, origin, dest, DataType.NULL, new Status("", "", ""));
+		return createFrame(packetType, origin, dest, null);
 	}
 
 	// Default data
@@ -59,7 +55,7 @@ public class FrameCreator {
 	}
 
 	private static Frame createFrame(PacketType packetType, String origin, String dest, Data data) {
-		String dataStr = data.toString();
+		String dataStr = (data == null) ? "" : data.toString();
 
 		// TODO We have to think about how the counter work
 		Header header = new Header(Helpers.toNbitBinaryString("" + dataStr.length() / 8, 3), packetType.toString(), "000");

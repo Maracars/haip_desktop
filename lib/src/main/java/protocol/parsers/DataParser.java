@@ -80,7 +80,7 @@ public class DataParser implements Parser {
 
 	@Override
 	public List<Byte> parseTx(Frame frame, List<Byte> byteList) {
-		if (frame.getData() != null & !frame.getData().getDataType().equals("")) {
+		if (frame.getData() != null && !frame.getData().getDataType().equals("")) {
 			if(frame.getData().getTimeWindow() != null) {
 				byteList.add(Helpers.getUnsignedByte(frame.getData().getTimeWindow()));
 			}else{

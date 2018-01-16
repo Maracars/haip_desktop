@@ -65,7 +65,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			LogListModel.add("Discovery is sent to boats");
 
 			try {
-				Thread.sleep(DISCOVERY_WAIT);
+				Thread.sleep(ACK_TIME_SLOT * 1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

@@ -17,10 +17,7 @@ public final class ProtocolProperties {
 	public static final int PARKING = 8;
 	public static final int CHECKSUM = 8;
 	public static final int TIME_WINDOW = 8;
-
-
 	static final long TOKEN_TIMEOUT = 1000;
-	static final int DISCOVERY_WAIT = 1000;
 
 	public static final String MASTER_ID = "00000000";
 	static final String BROADCAST = "11111111";
