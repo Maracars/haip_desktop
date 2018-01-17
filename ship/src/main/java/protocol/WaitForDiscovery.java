@@ -6,9 +6,9 @@ import serial.Serial;
 import ui.log.LogListModel;
 
 public class WaitForDiscovery implements Runnable{
-	long sleep;
-	Serial serial;
-	Frame frame;
+	private long sleep;
+	private Serial serial;
+	private Frame frame;
 	
 	public WaitForDiscovery(long sleep, Serial serial, Frame frame) {
 		this.sleep = sleep;
@@ -18,11 +18,11 @@ public class WaitForDiscovery implements Runnable{
 
 	@Override
 	public void run() {
-		long startingTime = System.currentTimeMillis();
-		long elapsedTime = 0;
-		do {
-			elapsedTime = System.currentTimeMillis() - startingTime;
-		} while (elapsedTime < sleep);
+		try {
+			Thread.sleep(sleep);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		Helpers.sendParsedFrame(frame, serial);
 		LogListModel.add("Ship number " + Integer.parseInt(frame.getOriginId(),2) + " sends ACK to connect");
 	}

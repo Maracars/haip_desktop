@@ -1,16 +1,14 @@
 package main;
 
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-
 import ui.panels.MainPanel;
+
+import javax.swing.*;
 
 public class Main {
 	
-	public Main() {
+	private Main() {
 		new MainPanel();
 	}
-
 
 	public static void main(String[] args) {
 		try {
@@ -19,7 +17,5 @@ public class Main {
 			e.printStackTrace();
 		}
 		new Main();
-
 	}
-
 }
