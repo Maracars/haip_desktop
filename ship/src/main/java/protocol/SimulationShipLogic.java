@@ -54,7 +54,7 @@ public class SimulationShipLogic implements Observer {
 		for (Ship ship : simulationShips) {
 			if (ship.getId().equals(receiveFrame.getDestinationId())) {
 				System.out.println("Received token, permission to talk for ship " + Integer.parseInt(ship.getId(), 2));
-				Frame sendFrame = shipLogic.checkToken(receiveFrame, ship);
+				Frame sendFrame = shipLogic.checkToken(ship);
 				shipLogic.replyController(sendFrame);
 			}
 		}

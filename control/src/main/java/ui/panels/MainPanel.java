@@ -17,6 +17,7 @@ import ui.tables.CellRenderer;
 import ui.tables.ColumnModel;
 import ui.tables.TableModel;
 
+import javax.security.auth.spi.LoginModule;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -344,9 +345,10 @@ public class MainPanel {
 		try {
 			Port port = initSystem();
 			this.mapPanel.resetPort(port, this.controllerLogic);
+			LogListModel.clear();
 			this.controllerLogic.resetPort();
 		} catch (IOException e) {
-			e.printStackTrace();
+			LogListModel.add(ERROR_RESETTING_PORT);
 		}
 	}
 

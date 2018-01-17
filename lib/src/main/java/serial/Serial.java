@@ -1,5 +1,6 @@
 package serial;
 
+import helpers.Helpers;
 import jssc.*;
 import models.Frame;
 import protocol.FrameParser;
@@ -7,8 +8,6 @@ import ui.dialogs.COMPortChooser;
 
 import java.util.List;
 import java.util.Observable;
-
-import helpers.Helpers;
 
 import static serial.SerialExceptionMessages.*;
 
@@ -91,16 +90,6 @@ public class Serial extends Observable implements SerialPortEventListener {
 		}
 	}
 
-	public void writeStrings(List<String> stringList) throws SerialPortException {
-		for (String strByte : stringList) {
-			writeString(strByte);
-		}
-	}
-
-	public void writeString(String string) throws SerialPortException {
-		serialPort.writeString(string);
-	}
-
 	private void notifyFrame(Frame value) {
 		setChanged();
 		notifyObservers(value);
@@ -108,7 +97,7 @@ public class Serial extends Observable implements SerialPortEventListener {
 	}
 	
 	public void writeBytes(List<Byte> byteList) throws SerialPortException {
-		for(Byte b: byteList) {
+		for (Byte b : byteList) {
 			serialPort.writeByte(b);
 		}
 	}

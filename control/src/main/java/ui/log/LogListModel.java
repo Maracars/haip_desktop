@@ -18,16 +18,24 @@ public class LogListModel implements ListModel<String> {
 	public static void add(String text) {
 		messageList.add(text);
 		for (ListDataListener listener : listenerList) {
-			listener.intervalAdded(
-					new ListDataEvent(messageList, ListDataEvent.INTERVAL_ADDED, 0, messageList.size()));
+			listener.intervalAdded(new ListDataEvent(
+					messageList, ListDataEvent.INTERVAL_ADDED, 0, messageList.size()));
 		}
 	}
 
 	public static void remove(int index) {
 		messageList.remove(index);
 		for (ListDataListener listener : listenerList) {
-			listener.intervalRemoved(
-					new ListDataEvent(messageList, ListDataEvent.INTERVAL_REMOVED, index, index));
+			listener.intervalRemoved(new ListDataEvent(
+					messageList, ListDataEvent.INTERVAL_REMOVED, index, index));
+		}
+	}
+
+	public static void clear() {
+		messageList.clear();
+		for (ListDataListener listener : listenerList) {
+			listener.contentsChanged(new ListDataEvent(
+					messageList, ListDataEvent.CONTENTS_CHANGED, 0, messageList.size()));
 		}
 	}
 

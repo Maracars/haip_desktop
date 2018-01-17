@@ -1,23 +1,19 @@
 package protocol;
 
-import static protocol.ProtocolProperties.MASTER_ID;
+import helpers.Helpers;
+import models.Frame;
+import models.Ship;
+import models.Status;
+import protocol.ProtocolProperties.*;
+import serial.Serial;
+import ui.log.LogListModel;
 
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
 
-import helpers.Helpers;
-import models.Frame;
-import models.Ship;
-import models.Status;
-import protocol.ProtocolProperties.ActionType;
-import protocol.ProtocolProperties.DataType;
-import protocol.ProtocolProperties.PacketType;
-import protocol.ProtocolProperties.PermissionType;
-import protocol.ProtocolProperties.StatusType;
-import serial.Serial;
-import ui.log.LogListModel;
+import static protocol.ProtocolProperties.*;
 
 public class ShipLogic extends Observable implements Observer {
 	private Serial serial;
@@ -50,7 +46,7 @@ public class ShipLogic extends Observable implements Observer {
 		case TOKEN:
 			System.out.println("TOKEN");
 			LogListModel.add("Permission to talk: " + Integer.parseInt(ship.getId(), 2));
-			sendFrame = checkToken(frame, ship);
+			sendFrame = checkToken(ship);
 			replyController(sendFrame);
 			break;
 		default:
@@ -61,20 +57,19 @@ public class ShipLogic extends Observable implements Observer {
 	public void checkDiscovery(Frame frame, Ship ship) {
 		int timeWindow = Integer.parseInt(frame.getData().getTimeWindow(), 2);
 		Random interval = new Random();
-		int sleep = interval.nextInt(timeWindow*1000) + 1;
-		LogListModel.add("Interval for ship: "+ Integer.parseInt(ship.getId(),2) +", interval: "+sleep+" ms");
+		int delayMs = interval.nextInt(timeWindow*1000) + 1;
+		LogListModel.add("Interval for ship: " + Integer.parseInt(ship.getId(),2) + ", interval: " + delayMs + " ms");
 		Frame sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
-		waitForDiscoveryDelay(sleep, sendFrame);
+		ackDelay(sendFrame, delayMs);
 		ship.resetDiscoveryCounter();
 	}
 	
-	public void waitForDiscoveryDelay(long sleep, Frame frame) {
-		WaitForDiscovery waitDiscovery = new WaitForDiscovery(sleep, serial, frame);
-		Thread thread = new Thread(waitDiscovery);
-		thread.start();
+	private void ackDelay(Frame frame, long delayMs) {
+		AckDelayScheduler ackDelayScheduler = new AckDelayScheduler();
+		ackDelayScheduler.sendAckAfterDelay(frame, this.serial, delayMs);
 	}
 
-	public Frame checkToken(Frame frame, Ship ship) {
+	public Frame checkToken(Ship ship) {
 		Frame sendFrame = null;
 
 		if (simulation && ship.getStatus().getAction().equals(ActionType.IDLE.toString()) && ship.getIdleTime() >= 20) {
