@@ -108,6 +108,7 @@ public class ShipLogic extends Observable implements Observer {
 	}
 
 	public void checkShipMovement(Frame frame, Ship ship) {
+		System.out.println(frame.toString());
 		String dataType = frame.getData().getDataType();
 		String permission = frame.getData().getStatus().getPermission();
 		String frameStatus = frame.getData().getStatus().getStatus();

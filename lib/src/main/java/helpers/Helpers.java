@@ -16,7 +16,7 @@ public class Helpers {
 		return String.format("%" + num_bits + "s", Integer.toBinaryString((byte) Integer.parseInt(str) & 0xFF)).replace(' ', '0');
 	}
 
-	public static void sendParsedFrame(Frame frame, Serial serial) {
+	public static synchronized void sendParsedFrame(Frame frame, Serial serial) {
 		List<Byte> listBytes = FrameParser.parseTx(frame);
 		try {
 

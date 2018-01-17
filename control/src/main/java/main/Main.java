@@ -3,7 +3,6 @@ package main;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import ui.ControllerTest;
 import ui.panels.MainPanel;
 
 public class Main {
@@ -19,7 +18,7 @@ public class Main {
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
-		new ControllerTest();
+		new Main();
 
 	}
 
