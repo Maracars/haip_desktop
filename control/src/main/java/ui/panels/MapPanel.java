@@ -49,6 +49,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		this.port = port;
 
 		controllerLogic.addObserver(this);
+		this.shipList.clear();
 		this.repaintAllElements();
 	}
 

@@ -34,6 +34,7 @@ public class SimulationShipLogic implements Observer {
 				sendDataFromBoat(frame);
 				break;
 			case TOKEN:
+				LogListModel.add("Permission to talk: " + Integer.parseInt(frame.getDestinationId(), 2));
 				sendRequestFromBoat(frame);
 				break;
 			default:

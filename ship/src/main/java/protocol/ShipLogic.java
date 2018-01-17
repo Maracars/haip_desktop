@@ -62,6 +62,7 @@ public class ShipLogic extends Observable implements Observer {
 		int timeWindow = Integer.parseInt(frame.getData().getTimeWindow(), 2);
 		Random interval = new Random();
 		int sleep = interval.nextInt(timeWindow*1000) + 1;
+		LogListModel.add("Interval for ship: "+ Integer.parseInt(ship.getId(),2) +", interval: "+sleep+" ms");
 		Frame sendFrame = FrameCreator.createAck(ship.getId(), MASTER_ID);
 		waitForDiscoveryDelay(sleep, sendFrame);
 		ship.resetDiscoveryCounter();

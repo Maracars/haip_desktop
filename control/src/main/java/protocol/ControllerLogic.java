@@ -59,9 +59,8 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	@Override
 	public void run() {
 		while (active) {
-			if (serial != null && serial.isConnected()) {
-				Helpers.sendParsedFrame(FrameCreator.createDiscovery(), serial);
-			}
+			Frame frame = FrameCreator.createDiscovery();
+			sendFrame(frame);
 			LogListModel.add("Discovery is sent to boats");
 
 			try {
@@ -312,5 +311,14 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 	public Set<Integer> getDisconnectedShips() {
 		return disconnectedShips;
+	}
+
+	public void resetPort() {
+		receivedList.clear();
+		connectedShips.clear();
+		idleShips.clear();
+		disconnectedShips.clear();
+		idleTimeouts.clear();
+		disconnectTimeouts.clear();
 	}
 }

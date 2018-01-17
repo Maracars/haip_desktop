@@ -344,6 +344,7 @@ public class MainPanel {
 		try {
 			Port port = initSystem();
 			this.mapPanel.resetPort(port, this.controllerLogic);
+			this.controllerLogic.resetPort();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
