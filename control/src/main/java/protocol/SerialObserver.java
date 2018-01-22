@@ -27,7 +27,7 @@ public class SerialObserver implements Observer {
 			if (this.frame.getData() != null && this.frame.getHeader().getPacketType().equals(PacketType.DATA.toString())) {
 				if (!this.frame.getOriginId().equals(MASTER_ID)) {
 					int shipID = Integer.parseInt(this.frame.getOriginId(), 2);
-					int status = Integer.parseInt(this.frame.getData().getStatus().getStatus(), 2);
+					int status = Integer.parseInt(this.frame.getData().getStatus().getPosition(), 2);
 					int action = Integer.parseInt(this.frame.getData().getStatus().getAction(), 2);
 
 					TableData tableData = new TableData(shipID, status, action, false);

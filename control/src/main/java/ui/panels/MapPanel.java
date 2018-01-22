@@ -91,7 +91,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 
 	private void checkBoatPositionAndDraw(Graphics g, Ship ship) {
 		int x, y;
-		StatusType statusType = StatusType.getName(ship.getStatus().getStatus());
+		StatusType statusType = StatusType.getName(ship.getStatus().getPosition());
 		g.setColor(new Color(77, 244, 65));
 		checkBoatActionTypeAndPermissions(g, ship);
 		switch (statusType) {

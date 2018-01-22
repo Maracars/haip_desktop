@@ -2,18 +2,18 @@ package models;
 
 public class Status {
 
-	private String status;
+	private String position;
 	private String action;
 	private String permission;
 
-	public Status(String status, String action, String permission) {
-		this.status = status;
+	public Status(String position, String action, String permission) {
+		this.position = position;
 		this.action = action;
 		this.permission = permission;
 	}
 
-	public Status(String status, String action) {
-		this.status = status;
+	public Status(String position, String action) {
+		this.position = position;
 		this.action = action;
 	}
 
@@ -28,12 +28,12 @@ public class Status {
 		this.action = action;
 	}
 
-	public String getStatus() {
-		return status;
+	public String getPosition() {
+		return position;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setPosition(String position) {
+		this.position = position;
 	}
 
 	public String getPermission() {
@@ -46,6 +46,6 @@ public class Status {
 
 	@Override
 	public String toString() {
-		return status + action + permission;
+		return position + action + permission;
 	}
 }

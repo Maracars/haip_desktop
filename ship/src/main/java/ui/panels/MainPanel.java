@@ -230,7 +230,7 @@ public class MainPanel implements Observer {
 
 	private Component createStatusList() {
 		statusList = new JList<>(Helpers.getNames(StatusType.class));
-		String shipStatus = StatusType.getName(ship.getStatus().getStatus()).name();
+		String shipStatus = StatusType.getName(ship.getStatus().getPosition()).name();
 		statusRenderer = new StatusListRenderer(shipStatus);
 		statusList.setCellRenderer(statusRenderer);
 		statusList.setLayoutOrientation(JList.VERTICAL);
@@ -258,7 +258,7 @@ public class MainPanel implements Observer {
 	}
 
 	private void checkStatusLabel() {
-		statusLabel.setText("<html>Your status is: " + StatusType.getName(ship.getStatus().getStatus()).name() +
+		statusLabel.setText("<html>Your status is: " + StatusType.getName(ship.getStatus().getPosition()).name() +
 				"<br>You are asking for: " + ActionType.getName(ship.getStatus().getAction()).name() + "</html>");
 	}
 
@@ -286,7 +286,7 @@ public class MainPanel implements Observer {
 	}
 
 	private void repaintElements() {
-		statusRenderer.setStatusType(StatusType.getName(ship.getStatus().getStatus()).name());
+		statusRenderer.setStatusType(StatusType.getName(ship.getStatus().getPosition()).name());
 		statusList.repaint();
 		decisionList.repaint();
 		repaintLabels();

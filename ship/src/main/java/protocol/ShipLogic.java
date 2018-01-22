@@ -73,8 +73,8 @@ public class ShipLogic extends Observable implements Observer {
 		Frame sendFrame = null;
 
 		if (simulation && ship.getStatus().getAction().equals(ActionType.IDLE.toString()) && ship.getIdleTime() >= 20) {
-			Status newStatus = DecisionMaker.getRandomAction(StatusType.getName(ship.getStatus().getStatus()));
-			ship.setStatus(new Status(ship.getStatus().getStatus(), newStatus.getAction(), PermissionType.ASK.toString()));
+			Status newStatus = DecisionMaker.getRandomAction(StatusType.getName(ship.getStatus().getPosition()));
+			ship.setStatus(new Status(ship.getStatus().getPosition(), newStatus.getAction(), PermissionType.ASK.toString()));
 			ship.setActionList(new ArrayList<>());
 			ship.addAction(newStatus);
 		} else if (ship.getIdleTime() < 20 && simulation) {
@@ -106,8 +106,8 @@ public class ShipLogic extends Observable implements Observer {
 		System.out.println(frame.toString());
 		String dataType = frame.getData().getDataType();
 		String permission = frame.getData().getStatus().getPermission();
-		String frameStatus = frame.getData().getStatus().getStatus();
-		String actionStatus = ship.getActionList().get(0).getStatus();
+		String frameStatus = frame.getData().getStatus().getPosition();
+		String actionStatus = ship.getActionList().get(0).getPosition();
 		String frameAction = frame.getData().getStatus().getAction();
 		String framePermission = frame.getData().getStatus().getPermission();
 		String shipAction = ActionType.getName(ship.getStatus().getAction()).name();
@@ -119,12 +119,12 @@ public class ShipLogic extends Observable implements Observer {
 				LogListModel.add("Operation finish ship: " + shipId);
 				LogListModel.add("Ship " + shipId + " IDLE");
 				if (simulation) {
-					Status newStatus = DecisionMaker.getRandomAction(StatusType.getName(frame.getData().getStatus().getStatus()));
-					ship.setStatus(new Status(frame.getData().getStatus().getStatus(), newStatus.getAction(), PermissionType.ASK.toString()));
+					Status newStatus = DecisionMaker.getRandomAction(StatusType.getName(frame.getData().getStatus().getPosition()));
+					ship.setStatus(new Status(frame.getData().getStatus().getPosition(), newStatus.getAction(), PermissionType.ASK.toString()));
 					ship.setActionList(new ArrayList<>());
 					ship.addAction(newStatus);
 				} else {
-					ship.setStatus(new Status(frame.getData().getStatus().getStatus(), ActionType.IDLE.toString(), PermissionType.ASK.toString()));
+					ship.setStatus(new Status(frame.getData().getStatus().getPosition(), ActionType.IDLE.toString(), PermissionType.ASK.toString()));
 					ship.setActionList(new ArrayList<>());
 				}
 

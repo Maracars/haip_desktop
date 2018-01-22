@@ -170,7 +170,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 	private void checkRequest(Frame frame) {
 		Status nextStatus = frame.getData().getStatus();
-		String statusStr = nextStatus.getStatus();
+		String statusStr = nextStatus.getPosition();
 		String actionStr = nextStatus.getAction();
 
 		Ship ship = new Ship(frame.getOriginId());
@@ -208,7 +208,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	private void checkDockLeaveRequest(Ship ship, String actionStr, Status nextStatus, int shipID) {
 		boolean okay = port.addToTransitionZone(ship, actionStr);
 		if (okay) {
-			nextStatus.setStatus(StatusType.TRANSIT.toString());
+			nextStatus.setPosition(StatusType.TRANSIT.toString());
 			nextStatus.setAction(ActionType.LEAVE.toString());
 			nextStatus.setPermission(PermissionType.ALLOW.toString());
 			LogListModel.add("Ship " + shipID + " leaving dock");
@@ -220,11 +220,11 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 	private void checkTransitRequest(Ship ship, String actionStr, Status nextStatus, int shipID) {
 		if (actionStr.equals(ActionType.LEAVE.toString())) {
-			nextStatus.setStatus(StatusType.SEA.toString());
+			nextStatus.setPosition(StatusType.SEA.toString());
 			nextStatus.setPermission(PermissionType.ALLOW.toString());
 			LogListModel.add("Ship " + shipID + " leaving to the sea");
 		} else {
-			nextStatus.setStatus(StatusType.PARKING.toString());
+			nextStatus.setPosition(StatusType.PARKING.toString());
 			nextStatus.setPermission(PermissionType.ALLOW.toString());
 			LogListModel.add("Ship " + shipID + " entering dock");
 		}
@@ -241,7 +241,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 			boolean freeTransit = port.addToTransitionZone(ship, actionStr);
 
 			if (freeTransit) {
-				nextStatus.setStatus(StatusType.TRANSIT.toString());
+				nextStatus.setPosition(StatusType.TRANSIT.toString());
 				nextStatus.setAction(ActionType.ENTER.toString());
 				nextStatus.setPermission(PermissionType.ALLOW.toString());
 				LogListModel.add("Ship " + shipID + " entering transit zone");
@@ -299,18 +299,6 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		} else {
 			receivedList.add(frame);
 		}
-	}
-
-	public Set<Integer> getConnectedShips() {
-		return connectedShips;
-	}
-
-	public Set<Integer> getIdleShips() {
-		return idleShips;
-	}
-
-	public Set<Integer> getDisconnectedShips() {
-		return disconnectedShips;
 	}
 
 	public void resetPort() {

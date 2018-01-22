@@ -28,7 +28,7 @@ public class DataValidator implements Validator {
 			Map<Class, String> validator = new HashMap<Class, String>() {{
 				put(DataType.class, data.getDataType());
 				put(ActionType.class, status.getAction());
-				put(StatusType.class, status.getStatus());
+				put(StatusType.class, status.getPosition());
 				put(PermissionType.class, status.getPermission());
 			}};
 			if ((Integer.parseInt(frame.getHeader().getLength(), 2) * 8) != (data.toString().length()))
