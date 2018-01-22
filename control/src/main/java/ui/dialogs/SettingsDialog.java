@@ -101,14 +101,19 @@ public class SettingsDialog extends JDialog implements ActionListener {
 	}
 
 	private boolean checkFields() {
-		for (int i = 0; i < fieldList.size(); i++) {
-			if (fieldList.get(i).getText().trim().isEmpty()) {
+		for (TextFieldPanel textFieldPanel : fieldList) {
+			if (textFieldPanel.getText().trim().isEmpty()) {
 				JOptionPane.showMessageDialog(this, "Some of the fields are empty.",
 						"Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
-			if (isInteger(fieldList.get(i).getText()) == false) {
+			if (!isInteger(textFieldPanel.getText())) {
 				JOptionPane.showMessageDialog(this, "Some of the fields are not a number.",
+						"Error", JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+			if (Integer.parseInt(textFieldPanel.getText()) <= 0) {
+				JOptionPane.showMessageDialog(this, "Number must be greater than zero.",
 						"Error", JOptionPane.ERROR_MESSAGE);
 				return false;
 			}
