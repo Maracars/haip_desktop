@@ -72,20 +72,21 @@ public class ShipLogic extends Observable implements Observer {
 	public Frame checkToken(Ship ship) {
 		Frame sendFrame = null;
 
-		if (simulation && ship.getStatus().getAction().equals(ActionType.IDLE.toString()) && ship.getIdleTime() >= 20) {
+		if (simulation && ship.getStatus().getAction().equals(ActionType.IDLE.toString()) && ship.getIdleTime() >= 10) {
 			Status newStatus = DecisionMaker.getRandomAction(StatusType.getName(ship.getStatus().getPosition()));
 			ship.setStatus(new Status(ship.getStatus().getPosition(), newStatus.getAction(), PermissionType.ASK.toString()));
 			ship.setActionList(new ArrayList<>());
 			ship.addAction(newStatus);
-		} else if (ship.getIdleTime() < 20 && simulation) {
+		} else if (ship.getIdleTime() < 10 && simulation) {
 			ship.addIdleTime(1);
+			ship.addDiscoveryCounter();
 		}
 
 		if (ship.getActionList().size() > 0) {
 			ship.addDiscoveryCounter();
 			if (ship.getActionList().get(0).getAction().equals(ActionType.IDLE.toString())) {
 				sendFrame = FrameCreator.createStatus(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
-				LogListModel.add("Ship number " + Integer.parseInt(ship.getId()) + " sends STATUS");
+				LogListModel.add("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends STATUS");
 			} else if (ship.getActionList().get(0).getAction().equals(ActionType.ENTER.toString()) || ship.getActionList().get(0).getAction().equals(ActionType.LEAVE.toString())) {
 				sendFrame = FrameCreator.createRequest(ship.getId(), ProtocolProperties.MASTER_ID, ship.getStatus());
 				LogListModel.add("Ship number " + Integer.parseInt(ship.getId(), 2) + " sends REQUEST");

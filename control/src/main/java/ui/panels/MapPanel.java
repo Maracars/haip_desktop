@@ -15,6 +15,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MapPanel extends JPanel implements ComponentListener, Observer {
 	private static final long serialVersionUID = 1L;
@@ -39,7 +40,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		this.setLayout(new BorderLayout());
 		this.addComponentListener(this);
 
-		this.shipList = new ArrayList<>();
+		this.shipList = new CopyOnWriteArrayList<>();
 		this.port = port;
 
 		controllerLogic.addObserver(this);

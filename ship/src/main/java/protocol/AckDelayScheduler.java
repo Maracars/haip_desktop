@@ -20,6 +20,11 @@ public class AckDelayScheduler {
 	}
 
 	public void sendAckAfterDelay(Frame frame, Serial serial, long delayMs) {
-		scheduler.schedule(() -> Helpers.sendParsedFrame(frame, serial), delayMs, MILLISECONDS);
+		scheduler.schedule(() -> sendAck(frame, serial), delayMs, MILLISECONDS);
+	}
+	
+	public void sendAck(Frame frame, Serial serial) {
+		Helpers.sendParsedFrame(frame, serial);
+		LogListModel.add("ACK sent by ship: "+Integer.parseInt(frame.getOriginId(), 2));
 	}
 }
