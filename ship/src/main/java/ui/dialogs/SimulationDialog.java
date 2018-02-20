@@ -130,8 +130,10 @@ public class SimulationDialog extends JDialog implements ActionListener {
 		bStop.setEnabled(true);
 		bStart.setEnabled(false);
 		simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic.getShipLogic());
+		simShipLogic.getShipLogic().getSocketClient().deleteObserver(simShipLogic.getShipLogic());
 		simShipLogic.getShipLogic().setSimulationStarted();
 		simShipLogic.getShipLogic().getSerial().addObserver(simShipLogic);
+		simShipLogic.getShipLogic().getSocketClient().addObserver(simShipLogic);
 	}
 
 	private void stopSimulation() {
@@ -140,6 +142,7 @@ public class SimulationDialog extends JDialog implements ActionListener {
 
 		simShipLogic.getShipLogic().setSimulationStopped();
 		simShipLogic.getShipLogic().getSerial().deleteObserver(simShipLogic);
+		simShipLogic.getShipLogic().getSocketClient().deleteObserver(simShipLogic);
 	}
 
 }

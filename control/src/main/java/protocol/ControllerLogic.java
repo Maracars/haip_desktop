@@ -26,7 +26,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	private Serial serial;
 	private Thread thread;
 	private volatile boolean active;
-	
+
 	private SocketServer socketServer;
 
 	@SuppressWarnings("unchecked")
@@ -92,7 +92,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 		System.out.println("Sent token to ship number " + shipId);
 		//if (serial != null && serial.isConnected()) {
-			Helpers.sendParsedFrame(fr, serial, socketServer, null);
+		Helpers.sendParsedFrame(fr, serial, socketServer, null);
 		//}
 
 		startingTime = System.currentTimeMillis();
@@ -267,13 +267,14 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 	private void sendFrame(Frame frame) {
 		Helpers.sendParsedFrame(frame, serial, socketServer, null);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		if (serial != null && serial.isConnected()) {
-			
-			/*try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}*/
+
+
 		} else {
 			System.out.println("Sent frame");
 		}

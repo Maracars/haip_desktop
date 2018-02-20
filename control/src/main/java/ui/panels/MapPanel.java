@@ -129,7 +129,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 				y = seaHeight + transitHeight / 2 - BOAT_HEIGHT / 2;
 				g.drawImage(shipIcon, x, y, BOAT_WIDTH, BOAT_HEIGHT, null);
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
-						x + BOAT_WIDTH / 2 - 4, y + BOAT_HEIGHT / 2 + 3);
+						x + BOAT_WIDTH / 2 - 4, y - BOAT_HEIGHT / 2 + 3);
 				g.setColor(Color.BLACK);
 				break;
 			case SEA:
@@ -137,7 +137,7 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 				g.drawImage(shipIcon, (int) pointSea.getX(), (int) pointSea.getY(), BOAT_WIDTH, BOAT_HEIGHT, null);
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
 						(int) (pointSea.getX() + BOAT_WIDTH / 2 - 4),
-						(int) (pointSea.getY() + BOAT_HEIGHT / 2 + 3));
+						(int) (pointSea.getY() - BOAT_HEIGHT / 2 + 3));
 				g.setColor(Color.BLACK);
 				break;
 		}
