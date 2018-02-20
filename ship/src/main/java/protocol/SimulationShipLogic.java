@@ -64,6 +64,8 @@ public class SimulationShipLogic implements Observer {
 		for (Ship ship : simulationShips) {
 			if(ship.checkDiscovery()) {
 				shipLogic.checkDiscovery(receiveFrame, ship);
+			}else {
+				ship.addDiscoveryCounter();
 			}
 		}
 	}

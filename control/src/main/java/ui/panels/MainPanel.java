@@ -9,6 +9,7 @@ import models.Port;
 import protocol.ControllerLogic;
 import protocol.SerialObserver;
 import serial.Serial;
+import serial.SocketServer;
 import settings.Settings;
 import ui.dialogs.SettingsDialog;
 import ui.log.AutoScrollListPanel;
@@ -28,6 +29,7 @@ import java.awt.event.WindowEvent;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -54,6 +56,9 @@ public class MainPanel {
 
 	// Controller Logic
 	private ControllerLogic controllerLogic;
+	
+	//Socket
+	SocketServer socketServer;
 
 	public MainPanel() {
 		this.createJFrame();
@@ -69,8 +74,8 @@ public class MainPanel {
 	}
 
 	private void createJFrame() {
-		this.window = new JFrame("Haip Ain't an Infor Project");
-		this.window.setIconImage((new ImageIcon("control/src/main/resources/HAIP_squaredLogo.png").getImage()));
+		this.window = new JFrame("Momo Maritime Port Controller");
+		this.window.setIconImage((new ImageIcon("control/src/main/resources/MOMO.png").getImage()));
 		this.window.setLocation(0, 0);
 		this.window.setSize(new Dimension(java.awt.Toolkit.getDefaultToolkit().getScreenSize()));
 		this.window.setExtendedState(this.window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
@@ -126,12 +131,15 @@ public class MainPanel {
 		this.readSettings();
 
 		this.serial = new Serial();
+		this.socketServer = new SocketServer();
 		Port port = new Port(new Dock("Albert Dock", this.initMoorings()));
-		this.controllerLogic = new ControllerLogic(this.serial, port);
+		this.controllerLogic = new ControllerLogic(this.serial, port, socketServer);
 
 		SerialObserver serialObserver = new SerialObserver(this.tableModel);
 		this.serial.addObserver(this.controllerLogic);
+		this.socketServer.addObserver(this.controllerLogic);
 		this.serial.addObserver(serialObserver);
+		this.socketServer.addObserver(serialObserver);
 		this.controllerLogic.addObserver(serialObserver);
 
 		return port;
@@ -182,12 +190,12 @@ public class MainPanel {
 	}
 
 	private Component createHaipPanel() throws IOException {
-		ImagePanel logoPanel = new ImagePanel("control/src/main/resources/HAIP_logo.png");
+		ImagePanel logoPanel = new ImagePanel("control/src/main/resources/MOMO.png");
 		logoPanel.scaleImage(96, 96);
 
-		JLabel title = new JLabel("Haip");
+		JLabel title = new JLabel("MOMO");
 		title.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 32));
-		JLabel subtitle = new JLabel("Haip Ain't an Infor Project");
+		JLabel subtitle = new JLabel("Maritime Port controller");
 		subtitle.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 16));
 
 		JPanel textPanel = new JPanel();
@@ -280,7 +288,7 @@ public class MainPanel {
 
 	private void connect() {
 		try {
-			serial.openConnection();
+			//serial.openConnection();
 			connectButton.setText("Disconnect from board");
 			LogListModel.add(CONNECTION_ESTABLISHED);
 			logicAction.setEnabled(true);
@@ -291,7 +299,7 @@ public class MainPanel {
 
 	private void disconnect() {
 		try {
-			serial.closeConnection();
+			//serial.closeConnection();
 			connectButton.setText("Connect to board");
 			LogListModel.add(CONNECTION_CLOSED);
 			logicAction.setEnabled(false);
@@ -398,8 +406,7 @@ public class MainPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (!serial.isConnected()) connect();
-			else disconnect();
+			connect();
 		}
 	}
 

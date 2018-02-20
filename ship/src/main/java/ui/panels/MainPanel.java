@@ -319,19 +319,22 @@ public class MainPanel implements Observer {
 
 	private void connect() {
 		try {
-			this.serial.openConnection();
+			//this.serial.openConnection();
+			System.out.println("a");
+			shipLogic.connect();
 			this.connectButton.setText("Disconnect from board");
 			this.logicButton.setEnabled(true);
 			this.simulationAction.setEnabled(true);
 			LogListModel.add(CONNECTION_ESTABLISHED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			LogListModel.add(e.getMessage());
 		}
 	}
 
 	private void disconnect() {
 		try {
-			this.serial.closeConnection();
+			//this.serial.closeConnection();
 			this.simulationAction.setEnabled(false);
 			this.connectButton.setText("Connect to board");
 			this.logicButton.setEnabled(false);
@@ -344,6 +347,8 @@ public class MainPanel implements Observer {
 	private void waitForDiscovery() {
 		this.waitingForDiscovery = true;
 		this.serial.addObserver(this.shipLogic);
+		this.shipLogic.getSocketClient().addObserver(this.shipLogic);
+		shipLogic.waitForDiscovery();
 
 		this.logicButton.setText("Reject communications");
 		this.connectButton.setEnabled(false);
@@ -416,8 +421,7 @@ public class MainPanel implements Observer {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (!serial.isConnected()) connect();
-			else disconnect();
+			connect();
 		}
 	}
 

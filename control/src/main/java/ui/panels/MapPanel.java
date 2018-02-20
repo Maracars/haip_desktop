@@ -1,21 +1,33 @@
 package ui.panels;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+
 import models.Port;
 import models.Ship;
+import models.Status;
 import protocol.ControllerLogic;
 import protocol.ProtocolProperties;
 import protocol.ProtocolProperties.ActionType;
 import protocol.ProtocolProperties.PermissionType;
 import protocol.ProtocolProperties.StatusType;
 import settings.Settings;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MapPanel extends JPanel implements ComponentListener, Observer {
 	private static final long serialVersionUID = 1L;
@@ -85,44 +97,48 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 	private void paintBoats(Graphics g) {
 		for (Ship ship : shipList) {
 			if (ship.getStatus() != null) {
-				checkBoatPositionAndDraw(g, ship);
+				try {
+					checkBoatPositionAndDraw(g, ship);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
 
-	private void checkBoatPositionAndDraw(Graphics g, Ship ship) {
+	private void checkBoatPositionAndDraw(Graphics g, Ship ship) throws IOException {
 		int x, y;
 		StatusType statusType = StatusType.getName(ship.getStatus().getPosition());
 		g.setColor(new Color(77, 244, 65));
-		checkBoatActionTypeAndPermissions(g, ship);
+		File file = checkBoatActionTypeAndPermissions(g, ship);
+		BufferedImage shipIcon = ImageIO.read(file);
 		switch (statusType) {
 			case PARKING:
 				int parkingIndex = checkBoatParking(ship);
-				x = (panelLocation.x + (panelDimension.width / 2)) + (parkingIndex) * PARKING_WIDTH;
+				x = (panelLocation.x + (panelDimension.width / 2)) + (parkingIndex) * PARKING_WIDTH - 12;
 				y = panelDimension.height - (PARKING_HEIGHT / 2);
-				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
-				g.setColor(Color.BLACK);
+				g.drawImage(shipIcon, x, y, BOAT_WIDTH, BOAT_HEIGHT, null);
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
-						x + BOAT_WIDTH / 2 - 4, y + BOAT_HEIGHT / 2 + 3);
+						x + BOAT_WIDTH / 2 - 4, y - BOAT_HEIGHT / 2 + 3);
+				g.setColor(Color.BLACK);
 				break;
 			case TRANSIT:
 				int index = port.getTransitZone().indexOf(ship);
-				System.out.println(transitWidth);
 				x = (int) (panelLocation.getX() + transitWidth
 						+ (TRANSITION_WIDTH * index) + TRANSITION_WIDTH / 2 - BOAT_WIDTH / 2);
 				y = seaHeight + transitHeight / 2 - BOAT_HEIGHT / 2;
-				g.fillOval(x, y, BOAT_WIDTH, BOAT_HEIGHT);
-				g.setColor(Color.BLACK);
+				g.drawImage(shipIcon, x, y, BOAT_WIDTH, BOAT_HEIGHT, null);
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
 						x + BOAT_WIDTH / 2 - 4, y + BOAT_HEIGHT / 2 + 3);
+				g.setColor(Color.BLACK);
 				break;
 			case SEA:
 				Point pointSea = checkBoatLocation(ship);
-				g.fillOval((int) pointSea.getX(), (int) pointSea.getY(), BOAT_WIDTH, BOAT_HEIGHT);
-				g.setColor(Color.BLACK);
+				g.drawImage(shipIcon, (int) pointSea.getX(), (int) pointSea.getY(), BOAT_WIDTH, BOAT_HEIGHT, null);
 				g.drawString(Integer.toHexString(Integer.parseInt(ship.getId(), 2)),
 						(int) (pointSea.getX() + BOAT_WIDTH / 2 - 4),
 						(int) (pointSea.getY() + BOAT_HEIGHT / 2 + 3));
+				g.setColor(Color.BLACK);
 				break;
 		}
 	}
@@ -153,15 +169,16 @@ public class MapPanel extends JPanel implements ComponentListener, Observer {
 		}
 	}
 
-	private void checkBoatActionTypeAndPermissions(Graphics g, Ship ship) {
+	private File checkBoatActionTypeAndPermissions(Graphics g, Ship ship) {
 		ActionType actionType = ActionType.getName(ship.getStatus().getAction());
 		PermissionType pt = PermissionType.getName(ship.getStatus().getPermission());
 		if (actionType.equals(ActionType.IDLE)) {
-			g.setColor(new Color(244, 160, 65));
+			return new File("control/src/main/resources/Ship_icon_orange.png");
 		}
 		if (pt.equals(PermissionType.DENY)) {
-			g.setColor(new Color(244, 77, 65));
+			return new File("control/src/main/resources/Ship_icon_red.png");
 		}
+		return new File("control/src/main/resources/Ship_icon_green.png");
 	}
 
 	private void paintMoorings(Graphics g) {

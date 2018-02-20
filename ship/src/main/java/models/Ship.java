@@ -86,7 +86,6 @@ public class Ship {
 	}
 	
 	public boolean checkDiscovery() {
-		System.out.println("discovery counter: "+discoveryCounter);
 		if(discoveryCounter >= MAX_CYCLES_DISCOVERY || discoveryCounter == 0) {
 			return true;
 		}

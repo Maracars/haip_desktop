@@ -1,29 +1,36 @@
 package protocol;
 
-import helpers.Helpers;
-import models.Frame;
-import models.Ship;
-import models.Status;
-import protocol.ProtocolProperties.*;
-import serial.Serial;
-import ui.log.LogListModel;
+import static protocol.ProtocolProperties.MASTER_ID;
 
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
 
-import static protocol.ProtocolProperties.*;
+import helpers.Helpers;
+import models.Frame;
+import models.Ship;
+import models.Status;
+import protocol.ProtocolProperties.ActionType;
+import protocol.ProtocolProperties.DataType;
+import protocol.ProtocolProperties.PacketType;
+import protocol.ProtocolProperties.PermissionType;
+import protocol.ProtocolProperties.StatusType;
+import serial.Serial;
+import serial.SocketClient;
+import ui.log.LogListModel;
 
 public class ShipLogic extends Observable implements Observer {
 	private Serial serial;
 	private Ship ship;
 	private boolean simulation;
+	SocketClient socketClient;
 
-	public ShipLogic(Serial serial, Ship ship) {
+	public ShipLogic(Serial serial, Ship ship, SocketClient socketClient) {
 		this.serial = serial;
 		this.ship = ship;
 		simulation = false;
+		this.socketClient = socketClient;
 	}
 
 	@Override
@@ -66,7 +73,7 @@ public class ShipLogic extends Observable implements Observer {
 	
 	private void ackDelay(Frame frame, long delayMs) {
 		AckDelayScheduler ackDelayScheduler = new AckDelayScheduler();
-		ackDelayScheduler.sendAckAfterDelay(frame, this.serial, delayMs);
+		ackDelayScheduler.sendAckAfterDelay(frame, this.serial, delayMs, socketClient);
 	}
 
 	public Frame checkToken(Ship ship) {
@@ -100,7 +107,7 @@ public class ShipLogic extends Observable implements Observer {
 	}
 
 	public void replyController(Frame frame) {
-		Helpers.sendParsedFrame(frame, serial);
+		Helpers.sendParsedFrame(frame, serial, null, socketClient);
 	}
 
 	public void checkShipMovement(Frame frame, Ship ship) {
@@ -159,6 +166,14 @@ public class ShipLogic extends Observable implements Observer {
 		setChanged();
 		notifyObservers();
 	}
+	
+	public void connect() {
+		socketClient.connect();
+	}
+	
+	public void waitForDiscovery() {
+		socketClient.waitForCommunication();
+	}
 
 	public Serial getSerial() {
 		return serial;
@@ -171,5 +186,15 @@ public class ShipLogic extends Observable implements Observer {
 	public void setSimulationStopped() {
 		simulation = false;
 	}
+
+	public SocketClient getSocketClient() {
+		return socketClient;
+	}
+
+	public void setSocketClient(SocketClient socketClient) {
+		this.socketClient = socketClient;
+	}
+	
+	
 
 }

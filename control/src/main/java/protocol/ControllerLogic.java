@@ -4,6 +4,7 @@ import helpers.Helpers;
 import models.*;
 import protocol.ProtocolProperties.*;
 import serial.Serial;
+import serial.SocketServer;
 import ui.log.LogListModel;
 
 import java.util.*;
@@ -25,9 +26,11 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	private Serial serial;
 	private Thread thread;
 	private volatile boolean active;
+	
+	private SocketServer socketServer;
 
 	@SuppressWarnings("unchecked")
-	public ControllerLogic(Serial serial, Port port) {
+	public ControllerLogic(Serial serial, Port port, SocketServer socketServer) {
 		this.port = port;
 		this.receivedList = Collections.synchronizedList(new ArrayList());
 
@@ -37,6 +40,7 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 
 		this.idleTimeouts = new HashMap<>();
 		this.disconnectTimeouts = new HashMap<>();
+		this.socketServer = socketServer;
 
 		this.serial = serial;
 		this.active = false;
@@ -87,9 +91,9 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 		Frame fr = FrameCreator.createToken(ProtocolProperties.MASTER_ID, Helpers.toNbitBinaryString(shipIdStr, 8));
 
 		System.out.println("Sent token to ship number " + shipId);
-		if (serial != null && serial.isConnected()) {
-			Helpers.sendParsedFrame(fr, serial);
-		}
+		//if (serial != null && serial.isConnected()) {
+			Helpers.sendParsedFrame(fr, serial, socketServer, null);
+		//}
 
 		startingTime = System.currentTimeMillis();
 		do {
@@ -262,8 +266,9 @@ public class ControllerLogic extends Observable implements Observer, Runnable {
 	}
 
 	private void sendFrame(Frame frame) {
+		Helpers.sendParsedFrame(frame, serial, socketServer, null);
 		if (serial != null && serial.isConnected()) {
-			Helpers.sendParsedFrame(frame, serial);
+			
 			/*try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {

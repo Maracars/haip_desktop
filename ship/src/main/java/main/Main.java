@@ -8,6 +8,7 @@ import protocol.ProtocolProperties.StatusType;
 import protocol.ShipLogic;
 import protocol.SimulationShipLogic;
 import serial.Serial;
+import serial.SocketClient;
 import ui.panels.MainPanel;
 
 import javax.swing.*;
@@ -22,13 +23,14 @@ public class Main {
 		Status newStatus = new Status(StatusType.PARKING.toString(), ActionType.ENTER.toString());
 		ship.addAction(newStatus);
 		Serial serial = new Serial();
+		SocketClient socketClient = new SocketClient();
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
 
-		ShipLogic shipLogic = new ShipLogic(serial, ship);
+		ShipLogic shipLogic = new ShipLogic(serial, ship, socketClient);
 		SimulationShipLogic simulationShipLogic = new SimulationShipLogic(shipLogic);
 		MainPanel panel = new MainPanel(serial, ship, shipLogic, simulationShipLogic);
 		shipLogic.addObserver(panel);
