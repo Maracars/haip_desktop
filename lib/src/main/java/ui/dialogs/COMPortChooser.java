@@ -28,9 +28,9 @@ public class COMPortChooser extends JDialog implements ActionListener {
 	}
 
 	private JPanel createWindowPanel() {
-		JPanel panel = new JPanel(new BorderLayout(10, 10));
+		JPanel panel = new JPanel(new BorderLayout(15, 15));
 
-		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 		panel.add(createText(), BorderLayout.NORTH);
 		panel.add(createComboBox(), BorderLayout.CENTER);
 		panel.add(createButtonPanel(), BorderLayout.SOUTH);
@@ -40,7 +40,7 @@ public class COMPortChooser extends JDialog implements ActionListener {
 
 	private Component createButtonPanel() {
 		JPanel panel = new JPanel();
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 15));
 		panel.setAlignmentX(0.f);
 
 		bOk = new JButton("Ok");
